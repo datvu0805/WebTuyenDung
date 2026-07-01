@@ -2,6 +2,8 @@ package model;
 
 import constant.ScoreType;
 
+
+// Bảng chứng chỉ
 public class Certificates extends BaseEntity{
     private String certificatesName;
     private ScoreType scoreType;

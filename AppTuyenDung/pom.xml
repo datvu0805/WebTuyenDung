@@ -21,7 +21,6 @@
   </properties>
 
   <dependencies>
-
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -47,7 +46,14 @@
       <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
+HEAD
 
+
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.7.7</version>
+    </dependency>
   </dependencies>
 
 </project>

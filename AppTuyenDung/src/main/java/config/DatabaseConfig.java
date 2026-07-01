@@ -6,7 +6,5 @@ public class DatabaseConfig {
     public static final String Password = "123456";
     public static final String DB = "webtuyendung";
 
-    public static  DatabaseConfig getConnection() throws SQLException {
-        return DriverManager.getConnection(Url,User,Password);
-    }
+    private DatabaseConfig() {}
 }

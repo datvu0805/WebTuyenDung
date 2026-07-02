@@ -5,7 +5,7 @@ import model.Certificates;
 
 import java.util.List;
 
-public class CertificatesDAO extends DatabaseConfig implements IDAO<Certificates>{
+public class CertificatesDAO extends DatabaseConfig implements TDAO<Certificates>{
 
 
     @Override

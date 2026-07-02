@@ -5,7 +5,7 @@ import model.FavoriteJobs;
 
 import java.util.List;
 
-public class FavoriteJobsDAO extends DatabaseConfig implements IDAO<FavoriteJobs> {
+public class FavoriteJobsDAO extends DatabaseConfig implements TDAO<FavoriteJobs> {
     @Override
     public void add(FavoriteJobs entity) {
 

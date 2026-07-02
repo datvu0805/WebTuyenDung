@@ -5,7 +5,7 @@ import java.time.LocalDate;
 
 // Bảng chứng chỉ của ứng viên
 public class CandidateCertificates extends BaseEntity{
-    private int candidateID;
+    private Candidates candidateID;
     private Certificates certificatesID;
     private String score;
 // Ngày cấp chứng chỉ
@@ -15,7 +15,7 @@ public class CandidateCertificates extends BaseEntity{
 // Mô tả thêm
     private String description;
 
-    public CandidateCertificates(int candidateID, Certificates certificatesID, String score, LocalDate issueDate, LocalDate expiryDate, String description) {
+    public CandidateCertificates(Candidates candidateID, Certificates certificatesID, String score, LocalDate issueDate, LocalDate expiryDate, String description) {
         this.candidateID = candidateID;
         this.certificatesID = certificatesID;
         this.score = score;
@@ -24,7 +24,7 @@ public class CandidateCertificates extends BaseEntity{
         this.description = description;
     }
 
-    public CandidateCertificates(int id, int candidateID, Certificates certificatesID, String score, LocalDate issueDate, LocalDate expiryDate, String description) {
+    public CandidateCertificates(int id, Candidates candidateID, Certificates certificatesID, String score, LocalDate issueDate, LocalDate expiryDate, String description) {
         super(id);
         this.candidateID = candidateID;
         this.certificatesID = certificatesID;
@@ -34,11 +34,11 @@ public class CandidateCertificates extends BaseEntity{
         this.description = description;
     }
 
-    public int getCandidateID() {
+    public Candidates getCandidateID() {
         return candidateID;
     }
 
-    public void setCandidateID(int candidateID) {
+    public void setCandidateID(Candidates candidateID) {
         this.candidateID = candidateID;
     }
 

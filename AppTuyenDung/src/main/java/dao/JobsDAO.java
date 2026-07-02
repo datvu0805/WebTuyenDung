@@ -7,7 +7,7 @@ import model.Skills;
 
 import java.util.List;
 
-public class JobsDAO extends DatabaseConfig implements IDAO<Jobs>{
+public class JobsDAO extends DatabaseConfig implements TDAO<Jobs>{
     @Override
     public void add(Jobs entity) {
 

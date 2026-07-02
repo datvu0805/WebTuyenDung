@@ -3,28 +3,28 @@ package model;
 import java.time.LocalDateTime;
 
 public class FavoriteJobs extends BaseEntity{
-    private int candidateID;
+    private Candidates candidateID;
     private Jobs jobID;
     private LocalDateTime savedAt;
 
-    public FavoriteJobs(int candidateID, Jobs jobID, LocalDateTime savedAt) {
+    public FavoriteJobs(Candidates candidateID, Jobs jobID, LocalDateTime savedAt) {
         this.candidateID = candidateID;
         this.jobID = jobID;
         this.savedAt = savedAt;
     }
 
-    public FavoriteJobs(int id, int candidateID, Jobs jobID, LocalDateTime savedAt) {
+    public FavoriteJobs(int id, Candidates candidateID, Jobs jobID, LocalDateTime savedAt) {
         super(id);
         this.candidateID = candidateID;
         this.jobID = jobID;
         this.savedAt = savedAt;
     }
 
-    public int getCandidateID() {
+    public Candidates getCandidateID() {
         return candidateID;
     }
 
-    public void setCandidateID(int candidateID) {
+    public void setCandidateID(Candidates candidateID) {
         this.candidateID = candidateID;
     }
 

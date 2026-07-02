@@ -3,7 +3,7 @@ package model;
 import java.time.LocalDateTime;
 
 public class Jobs extends BaseEntity{
-    private int employerID;
+    private Employers employerID;
     private String title;
     private String description;
     private Double salary;
@@ -15,7 +15,7 @@ public class Jobs extends BaseEntity{
     private LocalDateTime applicationDeadline;
     private Short status;
 
-    public Jobs(int employerID, String title, String description, Double salary, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status) {
+    public Jobs(Employers employerID, String title, String description, Double salary, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status) {
         this.employerID = employerID;
         this.title = title;
         this.description = description;
@@ -29,7 +29,7 @@ public class Jobs extends BaseEntity{
         this.status = status;
     }
 
-    public Jobs(int id, int employerID, String title, String description, Double salary, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status) {
+    public Jobs(int id, Employers employerID, String title, String description, Double salary, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status) {
         super(id);
         this.employerID = employerID;
         this.title = title;
@@ -44,11 +44,11 @@ public class Jobs extends BaseEntity{
         this.status = status;
     }
 
-    public int getEmployerID() {
+    public Employers getEmployerID() {
         return employerID;
     }
 
-    public void setEmployerID(int employerID) {
+    public void setEmployerID(Employers employerID) {
         this.employerID = employerID;
     }
 

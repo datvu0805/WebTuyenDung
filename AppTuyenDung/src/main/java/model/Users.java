@@ -1,11 +1,8 @@
 package model;
 
-import model.BaseEntity;
-import model.Role;
-
 import java.time.LocalDate;
 
-public class User {
+public class Users {
         private String username;
         private String password;
         private String fullName;
@@ -16,12 +13,12 @@ public class User {
         private String address;
         private Role role;
 
-        public User() {
+        public Users() {
         }
 
-        public User(String username, String password, String fullName,
-                    String avatarUrl, String email, LocalDate dateOfBirth,
-                    String phoneNumber, String address, Role role) {
+        public Users(String username, String password, String fullName,
+                     String avatarUrl, String email, LocalDate dateOfBirth,
+                     String phoneNumber, String address, Role role) {
 
             this.username = username;
             this.password = password;

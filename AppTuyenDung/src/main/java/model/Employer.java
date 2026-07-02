@@ -2,7 +2,7 @@ package model;
 
 public class Employer extends BaseEntity {
 
-    private User user;
+    private Users user;
     private Company company;
 
     public Employer() {
@@ -13,16 +13,16 @@ public class Employer extends BaseEntity {
         return "";
     }
 
-    public Employer(User user, Company company) {
+    public Employer(Users user, Company company) {
         this.user = user;
         this.company = company;
     }
 
-    public User getUser() {
+    public Users getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(Users user) {
         this.user = user;
     }
 

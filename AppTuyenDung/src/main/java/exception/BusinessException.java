@@ -1,4 +1,6 @@
-package org.example.exception;
+package exception;
 
-public class BusinessException {
+public class BusinessException extends RuntimeException{
+
+
 }

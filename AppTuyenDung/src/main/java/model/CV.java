@@ -1,0 +1,76 @@
+package model;
+
+// class CV của ứng viên
+public class CV extends BaseEntity{
+
+    private int candidateId;
+    private String cvTitle;
+    private String avatarURl;
+    private String description;
+    private String version;
+
+    public CV() {
+    }
+
+    public CV(int candidateId, String cvTitle, String avatarURl, String description, String version) {
+        this.candidateId = candidateId;
+        this.cvTitle = cvTitle;
+        this.avatarURl = avatarURl;
+        this.description = description;
+        this.version = version;
+    }
+
+    public CV(int id, int candidateId, String cvTitle, String avatarURl, String description, String version) {
+        super(id);
+        this.candidateId = candidateId;
+        this.cvTitle = cvTitle;
+        this.avatarURl = avatarURl;
+        this.description = description;
+        this.version = version;
+    }
+
+    public int getCandidateId() {
+        return candidateId;
+    }
+
+    public void setCandidateId(int candidateId) {
+        this.candidateId = candidateId;
+    }
+
+    public String getCvTitle() {
+        return cvTitle;
+    }
+
+    public void setCvTitle(String cvTitle) {
+        this.cvTitle = cvTitle;
+    }
+
+    public String getAvatarURl() {
+        return avatarURl;
+    }
+
+    public void setAvatarURl(String avatarURl) {
+        this.avatarURl = avatarURl;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
+
+    @Override
+    public String getInfo() {
+        return "";
+    }
+}

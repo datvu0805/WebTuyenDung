@@ -2,22 +2,22 @@ package model;
 
 // Tin nhắn
 public class Message extends BaseEntity{
-    private int senderID;
-    private int receiverID;
+    private Users senderID;
+    private Users receiverID;
     private String messageConntent;
     private boolean isRead;
 
     public Message() {
     }
 
-    public Message(int senderID, int receiverID, String messageConntent, boolean isRead) {
+    public Message(Users senderID, Users receiverID, String messageConntent, boolean isRead) {
         this.senderID = senderID;
         this.receiverID = receiverID;
         this.messageConntent = messageConntent;
         this.isRead = isRead;
     }
 
-    public Message(int id, int senderID, int receiverID, String messageConntent, boolean isRead) {
+    public Message(int id, Users senderID, Users receiverID, String messageConntent, boolean isRead) {
         super(id);
         this.senderID = senderID;
         this.receiverID = receiverID;
@@ -25,19 +25,19 @@ public class Message extends BaseEntity{
         this.isRead = isRead;
     }
 
-    public int getSenderID() {
+    public Users getSenderID() {
         return senderID;
     }
 
-    public void setSenderID(int senderID) {
+    public void setSenderID(Users senderID) {
         this.senderID = senderID;
     }
 
-    public int getReceiverID() {
+    public Users getReceiverID() {
         return receiverID;
     }
 
-    public void setReceiverID(int receiverID) {
+    public void setReceiverID(Users receiverID) {
         this.receiverID = receiverID;
     }
 

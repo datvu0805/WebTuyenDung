@@ -2,6 +2,7 @@ package dao;
 
 import config.DatabaseConfig;
 import model.CV;
+import model.Candidates;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,10 +12,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CVDAO extends DatabaseConfig {
+public class CVDAO extends DatabaseConfig  implements IDAO<CV>{
     // thêm một CV mới(khi ứng viên upload CV lên hệ thômngs
-    public boolean insertCV(CV cv) throws SQLException {
-        String sql =  "INSERT INTO cvs(candidate_id, cv_title, file_url, avatar_url, description, version, created_at, update_at"
+    @Override
+    public void add(CV cv) {
+        String sql =  "INSERT INTO cvs(candidate_id, cv_title, file_url, avatar_url, description, version, created_at, update_at)"
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try(Connection conn = getConnection();
@@ -30,14 +32,19 @@ public class CVDAO extends DatabaseConfig {
             ps.setObject(8, cv.getUpdatedAt());
 
             int result = ps.executeUpdate();
-            return result > 0;
+
         }catch (Exception e){
             e.printStackTrace();
         }
-        return false;
+    }
+
+    @Override
+    public void update(CV entity) {
+
     }
 
     // lấy ra tất cả CV của từng ứng viên
+
     public List<CV> getCVByCandidateID( int candidateID){
         List<CV> list = new ArrayList<>();
         String sql = "SELECT * FROM cvs WHERE candidate_id = ?";
@@ -50,11 +57,15 @@ public class CVDAO extends DatabaseConfig {
                 while(rs.next()){
                     CV cv = new CV();
                     cv.setId(rs.getInt("id"));
-                    cv.setCandidateId(rs.get("candidate_id"));
+
+                    Candidates candidates = new Candidates();
+                    candidates.setId( rs.getInt("candidate_id"));
+                    cv.setCandidateId(candidates);
+
                     cv.setCvTitle(rs.getString("cv_title"));
                     cv.setFileUrl(rs.getString("file_url"));
                     cv.setAvatarURl(rs.getString("avatar_url"));
-                    cv.setDescription(rs.getString("decription"));
+                    cv.setDescription(rs.getString("description"));
                     cv.setVersion(rs.getString("version"));
                     cv.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
                     cv.setUpdatedAt(rs.getObject("update_at", LocalDateTime.class));
@@ -70,19 +81,26 @@ public class CVDAO extends DatabaseConfig {
 
 
     // xóa một cv theo id
-    public boolean deleteCV(int cvID){
+    @Override
+    public void delete(int cvID){
         String sql = "DELETE FROM cvs WHERE id = ?";
         try(Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setInt(1, cvID);
 
-            int result = ps.executeUpdate();
-            return result > 0;
+            ps.executeUpdate();
+
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
     }
+
+    @Override
+    public List<CV> getAll() {
+        return List.of();
+    }
+
 
 }

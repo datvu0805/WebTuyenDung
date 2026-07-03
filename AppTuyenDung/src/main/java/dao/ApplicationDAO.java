@@ -2,20 +2,24 @@ package dao;
 
 import config.DatabaseConfig;
 import model.Application;
+import model.Candidates;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
-public class ApplicationDAO extends DatabaseConfig {
-    public boolean insertApplication(Application app) {
+public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> {
+
+    @Override
+    public void add(Application app) {
         String sql = "INSERT INTO applications(candidate_id, job_id, cv_id, applied_at, cover_letter, description, status, created_at, update_at" +
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, app.getCandidateID());
-            ps.setInt(2, app.getJodID());
-            ps.setInt(3, app.getCvID());
+            ps.setInt(1, app.getCandidateID().getId());
+            ps.setInt(2, app.getJodID().getId());
+            ps.setInt(3, app.getCvID().getId());
             ps.setObject(4, app.getAppliedAt());
             ps.setString(5, app.getCoverLetter());
             ps.setString(6, app.getDescription());
@@ -28,7 +32,22 @@ public class ApplicationDAO extends DatabaseConfig {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
-        return false;
     }
 
+    @Override
+    public void update(Application entity) {
+
     }
+
+    @Override
+    public void delete(int id) {
+
+    }
+
+    @Override
+    public List<Application> getAll() {
+        return List.of();
+    }
+
+
+}

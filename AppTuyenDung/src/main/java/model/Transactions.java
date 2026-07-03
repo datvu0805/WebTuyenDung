@@ -7,7 +7,7 @@ public class Transactions extends BaseEntity{
     private String transactionType;
     private Double amount;
     private int status;
-    private String conntent;
+    private String content;
 
     public Transactions() {
     }
@@ -17,7 +17,7 @@ public class Transactions extends BaseEntity{
         this.transactionType = transactionType;
         this.amount = amount;
         this.status = status;
-        this.conntent = conntent;
+        this.content = conntent;
     }
 
     public Transactions(int id, Users userID, String transactionType, Double amount, int status, String conntent) {
@@ -26,7 +26,7 @@ public class Transactions extends BaseEntity{
         this.transactionType = transactionType;
         this.amount = amount;
         this.status = status;
-        this.conntent = conntent;
+        this.content = conntent;
     }
 
     public Users getUserID() {
@@ -61,12 +61,12 @@ public class Transactions extends BaseEntity{
         this.status = status;
     }
 
-    public String getConntent() {
-        return conntent;
+    public String getContent() {
+        return content;
     }
 
-    public void setConntent(String conntent) {
-        this.conntent = conntent;
+    public void setContent(String conntent) {
+        this.content = conntent;
     }
 
     @Override

@@ -5,9 +5,9 @@ import java.time.LocalDateTime;
 
 // bảng đơn ứng tuyển
 public class Application extends BaseEntity{
-    private int candidateID;
-    private int jodID;
-    private int cvID;
+    private Candidate candidateID;
+    private Jobs jodID;
+    private CV cvID;
     private LocalDateTime appliedAt;
     private String coverLetter;
     private String description;
@@ -16,7 +16,7 @@ public class Application extends BaseEntity{
     public Application() {
     }
 
-    public Application(int candidateID, int jodID, int cvID, LocalDateTime appliedAt, String coverLetter, String description, int status) {
+    public Application(Candidate candidateID, Jobs jodID, CV cvID, LocalDateTime appliedAt, String coverLetter, String description, int status) {
         this.candidateID = candidateID;
         this.jodID = jodID;
         this.cvID = cvID;
@@ -26,7 +26,7 @@ public class Application extends BaseEntity{
         this.status = status;
     }
 
-    public Application(int id, int candidateID, int jodID, int cvID, LocalDateTime appliedAt, String coverLetter, String description, int status) {
+    public Application(int id, Candidate candidateID, Jobs jodID, CV cvID, LocalDateTime appliedAt, String coverLetter, String description, int status) {
         super(id);
         this.candidateID = candidateID;
         this.jodID = jodID;
@@ -37,27 +37,27 @@ public class Application extends BaseEntity{
         this.status = status;
     }
 
-    public int getCandidateID() {
+    public Candidate getCandidateID() {
         return candidateID;
     }
 
-    public void setCandidateID(int candidateID) {
+    public void setCandidateID(Candidate candidateID) {
         this.candidateID = candidateID;
     }
 
-    public int getJodID() {
+    public Jobs getJodID() {
         return jodID;
     }
 
-    public void setJodID(int jodID) {
+    public void setJodID(Jobs jodID) {
         this.jodID = jodID;
     }
 
-    public int getCvID() {
+    public CV getCvID() {
         return cvID;
     }
 
-    public void setCvID(int cvID) {
+    public void setCvID(CV cvID) {
         this.cvID = cvID;
     }
 

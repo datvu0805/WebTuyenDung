@@ -3,7 +3,7 @@ package model;
 // class CV của ứng viên
 public class CV extends BaseEntity{
 
-    private int candidateId;
+    private Candidate candidateId;
     private String cvTitle;
     private String fileUrl;
     private String avatarURl;
@@ -15,7 +15,7 @@ public class CV extends BaseEntity{
 
 
 
-    public CV(int candidateId, String cvTitle, String fileUrl, String avatarURl, String description, String version) {
+    public CV(Candidate candidateId, String cvTitle, String fileUrl, String avatarURl, String description, String version) {
         this.candidateId = candidateId;
         this.cvTitle = cvTitle;
         this.fileUrl = fileUrl;
@@ -24,7 +24,7 @@ public class CV extends BaseEntity{
         this.version = version;
     }
 
-    public CV(int id, int candidateId, String cvTitle, String fileUrl, String avatarURl, String description, String version) {
+    public CV(int id, Candidate candidateId, String cvTitle, String fileUrl, String avatarURl, String description, String version) {
         super(id);
         this.candidateId = candidateId;
         this.cvTitle = cvTitle;
@@ -35,7 +35,7 @@ public class CV extends BaseEntity{
     }
 
     public int getCandidateId() {
-        return candidateId;
+        return candidateId.getId();
     }
 
     public void setCandidateId(int candidateId) {

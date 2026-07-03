@@ -2,7 +2,7 @@ package model;
 
 // gói dịch vụ VIP
 public class ServicePackages extends BaseEntity{
-    private String packageName;
+    private ServicePackages packageName;
     private String targetAudience;
     private Double price;
     private int durationDays;
@@ -12,7 +12,7 @@ public class ServicePackages extends BaseEntity{
     public ServicePackages() {
     }
 
-    public ServicePackages(String packageName, String targetAudience, Double price, int durationDays, String benifitType, String description) {
+    public ServicePackages(ServicePackages packageName, String targetAudience, Double price, int durationDays, String benifitType, String description) {
         this.packageName = packageName;
         this.targetAudience = targetAudience;
         this.price = price;
@@ -21,7 +21,7 @@ public class ServicePackages extends BaseEntity{
         this.description = description;
     }
 
-    public ServicePackages(int id, String packageName, String targetAudience, Double price, int durationDays, String benifitType, String description) {
+    public ServicePackages(int id, ServicePackages packageName, String targetAudience, Double price, int durationDays, String benifitType, String description) {
         super(id);
         this.packageName = packageName;
         this.targetAudience = targetAudience;
@@ -31,11 +31,11 @@ public class ServicePackages extends BaseEntity{
         this.description = description;
     }
 
-    public String getPackageName() {
+    public ServicePackages getPackageName() {
         return packageName;
     }
 
-    public void setPackageName(String packageName) {
+    public void setPackageName(ServicePackages packageName) {
         this.packageName = packageName;
     }
 

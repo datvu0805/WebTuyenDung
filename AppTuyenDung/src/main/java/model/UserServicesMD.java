@@ -1,20 +1,19 @@
 package model;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 // lịch sử đăng kí dịch vu
-public class UserService extends BaseEntity{
-    private int userID;
-    private int packageID;
+public class UserServicesMD extends BaseEntity{
+    private User userID;
+    private ServicePackages packageID;
     private LocalDate startDate;
     private LocalDate endDate;
     private String status;
 
-    public UserService() {
+    public UserServicesMD() {
     }
 
-    public UserService(int userID, int packageID, LocalDate startDate, LocalDate endDate, String status) {
+    public UserServicesMD(User userID, ServicePackages packageID, LocalDate startDate, LocalDate endDate, String status) {
         this.userID = userID;
         this.packageID = packageID;
         this.startDate = startDate;
@@ -22,7 +21,7 @@ public class UserService extends BaseEntity{
         this.status = status;
     }
 
-    public UserService(int id, int userID, int packageID, LocalDate startDate, LocalDate endDate, String status) {
+    public UserServicesMD(int id, User userID, ServicePackages packageID, LocalDate startDate, LocalDate endDate, String status) {
         super(id);
         this.userID = userID;
         this.packageID = packageID;
@@ -31,17 +30,17 @@ public class UserService extends BaseEntity{
         this.status = status;
     }
 
-    public int getUserID() {return userID;}
+    public User getUserID() {return userID;}
 
-    public void setUserID(int userID) {
+    public void setUserID(User userID) {
         this.userID = userID;
     }
 
-    public int getPackageID() {
+    public ServicePackages getPackageID() {
         return packageID;
     }
 
-    public void setPackageID(int packageID) {
+    public void setPackageID(ServicePackages packageID) {
         this.packageID = packageID;
     }
 

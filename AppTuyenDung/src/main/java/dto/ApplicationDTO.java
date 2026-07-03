@@ -1,11 +1,14 @@
 package dto;
 
+import model.Application;
+import model.Candidates;
+
 import java.time.LocalTime;
 
 // quản lý đơn ứng tuyển
 public class ApplicationDTO {
-    private int applicationID;
-    private String candidateName;
+    private Application applicationID;
+    private Candidates candidateName;
     private String jobTitle;
     private String cvTitle;
     private String fileUrl;
@@ -15,7 +18,7 @@ public class ApplicationDTO {
     public ApplicationDTO() {
     }
 
-    public ApplicationDTO(int applicationID, String candidateName, String jobTitle, String cvTitle, String fileUrl, LocalTime applieAt, int status) {
+    public ApplicationDTO(Application applicationID, Candidates candidateName, String jobTitle, String cvTitle, String fileUrl, LocalTime applieAt, int status) {
         this.applicationID = applicationID;
         this.candidateName = candidateName;
         this.jobTitle = jobTitle;
@@ -25,19 +28,19 @@ public class ApplicationDTO {
         this.status = status;
     }
 
-    public int getApplicationID() {
+    public Application getApplicationID() {
         return applicationID;
     }
 
-    public void setApplicationID(int applicationID) {
+    public void setApplicationID(Application applicationID) {
         this.applicationID = applicationID;
     }
 
-    public String getCandidateName() {
+    public Candidates getCandidateName() {
         return candidateName;
     }
 
-    public void setCandidateName(String candidateName) {
+    public void setCandidateName(Candidates candidateName) {
         this.candidateName = candidateName;
     }
 

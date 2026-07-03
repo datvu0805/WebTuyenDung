@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 // bảng đơn ứng tuyển
 public class Application extends BaseEntity{
-    private Candidate candidateID;
+    private Candidates candidateID;
     private Jobs jodID;
     private CV cvID;
     private LocalDateTime appliedAt;
@@ -16,7 +16,7 @@ public class Application extends BaseEntity{
     public Application() {
     }
 
-    public Application(Candidate candidateID, Jobs jodID, CV cvID, LocalDateTime appliedAt, String coverLetter, String description, int status) {
+    public Application(Candidates candidateID, Jobs jodID, CV cvID, LocalDateTime appliedAt, String coverLetter, String description, int status) {
         this.candidateID = candidateID;
         this.jodID = jodID;
         this.cvID = cvID;
@@ -26,7 +26,7 @@ public class Application extends BaseEntity{
         this.status = status;
     }
 
-    public Application(int id, Candidate candidateID, Jobs jodID, CV cvID, LocalDateTime appliedAt, String coverLetter, String description, int status) {
+    public Application(int id, Candidates candidateID, Jobs jodID, CV cvID, LocalDateTime appliedAt, String coverLetter, String description, int status) {
         super(id);
         this.candidateID = candidateID;
         this.jodID = jodID;
@@ -37,11 +37,11 @@ public class Application extends BaseEntity{
         this.status = status;
     }
 
-    public Candidate getCandidateID() {
+    public Candidates getCandidateID() {
         return candidateID;
     }
 
-    public void setCandidateID(Candidate candidateID) {
+    public void setCandidateID(Candidates candidateID) {
         this.candidateID = candidateID;
     }
 

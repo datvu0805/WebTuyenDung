@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 // lịch sử đăng kí dịch vu
 public class UserServicesMD extends BaseEntity{
-    private User userID;
+    private Users userID;
     private ServicePackages packageID;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -13,7 +13,7 @@ public class UserServicesMD extends BaseEntity{
     public UserServicesMD() {
     }
 
-    public UserServicesMD(User userID, ServicePackages packageID, LocalDate startDate, LocalDate endDate, String status) {
+    public UserServicesMD(Users userID, ServicePackages packageID, LocalDate startDate, LocalDate endDate, String status) {
         this.userID = userID;
         this.packageID = packageID;
         this.startDate = startDate;
@@ -21,7 +21,7 @@ public class UserServicesMD extends BaseEntity{
         this.status = status;
     }
 
-    public UserServicesMD(int id, User userID, ServicePackages packageID, LocalDate startDate, LocalDate endDate, String status) {
+    public UserServicesMD(int id, Users userID, ServicePackages packageID, LocalDate startDate, LocalDate endDate, String status) {
         super(id);
         this.userID = userID;
         this.packageID = packageID;
@@ -30,9 +30,9 @@ public class UserServicesMD extends BaseEntity{
         this.status = status;
     }
 
-    public User getUserID() {return userID;}
+    public Users getUserID() {return userID;}
 
-    public void setUserID(User userID) {
+    public void setUserID(Users userID) {
         this.userID = userID;
     }
 

@@ -50,7 +50,7 @@ public class CVDAO extends DatabaseConfig {
                 while(rs.next()){
                     CV cv = new CV();
                     cv.setId(rs.getInt("id"));
-                    cv.setCandidateId(rs.getInt("candidate_id"));
+                    cv.setCandidateId(rs.get("candidate_id"));
                     cv.setCvTitle(rs.getString("cv_title"));
                     cv.setFileUrl(rs.getString("file_url"));
                     cv.setAvatarURl(rs.getString("avatar_url"));

@@ -14,8 +14,9 @@ public class Jobs extends BaseEntity{
     private LocalDateTime expiredAt;
     private LocalDateTime applicationDeadline;
     private Short status;
+    private Boolean isHiddenOnExpiry;
 
-    public Jobs(Employers employerID, String title, String description, Double salary, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status) {
+    public Jobs(Employers employerID, String title, String description, Double salary, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status, Boolean isHiddenOnExpiry) {
         this.employerID = employerID;
         this.title = title;
         this.description = description;
@@ -27,9 +28,10 @@ public class Jobs extends BaseEntity{
         this.expiredAt = expiredAt;
         this.applicationDeadline = applicationDeadline;
         this.status = status;
+        this.isHiddenOnExpiry = isHiddenOnExpiry;
     }
 
-    public Jobs(int id, Employers employerID, String title, String description, Double salary, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status) {
+    public Jobs(int id, Employers employerID, String title, String description, Double salary, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status, Boolean isHiddenOnExpiry) {
         super(id);
         this.employerID = employerID;
         this.title = title;
@@ -42,6 +44,15 @@ public class Jobs extends BaseEntity{
         this.expiredAt = expiredAt;
         this.applicationDeadline = applicationDeadline;
         this.status = status;
+        this.isHiddenOnExpiry = isHiddenOnExpiry;
+    }
+
+    public Boolean getHiddenOnExpiry() {
+        return isHiddenOnExpiry;
+    }
+
+    public void setHiddenOnExpiry(Boolean hiddenOnExpiry) {
+        isHiddenOnExpiry = hiddenOnExpiry;
     }
 
     public Employers getEmployerID() {
@@ -131,8 +142,6 @@ public class Jobs extends BaseEntity{
     public void setStatus(Short status) {
         this.status = status;
     }
-
-
 
     @Override
     public String getInfo() {

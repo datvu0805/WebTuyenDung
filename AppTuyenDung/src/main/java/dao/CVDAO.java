@@ -22,7 +22,7 @@ public class CVDAO extends DatabaseConfig  implements IDAO<CV>{
         try(Connection conn = getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)){
 
-            ps.setInt(1, cv.getCandidateId());
+            ps.setInt(1,cv.getCandidateId());
             ps.setString(2, cv.getCvTitle());
             ps.setString(3, cv.getFileUrl());
             ps.setString(4, cv.getAvatarURl());

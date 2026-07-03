@@ -1,4 +1,5 @@
 package controller;
 
-public class ApplicationController {
+public class ApplicationController extends BaseServlet{
+
 }

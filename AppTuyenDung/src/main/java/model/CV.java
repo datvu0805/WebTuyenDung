@@ -14,7 +14,6 @@ public class CV extends BaseEntity{
     }
 
 
-
     public CV(Candidates candidateId, String cvTitle, String fileUrl, String avatarURl, String description, String version) {
         this.candidateId = candidateId;
         this.cvTitle = cvTitle;

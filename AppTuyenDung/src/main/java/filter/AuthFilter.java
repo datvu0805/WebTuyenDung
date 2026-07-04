@@ -1,4 +1,4 @@
-package org.example.filter;
+package filter;
 
 public class AuthFilter {
 }

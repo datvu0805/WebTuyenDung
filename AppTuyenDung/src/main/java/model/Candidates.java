@@ -12,10 +12,6 @@ public class Candidates extends BaseEntity {
         return "";
     }
 
-    public Candidates(Users user) {
-        this.user = user;
-    }
-
     public Users getUser() {
         return user;
     }

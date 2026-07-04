@@ -2,7 +2,7 @@ package model;
 
 import java.time.LocalDate;
 
-public class Users {
+public class Users extends BaseEntity{
         private String username;
         private String password;
         private String fullName;
@@ -16,7 +16,12 @@ public class Users {
         public Users() {
         }
 
-        public Users(String username, String password, String fullName,
+    @Override
+    public String getInfo() {
+        return "";
+    }
+
+    public Users(String username, String password, String fullName,
                      String avatarUrl, String email, LocalDate dateOfBirth,
                      String phoneNumber, String address, Role role) {
 
@@ -31,7 +36,20 @@ public class Users {
             this.role = role;
         }
 
-        public String getUsername() {
+    public Users(int id, String username, String password, String fullName, String avatarUrl, String email, LocalDate dateOfBirth, String phoneNumber, String address, Role role) {
+        super(id);
+        this.username = username;
+        this.password = password;
+        this.fullName = fullName;
+        this.avatarUrl = avatarUrl;
+        this.email = email;
+        this.dateOfBirth = dateOfBirth;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.role = role;
+    }
+
+    public String getUsername() {
             return username;
         }
 

@@ -6,11 +6,11 @@ import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class DatabaseConfig {
+public abstract class DatabaseConfig {
     private static HikariDataSource dataSource;
 
-    // Khối static này sẽ chạy 1 lần duy nhất khi ứng dụng nạp class DBConnection
-    static {
+    static {    // Khối static này sẽ chạy 1 lần duy nhất khi ứng dụng nạp class DBConnection
+
         try {
             HikariConfig config = new HikariConfig();
             config.setDriverClassName("org.postgresql.Driver"); // Khai báo Driver

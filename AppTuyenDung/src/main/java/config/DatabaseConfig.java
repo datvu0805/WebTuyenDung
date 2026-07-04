@@ -14,7 +14,7 @@ public class DatabaseConfig {
         try {
             HikariConfig config = new HikariConfig();
             config.setDriverClassName("org.postgresql.Driver"); // Khai báo Driver
-            config.setJdbcUrl("jdbc:postgres://103.216.117.40:15432/webtuyendung");
+            config.setJdbcUrl("jdbc:postgresql://103.216.117.40:15432/webtuyendung");
             config.setUsername("webtuyendung");
             config.setPassword("123456");
 

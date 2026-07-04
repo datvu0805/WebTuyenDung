@@ -8,6 +8,10 @@ public class Employers extends BaseEntity {
     public Employers() {
     }
 
+    public Employers(int id) {
+        super(id);
+    }
+
     @Override
     public String getInfo() {
         return "";

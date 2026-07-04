@@ -17,7 +17,7 @@ public class TransactionDAO extends DatabaseConfig implements IDAO<Transactions>
                 "VALUES(?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)){
-           ps.setInt(1, transactions.getUserID());
+//           ps.setInt(1, transactions.getUserID());
            ps.setString(2, transactions.getTransactionType());
            ps.setDouble(3, transactions.getAmount());
            ps.setInt(4, transactions.getStatus());

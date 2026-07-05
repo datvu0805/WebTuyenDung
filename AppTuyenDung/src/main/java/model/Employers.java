@@ -9,12 +9,10 @@ public class Employers extends BaseEntity {
     public Employers() {
     }
 
-<<<<<<< Updated upstream
 
 
 
-=======
->>>>>>> Stashed changes
+
     public Employers(int id, Users user, Company company,Role role) {
         super(id);
         this.user = user;
@@ -23,11 +21,9 @@ public class Employers extends BaseEntity {
     }
 
 
-<<<<<<< Updated upstream
 
 
-=======
->>>>>>> Stashed changes
+
     public Employers(int id) {
         super(id);
     }

@@ -1,7 +1,7 @@
-package dao;
+package model.main.java.dao;
 
-import config.DatabaseConfig;
-import model.Company;
+import model.main.java.config.DatabaseConfig;
+import model.main.java.model.Company;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -10,9 +10,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CompanyDAO extends DatabaseConfig {
+public class CompanyDAO extends DatabaseConfig implements IDAO<Company> {
 
-    public int add(Company entity) {
+    @Override
+    public void add(Company entity) {
         String sql = "  INSERT INTO companies(company_name, description) VALUES (?, ?)";
 
         try  (
@@ -25,10 +26,9 @@ public class CompanyDAO extends DatabaseConfig {
         }catch (SQLException e){
             e.printStackTrace();
         }
-        return -1;
     }
 
-
+    @Override
     public void update(Company company) {
         String sql = """
                 UPDATE companies
@@ -53,7 +53,7 @@ public class CompanyDAO extends DatabaseConfig {
 
     }
 
-
+    @Override
     public void delete(int id) {
         String sql = "DELETE FROM companies WHERE id = ?";
 
@@ -71,7 +71,7 @@ public class CompanyDAO extends DatabaseConfig {
 
     }
 
-
+    @Override
     public List<Company> getAll() {
         return List.of();
     }

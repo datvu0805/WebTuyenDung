@@ -1,10 +1,10 @@
-package dao;
+package model.main.java.dao;
 
-import config.DatabaseConfig;
-import model.Company;
-import model.Employers;
-import model.Role;
-import model.Users;
+import model.main.java.config.DatabaseConfig;
+import model.main.java.model.Company;
+import model.main.java.model.Employers;
+import model.main.java.model.Role;
+import model.main.java.model.Users;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,24 +13,23 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmployerDAO extends DatabaseConfig  {
-
-    public int add(int userId, int companyId) throws SQLException, ClassNotFoundException {
+public class EmployerDAO extends DatabaseConfig implements IDAO<Employers> {
+    @Override
+    public void add(Employers employer) {
         String sql = "INSERT INTO employers(user_id,company_id) VALUES (?,?)";
         try (
                 Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)
                 ){
-            ps.setInt(1, userId);
-            ps.setInt(2,companyId);
+            ps.setInt(1, employer.getUser().getId());
+            ps.setInt(2, employer.getCompany().getId());
             ps.executeUpdate();
         }catch (SQLException e){
             e.printStackTrace();
         }
-        return -1;
     }
 
-
+    @Override
     public void update(Employers employer) {
     String sql = "UPDATE employers SET user_id=?,company_id=? WHERE id=?";
 
@@ -45,6 +44,7 @@ public class EmployerDAO extends DatabaseConfig  {
     }
     }
 
+    @Override
     public void delete(int id) {
         String sql = "DELETE FROM employers WHERE id = ?";
 
@@ -62,7 +62,7 @@ public class EmployerDAO extends DatabaseConfig  {
     }
 
 
-
+    @Override
     public List<Employers> getAll() {
         String sql = "SELECT e.id AS employer_id,\n" +
                 "                    e.created_at AS employer_created_at,\n" +

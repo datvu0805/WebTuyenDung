@@ -1,17 +1,17 @@
-package dao;
+package model.main.java.dao;
 
-import config.DatabaseConfig;
-import model.Candidates;
-import model.Role;
-import model.Users;
+import model.main.java.config.DatabaseConfig;
+import model.main.java.model.Candidates;
+import model.main.java.model.Role;
+import model.main.java.model.Users;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CandicateDAO extends DatabaseConfig {
-    public boolean add(int userId) {
+public class candicateDAO extends DatabaseConfig {
+    public void add(int userId) {
         String sql = "INSERT INTO candidates(user_id) VALUES (?)";
 
         try (
@@ -24,7 +24,6 @@ public class CandicateDAO extends DatabaseConfig {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return true;
     }
 
     public void findById(int id) {

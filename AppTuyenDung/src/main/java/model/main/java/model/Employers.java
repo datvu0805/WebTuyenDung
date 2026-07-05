@@ -1,4 +1,4 @@
-package model;
+package model.main.java.model;
 
 public class Employers extends BaseEntity {
 
@@ -9,13 +9,10 @@ public class Employers extends BaseEntity {
     public Employers() {
     }
 
-<<<<<<< Updated upstream
 
 
 
-=======
->>>>>>> Stashed changes
-    public Employers(int id, Users user, Company company,Role role) {
+    public Employers(int id, Users user, Company company, Role role) {
         super(id);
         this.user = user;
         this.company = company;
@@ -23,11 +20,8 @@ public class Employers extends BaseEntity {
     }
 
 
-<<<<<<< Updated upstream
 
 
-=======
->>>>>>> Stashed changes
     public Employers(int id) {
         super(id);
     }

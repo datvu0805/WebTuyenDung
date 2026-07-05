@@ -47,6 +47,13 @@ public class Jobs extends BaseEntity{
         this.isHiddenOnExpiry = isHiddenOnExpiry;
     }
 
+    public Jobs() {
+
+    }
+    public Jobs(int id) {
+        super(id);
+    }
+
     public Boolean getHiddenOnExpiry() {
         return isHiddenOnExpiry;
     }

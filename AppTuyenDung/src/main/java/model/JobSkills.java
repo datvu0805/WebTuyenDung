@@ -18,6 +18,10 @@ public class JobSkills extends BaseEntity{
         this.skillID = skillID;
     }
 
+    public JobSkills() {
+
+    }
+
     public Jobs getJobID() {
         return jobID;
     }

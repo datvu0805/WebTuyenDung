@@ -7,12 +7,13 @@ import model.Skills;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
     @Override
     public void add(Jobs jobs) {
-        String sql = "INSERT INTO jobs (employer_id, title, description, salary, location, experience, quantity, posted_at, expired_at, application_deadline, status, is_hidden_on_expiry, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO jobs (employer_id, title, description, salary, location, experience, quantity, posted_at, expired_at, application_deadline, status, is_hidden_on_expiry, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id";
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -21,6 +22,7 @@ public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
             ps.setString(3, jobs.getDescription());
             ps.setDouble(4, jobs.getSalary());
             ps.setString(5, jobs.getLocation());
+            ps.setString(6, jobs.getExperience());
             ps.setInt(7, jobs.getQuantity());
             ps.setObject(8, jobs.getPostedAt());
             ps.setObject(9, jobs.getExpiredAt());
@@ -53,6 +55,7 @@ public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
             ps.setString(3, jobs.getDescription());
             ps.setDouble(4, jobs.getSalary());
             ps.setString(5, jobs.getLocation());
+            ps.setString(6, jobs.getExperience());
             ps.setInt(7, jobs.getQuantity());
             ps.setObject(8, jobs.getPostedAt());
             ps.setObject(9, jobs.getExpiredAt());
@@ -96,6 +99,7 @@ public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
                 rs.getString("description");
                 rs.getDouble("salary");
                 rs.getString("location");
+                rs.getString("experience");
                 rs.getInt("quantity");
                 rs.getObject("posted_at");
                 rs.getObject("expired_at");
@@ -124,6 +128,7 @@ public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
                 rs.getString("description");
                 rs.getDouble("salary");
                 rs.getString("location");
+                rs.getString("experience");
                 rs.getInt("quantity");
                 rs.getObject("posted_at");
                 rs.getObject("expired_at");
@@ -140,14 +145,62 @@ public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
     }
 
     public void addSkill(Jobs jobsID, Skills skillsID) {
+        String sql = "INSERT INTO jobs_skills (jobs_id, skills_id) VALUES (?, ?)";
 
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, jobsID.getId());
+            ps.setInt(2, skillsID.getId());
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void delete(Jobs jobsID, Skills skillsID) {
+        String sql = "DELETE FROM jobs_skills WHERE jobs_id = ? AND skills_id = ?";
 
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, jobsID.getId());
+            ps.setInt(2, skillsID.getId());
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public List<JobSkills> getAll(Jobs jobsID, Skills skillsID) {
+    public List<JobSkills> getSkillsByJob(int jobId) {
+        String sql = "SELECT * FROM job_skills WHERE job_id = ?";
+
+        List<JobSkills> list = new ArrayList<>();
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, jobId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                JobSkills jobSkill = new JobSkills();
+
+                jobSkill.setJobID(new Jobs(rs.getInt("job_id")));
+                jobSkill.setSkillID(new Skills(rs.getInt("skill_id")));
+
+                list.add(jobSkill);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return List.of();
     }
 }

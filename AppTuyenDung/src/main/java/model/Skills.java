@@ -12,6 +12,12 @@ public class Skills extends BaseEntity{
         this.skillName = skillName;
     }
 
+    public Skills() {
+
+    }
+    public Skills(int id) {
+        super(id);
+    }
     public String getSkillName() {
         return skillName;
     }

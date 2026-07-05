@@ -13,6 +13,11 @@ public class Company extends BaseEntity {
         return "";
     }
 
+    public Company(int id, String companyName) {
+        super(id);
+        this.companyName = companyName;
+    }
+
     public Company(String companyName, String description) {
         this.companyName = companyName;
         this.description = description;

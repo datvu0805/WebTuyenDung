@@ -7,6 +7,10 @@ public class Candidates extends BaseEntity {
     public Candidates() {
     }
 
+    public Candidates(int id) {
+        super(id);
+    }
+
     @Override
     public String getInfo() {
         return "";

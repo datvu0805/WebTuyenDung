@@ -35,6 +35,19 @@ public class Users extends BaseEntity{
             this.address = address;
             this.role = role;
         }
+    public Users(String username, String password, String fullName,
+                 String avatarUrl, String email, LocalDate dateOfBirth,
+                 String phoneNumber, String address) {
+
+        this.username = username;
+        this.password = password;
+        this.fullName = fullName;
+        this.avatarUrl = avatarUrl;
+        this.email = email;
+        this.dateOfBirth = dateOfBirth;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+    }
 
     public Users(int id, String username, String password, String fullName, String avatarUrl, String email, LocalDate dateOfBirth, String phoneNumber, String address, Role role) {
         super(id);

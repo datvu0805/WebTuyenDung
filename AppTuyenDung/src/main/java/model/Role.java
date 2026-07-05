@@ -18,6 +18,11 @@ public class  Role extends BaseEntity {
         this.description = description;
     }
 
+    public Role(int id, String roleName) {
+        super(id);
+        this.roleName = roleName;
+    }
+
     public Role(String roleName){
         this.roleName = roleName;
     }

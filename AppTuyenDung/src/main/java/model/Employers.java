@@ -4,8 +4,20 @@ public class Employers extends BaseEntity {
 
     private Users user;
     private Company company;
+    private Role role;
 
     public Employers() {
+    }
+
+    public Employers(int id, Users user, Company company,Role role) {
+        super(id);
+        this.user = user;
+        this.company = company;
+        this.role = role;
+    }
+
+    public Employers(int id) {
+        super(id);
     }
 
     @Override

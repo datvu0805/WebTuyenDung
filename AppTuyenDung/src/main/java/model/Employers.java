@@ -9,7 +9,6 @@ public class Employers extends BaseEntity {
     public Employers() {
     }
 
-<<<<<<< HEAD
     public Employers(int id, Users user, Company company,Role role) {
         super(id);
         this.user = user;
@@ -17,8 +16,6 @@ public class Employers extends BaseEntity {
         this.role = role;
     }
 
-=======
->>>>>>> 529be65e22bbfe6ee49ee151d50a67b157d00623
     public Employers(int id) {
         super(id);
     }

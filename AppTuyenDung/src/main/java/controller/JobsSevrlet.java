@@ -47,12 +47,10 @@ public class JobsSevrlet extends BaseServlet {
         boolean hiddenOnExpiry = Boolean.parseBoolean(req.getParameter("hiddenOnExpiry"));
         Jobs jobs = new Jobs(new Employers(employerId), title, description, salary, location, experience, quantity, postedAt, expiredAt, applicationDeadline, status, hiddenOnExpiry);
 
-        jobsDAO.add(jobs);
 //        resp.sendRedirect(req.getContextPath() + "/jobs");
         jobsDAO.add(jobs);
 
         resp.setContentType("text/plain;charset=UTF-8");
-        resp.getWriter().println(
-                "Add job success! ID = " + jobs.getId());
+        resp.getWriter().println("Add job success! ID = " + jobs.getId());
     }
 }

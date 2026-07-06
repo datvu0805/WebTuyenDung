@@ -20,7 +20,6 @@ public class Employers extends BaseEntity {
 
 
 
-
     public Employers(int id) {
         super(id);
     }

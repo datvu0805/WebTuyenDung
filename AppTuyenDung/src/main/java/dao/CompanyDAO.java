@@ -3,39 +3,56 @@ package dao;
 import config.DatabaseConfig;
 import model.Company;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CompanyDAO extends DatabaseConfig {
 
-    public int add(Company entity) {
-        String sql = "  INSERT INTO companies(company_name, description) VALUES (?, ?)";
+    private Company mapCompany(ResultSet rs) throws SQLException {
+        Company company = new Company(
+                rs.getString("company_name"),
+                rs.getString("description")
+        );
+        company.setId(rs.getInt("id"));
+        return company;
+    }
 
-        try  (
+    public int add(Company company) {
+        String sql = """
+            INSERT INTO companies(company_name, description)
+            VALUES (?, ?)
+            RETURNING id
+        """;
+
+        try (
                 Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)
-                ){
-            ps.setString(1, entity.getCompanyName());
-            ps.setString(2, entity.getDescription());
-            ps.executeUpdate();
-        }catch (SQLException e){
+        ) {
+            ps.setString(1, company.getCompanyName());
+            ps.setString(2, company.getDescription());
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return -1;
     }
 
-
     public void update(Company company) {
         String sql = """
-                UPDATE companies
-                SET company_name = ?,
-                    description = ?,
-                WHERE id = ?
-                """;
+            UPDATE companies
+            SET company_name = ?,
+                description = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """;
 
         try (
                 Connection conn = getConnection();
@@ -50,9 +67,7 @@ public class CompanyDAO extends DatabaseConfig {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
-
 
     public void delete(int id) {
         String sql = "DELETE FROM companies WHERE id = ?";
@@ -62,36 +77,25 @@ public class CompanyDAO extends DatabaseConfig {
                 PreparedStatement ps = conn.prepareStatement(sql)
         ) {
             ps.setInt(1, id);
-
-           ps.executeUpdate();
+            ps.executeUpdate();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
-
-
-    public List<Company> getAll() {
-        return List.of();
-    }
-
 
     public Company findById(int id) {
         String sql = "SELECT * FROM companies WHERE id = ?";
 
         try (
-                Connection conn =getConnection();
+                Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)
         ) {
             ps.setInt(1, id);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new Company(
-                            rs.getString("company_name"),
-                            rs.getString("description")
-                    );
+                    return mapCompany(rs);
                 }
             }
 
@@ -102,8 +106,7 @@ public class CompanyDAO extends DatabaseConfig {
         return null;
     }
 
-
-    public List<Company> findAll() {
+    public List<Company> getAll() {
         List<Company> companies = new ArrayList<>();
 
         String sql = "SELECT * FROM companies ORDER BY id DESC";
@@ -114,11 +117,7 @@ public class CompanyDAO extends DatabaseConfig {
                 ResultSet rs = ps.executeQuery()
         ) {
             while (rs.next()) {
-                Company company = new Company(
-                                rs.getString("company_name"),
-                                rs.getString("description")
-                        );
-                companies.add(company);
+                companies.add(mapCompany(rs));
             }
 
         } catch (SQLException e) {
@@ -126,5 +125,9 @@ public class CompanyDAO extends DatabaseConfig {
         }
 
         return companies;
+    }
+
+    public List<Company> findAll() {
+        return getAll();
     }
 }

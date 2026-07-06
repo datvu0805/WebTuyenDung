@@ -5,12 +5,10 @@ import model.Candidates;
 import model.Role;
 import model.Users;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 public class CandicateDAO extends DatabaseConfig {
+
     public boolean add(int userId) {
         String sql = "INSERT INTO candidates(user_id) VALUES (?)";
 
@@ -19,120 +17,132 @@ public class CandicateDAO extends DatabaseConfig {
                 PreparedStatement ps = conn.prepareStatement(sql)
         ) {
             ps.setInt(1, userId);
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return true;
+
+        return false;
     }
 
-    public void findById(int id) {
-        String sql = "SELECT  c.id AS candidate_id,\n" +
-                "\n" +
-                "                    u.id AS user_id,\n" +
-                "                    u.username,\n" +
-                "                    u.password,\n" +
-                "                    u.full_name,\n" +
-                "                    u.avatar_url,\n" +
-                "                    u.email,\n" +
-                "                    u.date_of_birth,\n" +
-                "                    u.phone_number,\n" +
-                "                    u.address,\n" +
-                "\n" +
-                "                    r.id AS role_id,\n" +
-                "                    r.name AS role_name" +
-                "     FROM candidates c " +
-                "     join users u on c.user_id = u.id " +
-                "     join roles r on u.role_id = r.id      " +
-                "     WHERE c.id = ?";
-        try  (Connection conn = getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
+    private Candidates mapCandidate(ResultSet rs) throws SQLException {
+        Role role = new Role();
+        role.setId(rs.getInt("role_id"));
+        role.setRoleName(rs.getString("role_name"));
 
-            try(ResultSet rs = ps.executeQuery()) {
-                if(rs.next()) {
-                    Candidates candidate = new Candidates(
-                            rs.getInt("id")
-                    );
-                    Users user = new Users(
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            rs.getString("full_name"),
-                            rs.getString("avatar_url"),
-                            rs.getString("email"),
-                            rs.getDate("date_of_birth").toLocalDate(),
-                            rs.getString("phone_number"),
-                            rs.getString("address")
-                    );
-                    Role role = new Role(
-                            rs.getInt("id"),
-                            rs.getString("role_name")
-                    );
-                }
-            }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
+        Users user = new Users(
+                rs.getString("username"),
+                rs.getString("password"),
+                rs.getString("full_name"),
+                rs.getString("avatar_url"),
+                rs.getString("email"),
+                rs.getDate("date_of_birth") == null
+                        ? null
+                        : rs.getDate("date_of_birth").toLocalDate(),
+                rs.getString("phone_number"),
+                rs.getString("address"),
+                role
+        );
+        user.setId(rs.getInt("user_id"));
+
+        Candidates candidate = new Candidates(rs.getInt("candidate_id"));
+        candidate.setUser(user);
+
+        return candidate;
     }
 
-    public void findByUserId(int userId) {
-        String sql = "SELECT  c.id AS candidate_id,\n" +
-                "\n" +
-                "                    u.id AS user_id,\n" +
-                "                    u.username,\n" +
-                "                    u.password,\n" +
-                "                    u.full_name,\n" +
-                "                    u.avatar_url,\n" +
-                "                    u.email,\n" +
-                "                    u.date_of_birth,\n" +
-                "                    u.phone_number,\n" +
-                "                    u.address,\n" +
-                "\n" +
-                "                    r.id AS role_id,\n" +
-                "                    r.name AS role_name" +
-                "     FROM candidates c " +
-                "     join users u on c.user_id = u.id " +
-                "     join roles r on u.role_id = r.id      " +
-                "     WHERE u.id = ?";
-        try  (Connection conn = getConnection();
-              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userId);
+    public Candidates findById(int id) {
+        String sql = """
+            SELECT
+                c.id AS candidate_id,
+                u.id AS user_id,
+                u.username,
+                u.password,
+                u.full_name,
+                u.avatar_url,
+                u.email,
+                u.date_of_birth,
+                u.phone_number,
+                u.address,
+                r.id AS role_id,
+                r.role_name
+            FROM candidates c
+            JOIN users u ON c.user_id = u.id
+            JOIN roles r ON u.role_id = r.id
+            WHERE c.id = ?
+        """;
 
-            try(ResultSet rs = ps.executeQuery()) {
-                if(rs.next()) {
-                    Candidates candidate = new Candidates(
-                            rs.getInt("id")
-                    );
-                    Users user = new Users(
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            rs.getString("full_name"),
-                            rs.getString("avatar_url"),
-                            rs.getString("email"),
-                            rs.getDate("date_of_birth").toLocalDate(),
-                            rs.getString("phone_number"),
-                            rs.getString("address")
-                    );
-                    Role role = new Role(
-                            rs.getInt("id"),
-                            rs.getString("role_name")
-                    );
-                }
-            }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-    }
-    public boolean deleteById(int id) {
-        String sql = "DELETE FROM candidates WHERE id = ?";
         try (
                 Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)
-                ){
+        ) {
             ps.setInt(1, id);
-            ps.executeUpdate();
-        }catch (SQLException e){
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapCandidate(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public Candidates findByUserId(int userId) {
+        String sql = """
+            SELECT
+                c.id AS candidate_id,
+                u.id AS user_id,
+                u.username,
+                u.password,
+                u.full_name,
+                u.avatar_url,
+                u.email,
+                u.date_of_birth,
+                u.phone_number,
+                u.address,
+                r.id AS role_id,
+                r.role_name
+            FROM candidates c
+            JOIN users u ON c.user_id = u.id
+            JOIN roles r ON u.role_id = r.id
+            WHERE u.id = ?
+        """;
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapCandidate(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public boolean deleteById(int id) {
+        String sql = "DELETE FROM candidates WHERE id = ?";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 

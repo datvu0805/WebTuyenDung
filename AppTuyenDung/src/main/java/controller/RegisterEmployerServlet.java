@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @WebServlet("/register-employer")
-public class RegisterEmployerServlet extends HttpServlet {
+public class RegisterEmployerServlet extends BaseServlet {
 
     private final Gson gson = new Gson();
     private final AuthService authService = new AuthService();

@@ -31,7 +31,7 @@ public class AuthService {
         if(userDAO.findByEmail(user.getEmail()) != null) {
             return "Email đã tồn tại";
         }
-        Role role = roleDAO.findByName("CANDICATE");
+        Role role = roleDAO.findByName("CANDIDATE");
         user.setRole(role);
 
         String hashedPassword = PasswordUtil.hashPassword(user.getPassword());

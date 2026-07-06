@@ -11,48 +11,46 @@ import java.util.HashMap;
 import java.util.Map;
 
 @WebServlet("/register-candidate")
-public class RegisterCandidateServlet extends HttpServlet {
+public class RegisterCandidateServlet extends BaseServlet {
 
     private final Gson gson = new Gson();
-    private final AuthService authService = new AuthService();
 
     @Override
     protected void doPost(HttpServletRequest req,
                           HttpServletResponse resp)
             throws IOException {
 
-        resp.setContentType("application/json;charset=UTF-8");
-
         req.setCharacterEncoding("UTF-8");
-
-        String username = req.getParameter("username");
-        String password = req.getParameter("password");
-        String fullName = req.getParameter("fullName");
-        String avatarUrl = req.getParameter("avatarUrl");
-        String email = req.getParameter("email");
-        String phoneNumber = req.getParameter("phoneNumber");
-        String address = req.getParameter("address");
-
-        Users user = new Users();
-
-        user.setUsername(username);
-        user.setPassword(password);
-        user.setFullName(fullName);
-        user.setAvatarUrl(avatarUrl);
-        user.setEmail(email);
-        user.setPhoneNumber(phoneNumber);
-        user.setAddress(address);
-
-        String error = authService.registerCandidate(user);
+        resp.setContentType("application/json;charset=UTF-8");
 
         Map<String, Object> result = new HashMap<>();
 
-        if (error != null) {
+        try {
+            AuthService authService = new AuthService();
+
+            Users user = new Users();
+            user.setUsername(req.getParameter("username"));
+            user.setPassword(req.getParameter("password"));
+            user.setFullName(req.getParameter("fullName"));
+            user.setAvatarUrl(req.getParameter("avatarUrl"));
+            user.setEmail(req.getParameter("email"));
+            user.setPhoneNumber(req.getParameter("phoneNumber"));
+            user.setAddress(req.getParameter("address"));
+
+            String error = authService.registerCandidate(user);
+
+            if (error != null) {
+                result.put("success", false);
+                result.put("message", error);
+            } else {
+                result.put("success", true);
+                result.put("message", "Đăng ký candidate thành công");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
             result.put("success", false);
-            result.put("message", error);
-        } else {
-            result.put("success", true);
-            result.put("message", "Đăng ký candidate thành công");
+            result.put("message", e.getClass().getName() + ": " + e.getMessage());
         }
 
         resp.getWriter().write(gson.toJson(result));

@@ -2,191 +2,173 @@ package dao;
 
 import config.DatabaseConfig;
 import model.Role;
-import model.Transactions;
 import model.Users;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDAO extends DatabaseConfig  {
+public class UserDAO extends DatabaseConfig {
 
+    private Users mapUser(ResultSet rs) throws SQLException {
+        Role role = new Role();
+        role.setId(rs.getInt("role_id"));
+        role.setRoleName(rs.getString("role_name"));
+
+        Users user = new Users(
+                rs.getString("username"),
+                rs.getString("password"),
+                rs.getString("full_name"),
+                rs.getString("avatar_url"),
+                rs.getString("email"),
+                rs.getDate("date_of_birth") == null
+                        ? null
+                        : rs.getDate("date_of_birth").toLocalDate(),
+                rs.getString("phone_number"),
+                rs.getString("address"),
+                role
+        );
+
+        user.setId(rs.getInt("id"));
+        return user;
+    }
 
     public Users getByID(int id) {
-        String sql = "SELECT * FROM users WHERE id = ?";
-        try(
-                Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ){
-                ps.setInt(1, id);
+        String sql = """
+            SELECT u.*, r.id AS role_id, r.role_name
+            FROM users u
+            JOIN roles r ON u.role_id = r.id
+            WHERE u.id = ?
+        """;
 
-                try (ResultSet rs = ps.executeQuery()){
-                    if (rs.next()) {
-                       return new Users(
-                               rs.getString("username"),
-                               rs.getString("password"),
-                               rs.getString("full_name"),
-                               rs.getString("avatar_url"),
-                               rs.getString("email"),
-                               rs.getDate("date_of_birth").toLocalDate(),
-                               rs.getString("phone_number"),
-                               rs.getString("address"),
-                               new Role(rs.getString("role_name"))
-                       );
-                    }
-                }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return null;
-    }
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
+            ps.setInt(1, id);
 
-    public Users findByEmail(String email) {
-        String sql = "SELECT * FROM users WHERE email = ?";
-        try(
-                Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-        ){
-            ps.setString(1, email);
-
-            try (ResultSet rs = ps.executeQuery()){
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new Users(
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            rs.getString("full_name"),
-                            rs.getString("avatar_url"),
-                            rs.getString("email"),
-                            rs.getDate("date_of_birth").toLocalDate(),
-                            rs.getString("phone_number"),
-                            rs.getString("address"),
-                            new Role(rs.getString("role_name"))
-                    );
+                    return mapUser(rs);
                 }
             }
-        }catch (SQLException e){
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
+    public Users findByEmail(String email) {
+        String sql = """
+            SELECT u.*, r.id AS role_id, r.role_name
+            FROM users u
+            JOIN roles r ON u.role_id = r.id
+            WHERE u.email = ?
+        """;
 
-    public void add(Users user) {
-        String sql="INSERT INTO Users(username,password,full_name,avatar_url,email,date_of_birth,phone_number,address,role_id) VALUES (?,?,?,?,?,?,?,?,?)";
-        try(
-                Connection conn = DatabaseConfig.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-                ){
-            ps.setString(1,user.getUsername());
-            ps.setString(2,user.getPassword());
-            ps.setString(3,user.getFullName());
-            ps.setString(4,user.getAvatarUrl());
-            ps.setString(5,user.getEmail());
-            ps.setDate(6, Date.valueOf(user.getDateOfBirth()));
-            ps.setString(7, user.getPhoneNumber());
-            ps.setString(8, user.getAddress());
-            ps.setInt(9,user.getRole().getId());
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.executeUpdate();
-        }catch (SQLException e){
-            e.printStackTrace() ;
+            ps.setString(1, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapUser(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+
+        return null;
     }
 
-    public void update(Users user) {
-        String sql = "UPDATE users set username = ?,password = ?,full_name = ?,avatar_url = ?, email = ?,date_of_birth = ?,phone_number = ?,address = ?,role_id = ?, updated_at = CURRENT_TIMESTAMP  where id = ?";
-        try(Connection conn = getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+    public Users getByUsername(String username) {
+        String sql = """
+            SELECT u.*, r.id AS role_id, r.role_name
+            FROM users u
+            JOIN roles r ON u.role_id = r.id
+            WHERE u.username = ?
+        """;
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapUser(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public List<Users> getAll() {
+        List<Users> list = new ArrayList<>();
+
+        String sql = """
+            SELECT u.*, r.id AS role_id, r.role_name
+            FROM users u
+            JOIN roles r ON u.role_id = r.id
+            ORDER BY u.id
+        """;
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(mapUser(rs));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public void add(Users user) {
+        String sql = """
+            INSERT INTO users(
+                username, password, full_name, avatar_url,
+                email, date_of_birth, phone_number, address, role_id
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """;
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getFullName());
             ps.setString(4, user.getAvatarUrl());
             ps.setString(5, user.getEmail());
-            ps.setDate(6, Date.valueOf(user.getDateOfBirth()));
+
+            if (user.getDateOfBirth() == null) {
+                ps.setNull(6, Types.DATE);
+            } else {
+                ps.setDate(6, Date.valueOf(user.getDateOfBirth()));
+            }
+
             ps.setString(7, user.getPhoneNumber());
             ps.setString(8, user.getAddress());
-            ps.setInt(9,user.getRole().getId());
-            ps.setInt(10,user.getId());
+            ps.setInt(9, user.getRole().getId());
+
             ps.executeUpdate();
-        }catch (SQLException e){
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-
-    public void delete(int id) {
-        String sql = "DELETE FROM users WHERE id = ?";
-        try(
-                Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-                ){
-            ps.setInt(1, id);
-            ps.executeUpdate();
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-    }
-
-
-    public List<Users> getAll() {
-        List<Users> list = new ArrayList<>();
-        String sql = "SELECT * FROM users";
-        ;
-        try (
-                Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-                ){
-                ResultSet rs = ps.executeQuery();
-                while (rs.next()) {
-                    Users user = new Users(
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            rs.getString("full_name"),
-                            rs.getString("avatar_url"),
-                            rs.getString("email"),
-                            rs.getDate("date_of_birth").toLocalDate(),
-                            rs.getString("phone_number"),
-                            rs.getString("address"),
-                            new Role(rs.getString("role_name"))
-                    );
-                    list.add(user);
-                }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    public Users getByUsername(String username) {
-        String sql = "SELECT * FROM users WHERE id = ?";
-        try(
-                Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql);
-        ){
-            ps.setString(1, username);
-
-            try (ResultSet rs = ps.executeQuery()){
-                if (rs.next()) {
-                    return new Users(
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            rs.getString("full_name"),
-                            rs.getString("avatar_url"),
-                            rs.getString("email"),
-                            rs.getDate("date_of_birth").toLocalDate(),
-                            rs.getString("phone_number"),
-                            rs.getString("address"),
-                            new Role(rs.getString("role_name"))
-                    );
-                }
-            }
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public int addAndReturnId(Users user) {
@@ -197,18 +179,23 @@ public class UserDAO extends DatabaseConfig  {
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING id
-            """;
+        """;
 
-        try (
-                Connection conn = getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setString(1, user.getUsername());
             ps.setString(2, user.getPassword());
             ps.setString(3, user.getFullName());
             ps.setString(4, user.getAvatarUrl());
             ps.setString(5, user.getEmail());
-            ps.setDate(6, java.sql.Date.valueOf(user.getDateOfBirth()));
+
+            if (user.getDateOfBirth() == null) {
+                ps.setNull(6, Types.DATE);
+            } else {
+                ps.setDate(6, Date.valueOf(user.getDateOfBirth()));
+            }
+
             ps.setString(7, user.getPhoneNumber());
             ps.setString(8, user.getAddress());
             ps.setInt(9, user.getRole().getId());
@@ -224,5 +211,62 @@ public class UserDAO extends DatabaseConfig  {
         }
 
         return -1;
+    }
+
+    public void update(Users user) {
+        String sql = """
+            UPDATE users
+            SET username = ?,
+                password = ?,
+                full_name = ?,
+                avatar_url = ?,
+                email = ?,
+                date_of_birth = ?,
+                phone_number = ?,
+                address = ?,
+                role_id = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """;
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, user.getUsername());
+            ps.setString(2, user.getPassword());
+            ps.setString(3, user.getFullName());
+            ps.setString(4, user.getAvatarUrl());
+            ps.setString(5, user.getEmail());
+
+            if (user.getDateOfBirth() == null) {
+                ps.setNull(6, Types.DATE);
+            } else {
+                ps.setDate(6, Date.valueOf(user.getDateOfBirth()));
+            }
+
+            ps.setString(7, user.getPhoneNumber());
+            ps.setString(8, user.getAddress());
+            ps.setInt(9, user.getRole().getId());
+            ps.setInt(10, user.getId());
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void delete(int id) {
+        String sql = "DELETE FROM users WHERE id = ?";
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, id);
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

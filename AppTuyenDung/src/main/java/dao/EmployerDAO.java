@@ -6,43 +6,122 @@ import model.Employers;
 import model.Role;
 import model.Users;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmployerDAO extends DatabaseConfig  {
+public class EmployerDAO extends DatabaseConfig {
 
-    public int add(int userId, int companyId) throws SQLException, ClassNotFoundException {
-        String sql = "INSERT INTO employers(user_id,company_id) VALUES (?,?)";
+    public int add(int userId, int companyId) {
+        String sql = """
+            INSERT INTO employers(user_id, company_id)
+            VALUES (?, ?)
+            RETURNING id
+        """;
+
         try (
                 Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)
-                ){
+        ) {
             ps.setInt(1, userId);
-            ps.setInt(2,companyId);
-            ps.executeUpdate();
-        }catch (SQLException e){
+            ps.setInt(2, companyId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("id");
+                }
+            }
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return -1;
     }
 
+    private Employers mapEmployer(ResultSet rs) throws SQLException {
+        Role role = new Role();
+        role.setId(rs.getInt("role_id"));
+        role.setRoleName(rs.getString("role_name"));
+
+        Users user = new Users(
+                rs.getString("username"),
+                rs.getString("password"),
+                rs.getString("full_name"),
+                rs.getString("avatar_url"),
+                rs.getString("email"),
+                rs.getDate("date_of_birth") == null
+                        ? null
+                        : rs.getDate("date_of_birth").toLocalDate(),
+                rs.getString("phone_number"),
+                rs.getString("address"),
+                role
+        );
+        user.setId(rs.getInt("user_id"));
+
+        Company company = new Company(
+                rs.getString("company_name"),
+                rs.getString("description")
+        );
+        company.setId(rs.getInt("company_id"));
+
+        Employers employer = new Employers(
+                rs.getInt("employer_id"),
+                user,
+                company,
+                role
+        );
+
+        return employer;
+    }
+
+    private String baseSelectSql() {
+        return """
+            SELECT
+                e.id AS employer_id,
+                u.id AS user_id,
+                u.username,
+                u.password,
+                u.full_name,
+                u.avatar_url,
+                u.email,
+                u.date_of_birth,
+                u.phone_number,
+                u.address,
+                r.id AS role_id,
+                r.role_name,
+                c.id AS company_id,
+                c.company_name,
+                c.description
+            FROM employers e
+            JOIN users u ON e.user_id = u.id
+            JOIN roles r ON u.role_id = r.id
+            JOIN companies c ON e.company_id = c.id
+        """;
+    }
 
     public void update(Employers employer) {
-    String sql = "UPDATE employers SET user_id=?,company_id=? WHERE id=?";
+        String sql = """
+            UPDATE employers
+            SET user_id = ?,
+                company_id = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+        """;
 
-    try( Connection conn = getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, employer.getUser().getId());
-        ps.setInt(2, employer.getCompany().getId());
-        ps.setInt(3, employer.getId());
-        ps.executeUpdate();
-    }catch (SQLException e){
-        e.printStackTrace();
-    }
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.setInt(1, employer.getUser().getId());
+            ps.setInt(2, employer.getCompany().getId());
+            ps.setInt(3, employer.getId());
+
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void delete(int id) {
@@ -58,139 +137,41 @@ public class EmployerDAO extends DatabaseConfig  {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
     }
 
-
-
     public List<Employers> getAll() {
-        String sql = "SELECT e.id AS employer_id,\n" +
-                "                    e.created_at AS employer_created_at,\n" +
-                "                    e.updated_at AS employer_updated_at,\n" +
-                "\n" +
-                "                    u.id AS user_id,\n" +
-                "                    u.username,\n" +
-                "                    u.password,\n" +
-                "                    u.full_name,\n" +
-                "                    u.avatar_url,\n" +
-                "                    u.email,\n" +
-                "                    u.date_of_birth,\n" +
-                "                    u.phone_number,\n" +
-                "                    u.address,\n" +
-                "\n" +
-                "                    r.id AS role_id,\n" +
-                "                    r.name AS role_name,\n" +
-                "\n" +
-                "                    c.id AS company_id,\n" +
-                "                    c.company_name,\n" +
-                "                    c.description,\n" +
-                "                    c.created_at AS company_created_at,\n" +
-                "                    c.updated_at AS company_updated_at\n" +
-                "\n" +
-                "                FROM employers e\n" +
-                "                JOIN users u ON e.user_id = u.id\n" +
-                "                JOIN roles r ON u.role_id = r.id\n" +
-                "                JOIN companies c ON e.company_id = c.id\n" +
-                "                ORDER BY e.id DESC";
         List<Employers> employers = new ArrayList<>();
+
+        String sql = baseSelectSql() + " ORDER BY e.id DESC";
+
         try (
                 Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery();
-        ){
+                ResultSet rs = ps.executeQuery()
+        ) {
             while (rs.next()) {
-                Users user = new Users(
-                        rs.getString("username"),
-                        rs.getString("password"),
-                        rs.getString("full_name"),
-                        rs.getString("avatar_url"),
-                        rs.getString("email"),
-                        rs.getDate("date_of_birth").toLocalDate(),
-                        rs.getString("phone_number"),
-                        rs.getString("address")
-                );
-                Company company = new Company(
-                        rs.getInt("id"),
-                         rs.getString("company_name")
-                );
-                Role role = new Role(
-                        rs.getString("role_name")
-                );
-                Employers employer = new Employers(
-                        rs.getInt("id"),
-                        user,company,role
-                );
-                employers.add(employer);
+                employers.add(mapEmployer(rs));
             }
-        }catch (SQLException e){
+
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return employers;
     }
 
-
     public Employers findByUserId(int userId) {
-        String sql = """
-                SELECT
-                    e.id AS employer_id,
-                    e.created_at AS employer_created_at,
-                    e.updated_at AS employer_updated_at,
-
-                    u.id AS user_id,
-                    u.username,
-                    u.password,
-                    u.full_name,
-                    u.avatar_url,
-                    u.email,
-                    u.date_of_birth,
-                    u.phone_number,
-                    u.address,
-
-                    r.id AS role_id,
-                    r.name AS role_name,
-
-                    c.id AS company_id,
-                    c.company_name,
-                    c.description,
-                    c.created_at AS company_created_at,
-                    c.updated_at AS company_updated_at
-
-                FROM employers e
-                JOIN users u ON e.user_id = u.id
-                JOIN roles r ON u.role_id = r.id
-                JOIN companies c ON e.company_id = c.id
-                WHERE u.id = ?
-                """;
+        String sql = baseSelectSql() + " WHERE u.id = ?";
 
         try (
-                Connection conn =getConnection();
+                Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)
         ) {
             ps.setInt(1, userId);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    Users user = new Users(
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            rs.getString("full_name"),
-                            rs.getString("avatar_url"),
-                            rs.getString("email"),
-                            rs.getDate("date_of_birth").toLocalDate(),
-                            rs.getString("phone_number"),
-                            rs.getString("address")
-                    );
-                    Company company = new Company(
-                            rs.getInt("id"),
-                            rs.getString("company_name")
-                    );
-                    Role role = new Role(
-                            rs.getString("role_name")
-                    );
-                    Employers employer = new Employers(
-                            rs.getInt("id"),
-                            user,company,role
-                    );
+                    return mapEmployer(rs);
                 }
             }
 
@@ -201,37 +182,8 @@ public class EmployerDAO extends DatabaseConfig  {
         return null;
     }
 
-
     public Employers findById(int id) {
-        String sql = """
-                SELECT
-                    e.id AS employer_id,
-               
-
-                    u.id AS user_id,
-                    u.username,
-                    u.password,
-                    u.full_name,
-                    u.avatar_url,
-                    u.email,
-                    u.date_of_birth,
-                    u.phone_number,
-                    u.address,
-
-                    r.id AS role_id,
-                    r.name AS role_name,
-
-                    c.id AS company_id,
-                    c.company_name,
-                    c.description,
-                
-
-                FROM employers e
-                JOIN users u ON e.user_id = u.id
-                JOIN roles r ON u.role_id = r.id
-                JOIN companies c ON e.company_id = c.id
-                WHERE e.id = ?
-                """;
+        String sql = baseSelectSql() + " WHERE e.id = ?";
 
         try (
                 Connection conn = getConnection();
@@ -241,27 +193,7 @@ public class EmployerDAO extends DatabaseConfig  {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    Users user = new Users(
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            rs.getString("full_name"),
-                            rs.getString("avatar_url"),
-                            rs.getString("email"),
-                            rs.getDate("date_of_birth").toLocalDate(),
-                            rs.getString("phone_number"),
-                            rs.getString("address")
-                    );
-                    Company company = new Company(
-                            rs.getInt("id"),
-                            rs.getString("company_name")
-                    );
-                    Role role = new Role(
-                            rs.getString("role_name")
-                    );
-                    Employers employer = new Employers(
-                            rs.getInt("id"),
-                            user,company,role
-                    );
+                    return mapEmployer(rs);
                 }
             }
 
@@ -275,36 +207,10 @@ public class EmployerDAO extends DatabaseConfig  {
     public List<Employers> findByCompanyId(int companyId) {
         List<Employers> employers = new ArrayList<>();
 
-        String sql = """
-                SELECT
-                    e.id AS employer_id,
-                
-
-                    u.id AS user_id,
-                    u.username,
-                    u.password,
-                    u.full_name,
-                    u.avatar_url,
-                    u.email,
-                    u.date_of_birth,
-                    u.phone_number,
-                    u.address,
-
-                    r.id AS role_id,
-                    r.name AS role_name,
-
-                    c.id AS company_id,
-                    c.company_name,
-                    c.description,
-              
-
-                FROM employers e
-                JOIN users u ON e.user_id = u.id
-                JOIN roles r ON u.role_id = r.id
-                JOIN companies c ON e.company_id = c.id
-                WHERE c.id = ?
-                ORDER BY e.id DESC
-                """;
+        String sql = baseSelectSql() + """
+            WHERE c.id = ?
+            ORDER BY e.id DESC
+        """;
 
         try (
                 Connection conn = getConnection();
@@ -314,28 +220,7 @@ public class EmployerDAO extends DatabaseConfig  {
 
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Users user = new Users(
-                            rs.getString("username"),
-                            rs.getString("password"),
-                            rs.getString("full_name"),
-                            rs.getString("avatar_url"),
-                            rs.getString("email"),
-                            rs.getDate("date_of_birth").toLocalDate(),
-                            rs.getString("phone_number"),
-                            rs.getString("address")
-                    );
-                    Company company = new Company(
-                            rs.getInt("id"),
-                            rs.getString("company_name")
-                    );
-                    Role role = new Role(
-                            rs.getString("role_name")
-                    );
-                    Employers employer = new Employers(
-                            rs.getInt("id"),
-                            user,company,role
-                    );
-                    employers.add(employer);
+                    employers.add(mapEmployer(rs));
                 }
             }
 

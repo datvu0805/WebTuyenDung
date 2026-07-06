@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @WebServlet("/login")
-public class LoginServlet extends HttpServlet {
+public class LoginServlet extends BaseServlet {
 
     private final Gson gson = new Gson();
     private final AuthService authService = new AuthService();
@@ -24,28 +24,35 @@ public class LoginServlet extends HttpServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
 
-        String username = req.getParameter("username");
-        String password = req.getParameter("password");
-
-        Users user = authService.login(username, password);
-
         Map<String, Object> result = new HashMap<>();
 
-        if (user == null) {
+        try {
+            String username = req.getParameter("username");
+            String password = req.getParameter("password");
+
+            Users user = authService.login(username, password);
+
+            if (user == null) {
+                result.put("success", false);
+                result.put("message", "Sai tài khoản hoặc mật khẩu");
+            } else {
+                HttpSession session = req.getSession();
+
+                session.setAttribute("user", user);
+                session.setAttribute("userId", user.getId());
+                session.setAttribute("role", user.getRole().getRoleName());
+
+                result.put("success", true);
+                result.put("message", "Đăng nhập thành công");
+                result.put("userId", user.getId());
+                result.put("username", user.getUsername());
+                result.put("role", user.getRole().getRoleName());
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
             result.put("success", false);
-            result.put("message", "Sai tài khoản hoặc mật khẩu");
-        } else {
-            HttpSession session = req.getSession();
-
-            session.setAttribute("user", user);
-            session.setAttribute("userId", user.getId());
-            session.setAttribute("role", user.getRole().getRoleName());
-
-            result.put("success", true);
-            result.put("message", "Đăng nhập thành công");
-            result.put("userId", user.getId());
-            result.put("username", user.getUsername());
-            result.put("role", user.getRole().getRoleName());
+            result.put("message", e.getClass().getName() + ": " + e.getMessage());
         }
 
         resp.getWriter().write(gson.toJson(result));

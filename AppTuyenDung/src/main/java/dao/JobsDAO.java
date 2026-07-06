@@ -1,6 +1,7 @@
 package dao;
 
 import config.DatabaseConfig;
+import mapper.JobMapper;
 import model.JobSkills;
 import model.Jobs;
 import model.Skills;
@@ -62,8 +63,7 @@ public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
             ps.setObject(10, jobs.getApplicationDeadline());
             ps.setInt(11, jobs.getStatus());
             ps.setBoolean(12, jobs.getHiddenOnExpiry());
-            ps.setObject(13, jobs.getCreatedAt());
-            ps.setObject(14, jobs.getUpdatedAt());
+            ps.setInt(13, jobs.getId());
 
             ps.executeUpdate();
         } catch (Exception e) {
@@ -76,8 +76,8 @@ public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
         String sql = " DELETE FROM jobs WHERE id=?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
-
             ps.setInt(1, id);
+            ps.executeUpdate();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -86,62 +86,48 @@ public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
 
     @Override
     public Jobs getById(int id) {
-        String sql = "SELECT * FROM jobs WHERE id=?";
+
+        String sql = "SELECT * FROM jobs WHERE id = ?";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                rs.getInt("id");
-                rs.getString("title");
-                rs.getString("description");
-                rs.getDouble("salary");
-                rs.getString("location");
-                rs.getString("experience");
-                rs.getInt("quantity");
-                rs.getObject("posted_at");
-                rs.getObject("expired_at");
-                rs.getObject("application_deadline");
-                rs.getInt("status");
-                rs.getBoolean("is_hidden_on_expiry");
-                rs.getObject("created_at");
-                rs.getObject("updated_at");
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+                    return JobMapper.map(rs);
+                }
             }
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
         return null;
     }
 
     @Override
     public List<Jobs> getAll() {
+
         String sql = "SELECT * FROM jobs";
+
+        List<Jobs> list = new ArrayList<>();
+
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery(sql)) {
+             ResultSet rs = ps.executeQuery()) {
 
-            if (rs.next()) {
-                rs.getInt("id");
-                rs.getString("title");
-                rs.getString("description");
-                rs.getDouble("salary");
-                rs.getString("location");
-                rs.getString("experience");
-                rs.getInt("quantity");
-                rs.getObject("posted_at");
-                rs.getObject("expired_at");
-                rs.getObject("application_deadline");
-                rs.getInt("status");
-                rs.getBoolean("is_hidden_on_expiry");
-                rs.getObject("created_at");
-                rs.getObject("updated_at");
+            while (rs.next()) {
+                list.add(JobMapper.map(rs));
             }
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return List.of();
+
+        return list;
     }
 
     public void addSkill(Jobs jobsID, Skills skillsID) {
@@ -160,7 +146,7 @@ public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
         }
     }
 
-    public void delete(Jobs jobsID, Skills skillsID) {
+    public void deleteSkill(Jobs jobsID, Skills skillsID) {
         String sql = "DELETE FROM jobs_skills WHERE jobs_id = ? AND skills_id = ?";
 
         try (Connection conn = getConnection();

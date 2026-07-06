@@ -4,3 +4,6 @@
 0:0:0:0:0:0:0:1 - - [06/Jul/2026:09:33:41 +0700] "POST /AppTuyenDung/UploadCV HTTP/1.1" 200 71
 0:0:0:0:0:0:0:1 - - [06/Jul/2026:10:00:57 +0700] "POST /AppTuyenDung/UploadCV HTTP/1.1" 200 71
 0:0:0:0:0:0:0:1 - - [06/Jul/2026:10:04:23 +0700] "POST /AppTuyenDung/UploadCV HTTP/1.1" 200 71
+0:0:0:0:0:0:0:1 - - [06/Jul/2026:17:37:33 +0700] "POST /AppTuyenDung/jobs HTTP/1.1" 400 841
+0:0:0:0:0:0:0:1 - - [06/Jul/2026:17:39:05 +0700] "POST /AppTuyenDung/jobs HTTP/1.1" 200 18
+0:0:0:0:0:0:0:1 - - [06/Jul/2026:17:52:19 +0700] "POST /AppTuyenDung/jobs HTTP/1.1" 200 84

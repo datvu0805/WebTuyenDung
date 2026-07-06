@@ -5,7 +5,7 @@ import model.Skills;
 
 import java.util.List;
 
-public class SkillsDAO extends DatabaseConfig implements TDAO<Skills> {
+public class SkillDAO extends DatabaseConfig implements TDAO<Skills> {
     @Override
     public void add(Skills entity) {
 

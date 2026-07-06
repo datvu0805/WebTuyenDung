@@ -4,10 +4,9 @@ package dao;
 import config.DatabaseConfig;
 import model.Certificates;
 
-import java.sql.Connection;
 import java.util.List;
 
-public class CandidateCertificatesDAO extends DatabaseConfig implements TDAO<Certificates> {
+public class CandidateCertificateDAO extends DatabaseConfig implements TDAO<Certificates> {
     @Override
     public void add(Certificates entity) {
 

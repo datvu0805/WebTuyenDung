@@ -23,4 +23,9 @@ public abstract class BaseServlet extends HttpServlet {
             throws ServletException, IOException {
         response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "DELETE not supported");
     }
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException{
+        response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "DELETE not supported");
+    }
 }

@@ -3,10 +3,8 @@ package service;
 import config.MinIOConfig;
 import dao.CVDAO;
 import dto.UploadCVDTO;
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
+import io.minio.errors.MinioException;
 import model.CV;
 import model.Candidates;
 import validator.CVValidator;
@@ -14,15 +12,16 @@ import validator.CVValidator;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.TimeUnit;
 
 public class CVService {
     private final String BUCKET_NAME = "other-project";
     private final CVDAO cvdao = new CVDAO();
 
-    public String handleUploadCV(UploadCVDTO dto) throws Exception {
+    public CV handleUploadCV(UploadCVDTO dto) throws Exception {
         String valResult = CVValidator.validate(dto);
         if (valResult != null) {
-            return valResult;
+           throw new IllegalArgumentException(valResult);
         }
 
         int candidateID = Integer.parseInt(dto.getCandidateId());
@@ -72,6 +71,28 @@ public class CVService {
         cv.setUpdatedAt(now);
 
         cvdao.add(cv);
-        return "SUCCESS";
+
+        // chuyển đổi thành link url;
+        cv.setFileUrl(genarateMinioURL(cvObjectName));
+        cv.setAvatarURl(genarateMinioURL(avatarObjectName));
+        return cv;
+    }
+    public String genarateMinioURL(String objectName){
+        if(objectName == null || objectName.trim().isEmpty()){
+            return null;
+        }
+        try{
+            MinioClient minioClient = MinIOConfig.getClient();
+            return minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .method(Http.Method.GET)
+                            .bucket(BUCKET_NAME)
+                            .object(objectName)
+                            .expiry(1, TimeUnit.DAYS).build()
+            );
+        } catch (MinioException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

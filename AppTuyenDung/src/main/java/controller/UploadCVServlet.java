@@ -1,6 +1,9 @@
 package controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import dto.ApiResponse;
 import dto.UploadCVDTO;
+import model.CV;
 import service.CVService;
 
 import javax.servlet.ServletException;
@@ -13,17 +16,20 @@ import java.io.IOException;
 
 @WebServlet("/UploadCV")
 @MultipartConfig(
-        fileSizeThreshold = 1024 * 1024 * 2,  // 2MB bộ đệm
-        maxFileSize = 1024 * 1024 * 10,       // 10MB tối đa cho 1 file
-        maxRequestSize = 1024 * 1024 * 30     // 30MB trần tổng request
+        fileSizeThreshold = 0,
+        maxFileSize = 1024 * 1024 * 2,
+        maxRequestSize = 1024 * 1024 * 3
 )
 public class UploadCVServlet extends HttpServlet {
     private final CVService cvService = new CVService();
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        response.setContentType("text/plain;charset=UTF-8");
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
 
         try {
             UploadCVDTO dto = new UploadCVDTO();
@@ -34,20 +40,21 @@ public class UploadCVServlet extends HttpServlet {
             dto.setFileCV(request.getPart("file"));
             dto.setFileAvatar(request.getPart("avatar_url"));
 
-            String result = cvService.handleUploadCV(dto);
+            CV saveCV = cvService.handleUploadCV(dto);
 
-            if ("SUCCESS".equals(result)) {
+            if (saveCV != null) {
                 response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().write("Thành công: Hệ thống phân lớp đã lưu hồ sơ hoàn chỉnh!");
-            } else {
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write(result);
+                ApiResponse<CV> apiResponse = new ApiResponse<>(true, "Hệ thống đã ẩy file lên MinIO thành công", saveCV);
+                response.getWriter().print(this.objectMapper.writeValueAsString(apiResponse));
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("Lỗi hệ thống máy chủ Servlet: " + e.getMessage());
+            ApiResponse<Void> apiResponse = new ApiResponse<>(false, e.getMessage());
+            response.getWriter().print(this.objectMapper.writeValueAsString(apiResponse));
+        }finally {
+            response.getWriter().flush();
         }
     }
 }

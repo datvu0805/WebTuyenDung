@@ -31,7 +31,15 @@ public class CVDAO   implements IDAO<CV>{
             ps.setObject(7, cv.getCreatedAt());
             ps.setObject(8, cv.getUpdatedAt());
 
-            int result = ps.executeUpdate();
+            ps.executeUpdate();
+
+            // id tự tăng khi đc sinh ra trong db
+            try(ResultSet generateKeys = ps.getGeneratedKeys()) {
+                if(generateKeys.next()){
+                    int generateID = generateKeys.getInt(1);
+                    cv.setId(generateID);
+                }
+            }
 
         }catch (Exception e){
             e.printStackTrace();

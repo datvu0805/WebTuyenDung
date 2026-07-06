@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class CVService {
-    private final String BUCKET_NAME = "other-project"; // Chuẩn S3 không chứa dấu gạch dưới (_)
+    private final String BUCKET_NAME = "other-project";
     private final CVDAO cvdao = new CVDAO();
 
     public String handleUploadCV(UploadCVDTO dto) throws Exception {
@@ -37,7 +37,7 @@ public class CVService {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(BUCKET_NAME).build());
         }
 
-        String cvObjectName = "cv_" + timestamp + "_" + dto.getFileCV().getSubmittedFileName();
+        String cvObjectName = "candidates/" +candidateID  + "/cvs/cv_" + timestamp + "_"+ dto.getFileCV().getSubmittedFileName();
         try (InputStream inputStream = dto.getFileCV().getInputStream()) {
             minioClient.putObject(
                     PutObjectArgs.builder().bucket(BUCKET_NAME)
@@ -48,7 +48,7 @@ public class CVService {
 
         String avatarObjectName = null;
         if (dto.getFileAvatar() != null && dto.getFileAvatar().getSize() > 0) {
-            avatarObjectName = "avatar_" + timestamp + "_" + dto.getFileAvatar().getSubmittedFileName();
+            avatarObjectName = "candidates/" + candidateID + "/avatars/avatar_" + timestamp + "_" + dto.getFileAvatar().getSubmittedFileName();
             try (InputStream avatarStream = dto.getFileAvatar().getInputStream()) {
                 minioClient.putObject(
                         PutObjectArgs.builder().bucket(BUCKET_NAME)

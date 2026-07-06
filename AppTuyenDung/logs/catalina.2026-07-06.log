@@ -1,0 +1,504 @@
+06-Jul-2026 09:18:26.447 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version name:   Apache Tomcat/9.0.117
+06-Jul-2026 09:18:26.453 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          Mar 30 2026 18:21:16 UTC
+06-Jul-2026 09:18:26.454 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version number: 9.0.117.0
+06-Jul-2026 09:18:26.454 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Windows 10
+06-Jul-2026 09:18:26.455 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            10.0
+06-Jul-2026 09:18:26.455 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+06-Jul-2026 09:18:26.455 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             C:\Program Files\Java\jdk-21
+06-Jul-2026 09:18:26.456 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           21.0.5+9-LTS-239
+06-Jul-2026 09:18:26.456 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Oracle Corporation
+06-Jul-2026 09:18:26.456 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         D:\web\WebTuyenDung\AppTuyenDung
+06-Jul-2026 09:18:26.456 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         D:\Study Java\apache-tomcat-9.0.117
+06-Jul-2026 09:18:26.467 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.lang=ALL-UNNAMED
+06-Jul-2026 09:18:26.467 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.io=ALL-UNNAMED
+06-Jul-2026 09:18:26.467 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util=ALL-UNNAMED
+06-Jul-2026 09:18:26.468 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+06-Jul-2026 09:18:26.468 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+06-Jul-2026 09:18:26.468 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=D:\Study Java\apache-tomcat-9.0.117
+06-Jul-2026 09:18:26.468 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=D:\web\WebTuyenDung\AppTuyenDung
+06-Jul-2026 09:18:26.468 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=D:\web\WebTuyenDung\AppTuyenDung\temp
+06-Jul-2026 09:18:26.468 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=D:\web\WebTuyenDung\AppTuyenDung\conf\logging.properties
+06-Jul-2026 09:18:26.469 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+06-Jul-2026 09:18:26.469 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2026.1.1\lib\idea_rt.jar=62531
+06-Jul-2026 09:18:26.469 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dfile.encoding=UTF-8
+06-Jul-2026 09:18:26.469 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dsun.stdout.encoding=UTF-8
+06-Jul-2026 09:18:26.469 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dsun.stderr.encoding=UTF-8
+06-Jul-2026 09:18:26.476 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent Loaded Apache Tomcat Native library [1.3.7] using APR version [1.7.6].
+06-Jul-2026 09:18:26.476 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true], UDS [true].
+06-Jul-2026 09:18:26.476 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+06-Jul-2026 09:18:26.487 INFO [main] org.apache.catalina.core.AprLifecycleListener.initializeSSL OpenSSL successfully initialized [OpenSSL 3.0.19 27 Jan 2026]
+06-Jul-2026 09:18:27.062 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:18:27.099 INFO [main] org.apache.catalina.startup.Catalina.load Server initialization in [1015] milliseconds
+06-Jul-2026 09:18:27.171 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service [Catalina]
+06-Jul-2026 09:18:27.171 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet engine: [Apache Tomcat/9.0.117]
+06-Jul-2026 09:18:27.184 INFO [main] org.apache.catalina.startup.HostConfig.deployDescriptor Deploying deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml]
+06-Jul-2026 09:18:27.985 SEVERE [main] org.apache.catalina.startup.HostConfig.deployDescriptor Error deploying deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml]
+	java.lang.IllegalStateException: Error starting child
+		at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:600)
+		at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:569)
+		at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:608)
+		at org.apache.catalina.startup.HostConfig.deployDescriptor(HostConfig.java:677)
+		at org.apache.catalina.startup.HostConfig$DeployDescriptor.run(HostConfig.java:1836)
+		at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+		at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:82)
+		at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:123)
+		at org.apache.catalina.startup.HostConfig.deployDescriptors(HostConfig.java:572)
+		at org.apache.catalina.startup.HostConfig.deployApps(HostConfig.java:463)
+		at org.apache.catalina.startup.HostConfig.start(HostConfig.java:1576)
+		at org.apache.catalina.startup.HostConfig.lifecycleEvent(HostConfig.java:309)
+		at org.apache.catalina.util.LifecycleBase.fireLifecycleEvent(LifecycleBase.java:109)
+		at org.apache.catalina.util.LifecycleBase.setStateInternal(LifecycleBase.java:389)
+		at org.apache.catalina.util.LifecycleBase.setState(LifecycleBase.java:336)
+		at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:774)
+		at org.apache.catalina.core.StandardHost.startInternal(StandardHost.java:726)
+		at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+		at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1201)
+		at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1191)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+		at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:82)
+		at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+		at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:747)
+		at org.apache.catalina.core.StandardEngine.startInternal(StandardEngine.java:209)
+		at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+		at org.apache.catalina.core.StandardService.startInternal(StandardService.java:410)
+		at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+		at org.apache.catalina.core.StandardServer.startInternal(StandardServer.java:872)
+		at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+		at org.apache.catalina.startup.Catalina.start(Catalina.java:736)
+		at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+		at org.apache.catalina.startup.Bootstrap.start(Bootstrap.java:342)
+		at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:473)
+	Caused by: org.apache.catalina.LifecycleException: Failed to start component [StandardEngine[Catalina].StandardHost[localhost].StandardContext[/AppTuyenDung]]
+		at org.apache.catalina.util.LifecycleBase.handleSubClassException(LifecycleBase.java:404)
+		at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:179)
+		at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:597)
+		... 35 more
+	Caused by: java.lang.IllegalArgumentException: The servlets named [controller.JobsSevrlet] and [model.main.java.controller.JobsSevrlet] are both mapped to the url-pattern [/jobs] which is not permitted
+		at org.apache.tomcat.util.descriptor.web.WebXml.addServletMappingDecoded(WebXml.java:415)
+		at org.apache.tomcat.util.descriptor.web.WebXml.addServletMapping(WebXml.java:406)
+		at org.apache.catalina.startup.ContextConfig.processAnnotationWebServlet(ContextConfig.java:2554)
+		at org.apache.catalina.startup.ContextConfig.processClass(ContextConfig.java:2260)
+		at org.apache.catalina.startup.ContextConfig.processAnnotationsStream(ContextConfig.java:2249)
+		at org.apache.catalina.startup.ContextConfig.processAnnotationsWebResource(ContextConfig.java:2160)
+		at org.apache.catalina.startup.ContextConfig.processAnnotationsWebResource(ContextConfig.java:2155)
+		at org.apache.catalina.startup.ContextConfig.processAnnotationsWebResource(ContextConfig.java:2155)
+		at org.apache.catalina.startup.ContextConfig.processAnnotationsWebResource(ContextConfig.java:2155)
+		at org.apache.catalina.startup.ContextConfig.processAnnotationsWebResource(ContextConfig.java:2155)
+		at org.apache.catalina.startup.ContextConfig.processClasses(ContextConfig.java:1360)
+		at org.apache.catalina.startup.ContextConfig.webConfig(ContextConfig.java:1270)
+		at org.apache.catalina.startup.ContextConfig.configureStart(ContextConfig.java:971)
+		at org.apache.catalina.startup.ContextConfig.lifecycleEvent(ContextConfig.java:288)
+		at org.apache.catalina.util.LifecycleBase.fireLifecycleEvent(LifecycleBase.java:109)
+		at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:4395)
+		at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+		... 36 more
+06-Jul-2026 09:18:27.990 INFO [main] org.apache.catalina.startup.HostConfig.deployDescriptor Deployment of deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml] has finished in [805] ms
+06-Jul-2026 09:18:27.997 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:18:28.094 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in [993] milliseconds
+06-Jul-2026 09:21:44.597 INFO [Thread-1] org.apache.coyote.AbstractProtocol.pause Pausing ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:21:44.604 INFO [Thread-1] org.apache.catalina.core.StandardService.stopInternal Stopping service [Catalina]
+06-Jul-2026 09:21:44.609 INFO [Thread-1] org.apache.coyote.AbstractProtocol.stop Stopping ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:21:44.618 INFO [Thread-1] org.apache.coyote.AbstractProtocol.destroy Destroying ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:21:47.911 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version name:   Apache Tomcat/9.0.117
+06-Jul-2026 09:21:47.916 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          Mar 30 2026 18:21:16 UTC
+06-Jul-2026 09:21:47.917 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version number: 9.0.117.0
+06-Jul-2026 09:21:47.917 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Windows 10
+06-Jul-2026 09:21:47.917 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            10.0
+06-Jul-2026 09:21:47.918 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+06-Jul-2026 09:21:47.918 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             C:\Program Files\Java\jdk-21
+06-Jul-2026 09:21:47.918 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           21.0.5+9-LTS-239
+06-Jul-2026 09:21:47.918 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Oracle Corporation
+06-Jul-2026 09:21:47.919 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         D:\web\WebTuyenDung\AppTuyenDung
+06-Jul-2026 09:21:47.919 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         D:\Study Java\apache-tomcat-9.0.117
+06-Jul-2026 09:21:47.930 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.lang=ALL-UNNAMED
+06-Jul-2026 09:21:47.931 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.io=ALL-UNNAMED
+06-Jul-2026 09:21:47.931 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util=ALL-UNNAMED
+06-Jul-2026 09:21:47.931 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+06-Jul-2026 09:21:47.931 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+06-Jul-2026 09:21:47.931 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=D:\Study Java\apache-tomcat-9.0.117
+06-Jul-2026 09:21:47.932 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=D:\web\WebTuyenDung\AppTuyenDung
+06-Jul-2026 09:21:47.932 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=D:\web\WebTuyenDung\AppTuyenDung\temp
+06-Jul-2026 09:21:47.932 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=D:\web\WebTuyenDung\AppTuyenDung\conf\logging.properties
+06-Jul-2026 09:21:47.932 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+06-Jul-2026 09:21:47.932 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2026.1.1\lib\idea_rt.jar=62589
+06-Jul-2026 09:21:47.932 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dfile.encoding=UTF-8
+06-Jul-2026 09:21:47.933 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dsun.stdout.encoding=UTF-8
+06-Jul-2026 09:21:47.933 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dsun.stderr.encoding=UTF-8
+06-Jul-2026 09:21:47.939 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent Loaded Apache Tomcat Native library [1.3.7] using APR version [1.7.6].
+06-Jul-2026 09:21:47.939 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true], UDS [true].
+06-Jul-2026 09:21:47.940 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+06-Jul-2026 09:21:47.948 INFO [main] org.apache.catalina.core.AprLifecycleListener.initializeSSL OpenSSL successfully initialized [OpenSSL 3.0.19 27 Jan 2026]
+06-Jul-2026 09:21:48.495 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:21:48.535 INFO [main] org.apache.catalina.startup.Catalina.load Server initialization in [1058] milliseconds
+06-Jul-2026 09:21:48.630 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service [Catalina]
+06-Jul-2026 09:21:48.630 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet engine: [Apache Tomcat/9.0.117]
+06-Jul-2026 09:21:48.644 INFO [main] org.apache.catalina.startup.HostConfig.deployDescriptor Deploying deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml]
+06-Jul-2026 09:21:49.361 SEVERE [main] org.apache.catalina.startup.HostConfig.deployDescriptor Error deploying deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml]
+	java.lang.IllegalStateException: Error starting child
+		at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:600)
+		at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:569)
+		at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:608)
+		at org.apache.catalina.startup.HostConfig.deployDescriptor(HostConfig.java:677)
+		at org.apache.catalina.startup.HostConfig$DeployDescriptor.run(HostConfig.java:1836)
+		at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+		at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:82)
+		at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:123)
+		at org.apache.catalina.startup.HostConfig.deployDescriptors(HostConfig.java:572)
+		at org.apache.catalina.startup.HostConfig.deployApps(HostConfig.java:463)
+		at org.apache.catalina.startup.HostConfig.start(HostConfig.java:1576)
+		at org.apache.catalina.startup.HostConfig.lifecycleEvent(HostConfig.java:309)
+		at org.apache.catalina.util.LifecycleBase.fireLifecycleEvent(LifecycleBase.java:109)
+		at org.apache.catalina.util.LifecycleBase.setStateInternal(LifecycleBase.java:389)
+		at org.apache.catalina.util.LifecycleBase.setState(LifecycleBase.java:336)
+		at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:774)
+		at org.apache.catalina.core.StandardHost.startInternal(StandardHost.java:726)
+		at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+		at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1201)
+		at org.apache.catalina.core.ContainerBase$StartChild.call(ContainerBase.java:1191)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+		at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:82)
+		at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:145)
+		at org.apache.catalina.core.ContainerBase.startInternal(ContainerBase.java:747)
+		at org.apache.catalina.core.StandardEngine.startInternal(StandardEngine.java:209)
+		at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+		at org.apache.catalina.core.StandardService.startInternal(StandardService.java:410)
+		at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+		at org.apache.catalina.core.StandardServer.startInternal(StandardServer.java:872)
+		at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+		at org.apache.catalina.startup.Catalina.start(Catalina.java:736)
+		at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+		at org.apache.catalina.startup.Bootstrap.start(Bootstrap.java:342)
+		at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:473)
+	Caused by: org.apache.catalina.LifecycleException: Failed to start component [StandardEngine[Catalina].StandardHost[localhost].StandardContext[/AppTuyenDung]]
+		at org.apache.catalina.util.LifecycleBase.handleSubClassException(LifecycleBase.java:404)
+		at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:179)
+		at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:597)
+		... 35 more
+	Caused by: java.lang.IllegalArgumentException: The servlets named [controller.JobsSevrlet] and [model.main.java.controller.JobsSevrlet] are both mapped to the url-pattern [/jobs] which is not permitted
+		at org.apache.tomcat.util.descriptor.web.WebXml.addServletMappingDecoded(WebXml.java:415)
+		at org.apache.tomcat.util.descriptor.web.WebXml.addServletMapping(WebXml.java:406)
+		at org.apache.catalina.startup.ContextConfig.processAnnotationWebServlet(ContextConfig.java:2554)
+		at org.apache.catalina.startup.ContextConfig.processClass(ContextConfig.java:2260)
+		at org.apache.catalina.startup.ContextConfig.processAnnotationsStream(ContextConfig.java:2249)
+		at org.apache.catalina.startup.ContextConfig.processAnnotationsWebResource(ContextConfig.java:2160)
+		at org.apache.catalina.startup.ContextConfig.processAnnotationsWebResource(ContextConfig.java:2155)
+		at org.apache.catalina.startup.ContextConfig.processAnnotationsWebResource(ContextConfig.java:2155)
+		at org.apache.catalina.startup.ContextConfig.processAnnotationsWebResource(ContextConfig.java:2155)
+		at org.apache.catalina.startup.ContextConfig.processAnnotationsWebResource(ContextConfig.java:2155)
+		at org.apache.catalina.startup.ContextConfig.processClasses(ContextConfig.java:1360)
+		at org.apache.catalina.startup.ContextConfig.webConfig(ContextConfig.java:1270)
+		at org.apache.catalina.startup.ContextConfig.configureStart(ContextConfig.java:971)
+		at org.apache.catalina.startup.ContextConfig.lifecycleEvent(ContextConfig.java:288)
+		at org.apache.catalina.util.LifecycleBase.fireLifecycleEvent(LifecycleBase.java:109)
+		at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:4395)
+		at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+		... 36 more
+06-Jul-2026 09:21:49.371 INFO [main] org.apache.catalina.startup.HostConfig.deployDescriptor Deployment of deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml] has finished in [725] ms
+06-Jul-2026 09:21:49.376 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:21:49.468 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in [930] milliseconds
+06-Jul-2026 09:24:49.739 INFO [Thread-1] org.apache.coyote.AbstractProtocol.pause Pausing ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:24:49.748 INFO [Thread-1] org.apache.catalina.core.StandardService.stopInternal Stopping service [Catalina]
+06-Jul-2026 09:24:49.750 INFO [Thread-1] org.apache.coyote.AbstractProtocol.stop Stopping ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:24:49.753 INFO [Thread-1] org.apache.coyote.AbstractProtocol.destroy Destroying ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:32:38.976 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version name:   Apache Tomcat/9.0.117
+06-Jul-2026 09:32:38.988 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          Mar 30 2026 18:21:16 UTC
+06-Jul-2026 09:32:38.989 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version number: 9.0.117.0
+06-Jul-2026 09:32:38.989 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Windows 10
+06-Jul-2026 09:32:38.990 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            10.0
+06-Jul-2026 09:32:38.991 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+06-Jul-2026 09:32:38.991 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             C:\Program Files\Java\jdk-21
+06-Jul-2026 09:32:38.992 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           21.0.5+9-LTS-239
+06-Jul-2026 09:32:38.992 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Oracle Corporation
+06-Jul-2026 09:32:38.992 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         D:\web\WebTuyenDung\AppTuyenDung
+06-Jul-2026 09:32:38.992 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         D:\Study Java\apache-tomcat-9.0.117
+06-Jul-2026 09:32:39.016 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.lang=ALL-UNNAMED
+06-Jul-2026 09:32:39.017 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.io=ALL-UNNAMED
+06-Jul-2026 09:32:39.017 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util=ALL-UNNAMED
+06-Jul-2026 09:32:39.017 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+06-Jul-2026 09:32:39.017 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+06-Jul-2026 09:32:39.017 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=D:\Study Java\apache-tomcat-9.0.117
+06-Jul-2026 09:32:39.017 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=D:\web\WebTuyenDung\AppTuyenDung
+06-Jul-2026 09:32:39.018 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=D:\web\WebTuyenDung\AppTuyenDung\temp
+06-Jul-2026 09:32:39.018 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=D:\web\WebTuyenDung\AppTuyenDung\conf\logging.properties
+06-Jul-2026 09:32:39.018 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+06-Jul-2026 09:32:39.018 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2026.1.1\lib\idea_rt.jar=62787
+06-Jul-2026 09:32:39.019 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dfile.encoding=UTF-8
+06-Jul-2026 09:32:39.022 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dsun.stdout.encoding=UTF-8
+06-Jul-2026 09:32:39.023 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dsun.stderr.encoding=UTF-8
+06-Jul-2026 09:32:39.038 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent Loaded Apache Tomcat Native library [1.3.7] using APR version [1.7.6].
+06-Jul-2026 09:32:39.038 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true], UDS [true].
+06-Jul-2026 09:32:39.038 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+06-Jul-2026 09:32:39.073 INFO [main] org.apache.catalina.core.AprLifecycleListener.initializeSSL OpenSSL successfully initialized [OpenSSL 3.0.19 27 Jan 2026]
+06-Jul-2026 09:32:40.108 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:32:40.183 INFO [main] org.apache.catalina.startup.Catalina.load Server initialization in [2367] milliseconds
+06-Jul-2026 09:32:40.324 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service [Catalina]
+06-Jul-2026 09:32:40.324 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet engine: [Apache Tomcat/9.0.117]
+06-Jul-2026 09:32:40.345 INFO [main] org.apache.catalina.startup.HostConfig.deployDescriptor Deploying deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml]
+06-Jul-2026 09:32:45.105 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version name:   Apache Tomcat/9.0.117
+06-Jul-2026 09:32:45.114 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          Mar 30 2026 18:21:16 UTC
+06-Jul-2026 09:32:45.114 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version number: 9.0.117.0
+06-Jul-2026 09:32:45.115 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Windows 10
+06-Jul-2026 09:32:45.115 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            10.0
+06-Jul-2026 09:32:45.115 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+06-Jul-2026 09:32:45.115 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             C:\Program Files\Java\jdk-21
+06-Jul-2026 09:32:45.116 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           21.0.5+9-LTS-239
+06-Jul-2026 09:32:45.116 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Oracle Corporation
+06-Jul-2026 09:32:45.116 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         D:\web\WebTuyenDung\AppTuyenDung
+06-Jul-2026 09:32:45.117 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         D:\Study Java\apache-tomcat-9.0.117
+06-Jul-2026 09:32:45.130 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.lang=ALL-UNNAMED
+06-Jul-2026 09:32:45.131 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.io=ALL-UNNAMED
+06-Jul-2026 09:32:45.131 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util=ALL-UNNAMED
+06-Jul-2026 09:32:45.131 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+06-Jul-2026 09:32:45.131 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+06-Jul-2026 09:32:45.132 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=D:\Study Java\apache-tomcat-9.0.117
+06-Jul-2026 09:32:45.132 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=D:\web\WebTuyenDung\AppTuyenDung
+06-Jul-2026 09:32:45.132 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=D:\web\WebTuyenDung\AppTuyenDung\temp
+06-Jul-2026 09:32:45.132 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=D:\web\WebTuyenDung\AppTuyenDung\conf\logging.properties
+06-Jul-2026 09:32:45.132 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+06-Jul-2026 09:32:45.133 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2026.1.1\lib\idea_rt.jar=62790
+06-Jul-2026 09:32:45.133 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dfile.encoding=UTF-8
+06-Jul-2026 09:32:45.134 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dsun.stdout.encoding=UTF-8
+06-Jul-2026 09:32:45.134 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dsun.stderr.encoding=UTF-8
+06-Jul-2026 09:32:45.140 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent Loaded Apache Tomcat Native library [1.3.7] using APR version [1.7.6].
+06-Jul-2026 09:32:45.140 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true], UDS [true].
+06-Jul-2026 09:32:45.140 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+06-Jul-2026 09:32:45.150 INFO [main] org.apache.catalina.core.AprLifecycleListener.initializeSSL OpenSSL successfully initialized [OpenSSL 3.0.19 27 Jan 2026]
+06-Jul-2026 09:32:45.915 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:32:45.934 SEVERE [main] org.apache.catalina.util.LifecycleBase.handleSubClassException Failed to initialize component [Connector["http-nio-8080"]]
+	org.apache.catalina.LifecycleException: Protocol handler initialization failed
+		at org.apache.catalina.connector.Connector.initInternal(Connector.java:1084)
+		at org.apache.catalina.util.LifecycleBase.init(LifecycleBase.java:122)
+		at org.apache.catalina.core.StandardService.initInternal(StandardService.java:520)
+		at org.apache.catalina.util.LifecycleBase.init(LifecycleBase.java:122)
+		at org.apache.catalina.core.StandardServer.initInternal(StandardServer.java:984)
+		at org.apache.catalina.util.LifecycleBase.init(LifecycleBase.java:122)
+		at org.apache.catalina.startup.Catalina.load(Catalina.java:687)
+		at org.apache.catalina.startup.Catalina.load(Catalina.java:710)
+		at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+		at org.apache.catalina.startup.Bootstrap.load(Bootstrap.java:299)
+		at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:472)
+	Caused by: java.net.BindException: Address already in use: bind
+		at java.base/sun.nio.ch.Net.bind0(Native Method)
+		at java.base/sun.nio.ch.Net.bind(Net.java:565)
+		at java.base/sun.nio.ch.ServerSocketChannelImpl.netBind(ServerSocketChannelImpl.java:344)
+		at java.base/sun.nio.ch.ServerSocketChannelImpl.bind(ServerSocketChannelImpl.java:301)
+		at org.apache.tomcat.util.net.NioEndpoint.initServerSocket(NioEndpoint.java:296)
+		at org.apache.tomcat.util.net.NioEndpoint.bind(NioEndpoint.java:251)
+		at org.apache.tomcat.util.net.AbstractEndpoint.bindWithCleanup(AbstractEndpoint.java:1498)
+		at org.apache.tomcat.util.net.AbstractEndpoint.init(AbstractEndpoint.java:1511)
+		at org.apache.coyote.AbstractProtocol.init(AbstractProtocol.java:667)
+		at org.apache.coyote.http11.AbstractHttp11Protocol.init(AbstractHttp11Protocol.java:80)
+		at org.apache.catalina.connector.Connector.initInternal(Connector.java:1082)
+		... 11 more
+06-Jul-2026 09:32:45.937 INFO [main] org.apache.catalina.startup.Catalina.load Server initialization in [1294] milliseconds
+06-Jul-2026 09:32:46.029 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service [Catalina]
+06-Jul-2026 09:32:46.030 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet engine: [Apache Tomcat/9.0.117]
+06-Jul-2026 09:32:46.050 INFO [main] org.apache.catalina.startup.HostConfig.deployDescriptor Deploying deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml]
+06-Jul-2026 09:32:46.640 INFO [main] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+06-Jul-2026 09:32:46.829 INFO [main] org.apache.catalina.startup.HostConfig.deployDescriptor Deployment of deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml] has finished in [6,484] ms
+06-Jul-2026 09:32:46.838 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:32:46.894 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in [6703] milliseconds
+06-Jul-2026 09:32:50.829 INFO [main] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+06-Jul-2026 09:32:51.132 INFO [main] org.apache.catalina.startup.HostConfig.deployDescriptor Deployment of deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml] has finished in [5,078] ms
+06-Jul-2026 09:32:51.154 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in [5214] milliseconds
+06-Jul-2026 09:32:51.181 SEVERE [main] org.apache.catalina.core.StandardServer.await Failed to create server shutdown socket on address [localhost] and port [8005] (base port [8005] and offset [0])
+	java.net.BindException: Address already in use: bind
+		at java.base/sun.nio.ch.Net.bind0(Native Method)
+		at java.base/sun.nio.ch.Net.bind(Net.java:565)
+		at java.base/sun.nio.ch.Net.bind(Net.java:554)
+		at java.base/sun.nio.ch.NioSocketImpl.bind(NioSocketImpl.java:636)
+		at java.base/java.net.ServerSocket.bind(ServerSocket.java:391)
+		at java.base/java.net.ServerSocket.<init>(ServerSocket.java:278)
+		at org.apache.catalina.core.StandardServer.await(StandardServer.java:535)
+		at org.apache.catalina.startup.Catalina.await(Catalina.java:826)
+		at org.apache.catalina.startup.Catalina.start(Catalina.java:774)
+		at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+		at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+		at org.apache.catalina.startup.Bootstrap.start(Bootstrap.java:342)
+		at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:473)
+06-Jul-2026 09:32:51.182 INFO [main] org.apache.coyote.AbstractProtocol.pause Pausing ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:32:51.182 INFO [main] org.apache.catalina.core.StandardService.stopInternal Stopping service [Catalina]
+06-Jul-2026 09:32:51.216 INFO [main] org.apache.coyote.AbstractProtocol.stop Stopping ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:32:51.217 INFO [main] org.apache.coyote.AbstractProtocol.destroy Destroying ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 09:32:56.853 INFO [Catalina-utility-1] org.apache.catalina.startup.HostConfig.undeploy Undeploying context [/AppTuyenDung]
+06-Jul-2026 09:32:56.869 INFO [Catalina-utility-1] org.apache.catalina.startup.HostConfig.deployDescriptor Deploying deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml]
+06-Jul-2026 09:32:59.360 INFO [Catalina-utility-1] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+06-Jul-2026 09:32:59.404 INFO [Catalina-utility-1] org.apache.catalina.startup.HostConfig.deployDescriptor Deployment of deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml] has finished in [2,535] ms
+06-Jul-2026 10:00:20.403 INFO [Thread-1] org.apache.coyote.AbstractProtocol.pause Pausing ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 10:00:20.457 INFO [Thread-1] org.apache.catalina.core.StandardService.stopInternal Stopping service [Catalina]
+06-Jul-2026 10:00:20.560 WARNING [Thread-1] org.apache.catalina.loader.WebappClassLoaderBase.clearReferencesJdbc The web application [AppTuyenDung] registered the JDBC driver [org.postgresql.Driver] but failed to unregister it when the web application was stopped. To prevent a memory leak, the JDBC Driver has been forcibly unregistered.
+06-Jul-2026 10:00:20.568 WARNING [Thread-1] org.apache.catalina.loader.WebappClassLoaderBase.clearReferencesThreads The web application [AppTuyenDung] appears to have started a thread named [HikariPool-1 housekeeper] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ java.base/jdk.internal.misc.Unsafe.park(Native Method)
+ java.base/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:269)
+ java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1763)
+ java.base/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1182)
+ java.base/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:899)
+ java.base/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1070)
+ java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1130)
+ java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+ java.base/java.lang.Thread.run(Thread.java:1583)
+06-Jul-2026 10:00:20.658 INFO [Thread-1] org.apache.coyote.AbstractProtocol.stop Stopping ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 10:00:20.729 INFO [Thread-1] org.apache.coyote.AbstractProtocol.destroy Destroying ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 10:00:39.499 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version name:   Apache Tomcat/9.0.117
+06-Jul-2026 10:00:39.508 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          Mar 30 2026 18:21:16 UTC
+06-Jul-2026 10:00:39.509 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version number: 9.0.117.0
+06-Jul-2026 10:00:39.509 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Windows 10
+06-Jul-2026 10:00:39.509 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            10.0
+06-Jul-2026 10:00:39.510 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+06-Jul-2026 10:00:39.510 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             C:\Program Files\Java\jdk-21
+06-Jul-2026 10:00:39.510 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           21.0.5+9-LTS-239
+06-Jul-2026 10:00:39.510 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Oracle Corporation
+06-Jul-2026 10:00:39.511 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         D:\web\WebTuyenDung\AppTuyenDung
+06-Jul-2026 10:00:39.511 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         D:\Study Java\apache-tomcat-9.0.117
+06-Jul-2026 10:00:39.525 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.lang=ALL-UNNAMED
+06-Jul-2026 10:00:39.525 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.io=ALL-UNNAMED
+06-Jul-2026 10:00:39.526 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util=ALL-UNNAMED
+06-Jul-2026 10:00:39.526 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+06-Jul-2026 10:00:39.526 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+06-Jul-2026 10:00:39.526 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=D:\Study Java\apache-tomcat-9.0.117
+06-Jul-2026 10:00:39.526 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=D:\web\WebTuyenDung\AppTuyenDung
+06-Jul-2026 10:00:39.527 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=D:\web\WebTuyenDung\AppTuyenDung\temp
+06-Jul-2026 10:00:39.527 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=D:\web\WebTuyenDung\AppTuyenDung\conf\logging.properties
+06-Jul-2026 10:00:39.527 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+06-Jul-2026 10:00:39.527 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2026.1.1\lib\idea_rt.jar=63092
+06-Jul-2026 10:00:39.527 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dfile.encoding=UTF-8
+06-Jul-2026 10:00:39.528 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dsun.stdout.encoding=UTF-8
+06-Jul-2026 10:00:39.528 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dsun.stderr.encoding=UTF-8
+06-Jul-2026 10:00:39.539 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent Loaded Apache Tomcat Native library [1.3.7] using APR version [1.7.6].
+06-Jul-2026 10:00:39.540 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true], UDS [true].
+06-Jul-2026 10:00:39.540 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+06-Jul-2026 10:00:39.582 INFO [main] org.apache.catalina.core.AprLifecycleListener.initializeSSL OpenSSL successfully initialized [OpenSSL 3.0.19 27 Jan 2026]
+06-Jul-2026 10:00:40.390 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 10:00:40.416 INFO [main] org.apache.catalina.startup.Catalina.load Server initialization in [1356] milliseconds
+06-Jul-2026 10:00:40.505 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service [Catalina]
+06-Jul-2026 10:00:40.506 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet engine: [Apache Tomcat/9.0.117]
+06-Jul-2026 10:00:40.521 INFO [main] org.apache.catalina.startup.HostConfig.deployDescriptor Deploying deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml]
+06-Jul-2026 10:00:44.337 INFO [main] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+06-Jul-2026 10:00:44.451 INFO [main] org.apache.catalina.startup.HostConfig.deployDescriptor Deployment of deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml] has finished in [3,929] ms
+06-Jul-2026 10:00:44.455 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 10:00:44.479 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in [4061] milliseconds
+06-Jul-2026 10:09:15.057 INFO [Catalina-utility-1] org.apache.catalina.startup.HostConfig.undeploy Undeploying context [/AppTuyenDung]
+06-Jul-2026 10:09:15.218 WARNING [Catalina-utility-1] org.apache.catalina.loader.WebappClassLoaderBase.clearReferencesJdbc The web application [AppTuyenDung] registered the JDBC driver [org.postgresql.Driver] but failed to unregister it when the web application was stopped. To prevent a memory leak, the JDBC Driver has been forcibly unregistered.
+06-Jul-2026 10:09:15.227 WARNING [Catalina-utility-1] org.apache.catalina.loader.WebappClassLoaderBase.clearReferencesThreads The web application [AppTuyenDung] appears to have started a thread named [OkHttp TaskRunner] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ java.base/java.lang.Object.wait0(Native Method)
+ java.base/java.lang.Object.wait(Object.java:366)
+ java.base/java.lang.Object.wait(Object.java:488)
+ okhttp3.internal.concurrent.TaskRunner$RealBackend.coordinatorWait(TaskRunner.kt:294)
+ okhttp3.internal.concurrent.TaskRunner.awaitTaskToRun(TaskRunner.kt:218)
+ okhttp3.internal.concurrent.TaskRunner$runnable$1.run(TaskRunner.kt:59)
+ java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+ java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+ java.base/java.lang.Thread.run(Thread.java:1583)
+06-Jul-2026 10:09:15.230 WARNING [Catalina-utility-1] org.apache.catalina.loader.WebappClassLoaderBase.clearReferencesThreads The web application [AppTuyenDung] appears to have started a thread named [Okio Watchdog] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ java.base/jdk.internal.misc.Unsafe.park(Native Method)
+ java.base/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:269)
+ java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.await(AbstractQueuedSynchronizer.java:1852)
+ okio.AsyncTimeout$Companion.awaitTimeout$okio(AsyncTimeout.kt:320)
+ okio.AsyncTimeout$Watchdog.run(AsyncTimeout.kt:186)
+06-Jul-2026 10:09:15.230 WARNING [Catalina-utility-1] org.apache.catalina.loader.WebappClassLoaderBase.clearReferencesThreads The web application [AppTuyenDung] appears to have started a thread named [HikariPool-1 housekeeper] but has failed to stop it. This is very likely to create a memory leak. Stack trace of thread:
+ java.base/jdk.internal.misc.Unsafe.park(Native Method)
+ java.base/java.util.concurrent.locks.LockSupport.parkNanos(LockSupport.java:269)
+ java.base/java.util.concurrent.locks.AbstractQueuedSynchronizer$ConditionObject.awaitNanos(AbstractQueuedSynchronizer.java:1763)
+ java.base/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:1182)
+ java.base/java.util.concurrent.ScheduledThreadPoolExecutor$DelayedWorkQueue.take(ScheduledThreadPoolExecutor.java:899)
+ java.base/java.util.concurrent.ThreadPoolExecutor.getTask(ThreadPoolExecutor.java:1070)
+ java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1130)
+ java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+ java.base/java.lang.Thread.run(Thread.java:1583)
+06-Jul-2026 10:09:15.414 INFO [Catalina-utility-1] org.apache.catalina.startup.HostConfig.deployDescriptor Deploying deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml]
+06-Jul-2026 10:09:15.444 SEVERE [Catalina-utility-1] org.apache.catalina.startup.HostConfig.deployDescriptor Error deploying deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml]
+	java.lang.IllegalStateException: Error starting child
+		at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:600)
+		at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:569)
+		at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:608)
+		at org.apache.catalina.startup.HostConfig.deployDescriptor(HostConfig.java:677)
+		at org.apache.catalina.startup.HostConfig$DeployDescriptor.run(HostConfig.java:1836)
+		at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+		at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+		at org.apache.tomcat.util.threads.InlineExecutorService.execute(InlineExecutorService.java:82)
+		at java.base/java.util.concurrent.AbstractExecutorService.submit(AbstractExecutorService.java:123)
+		at org.apache.catalina.startup.HostConfig.deployDescriptors(HostConfig.java:572)
+		at org.apache.catalina.startup.HostConfig.deployApps(HostConfig.java:463)
+		at org.apache.catalina.startup.HostConfig.check(HostConfig.java:1625)
+		at org.apache.catalina.startup.HostConfig.lifecycleEvent(HostConfig.java:305)
+		at org.apache.catalina.util.LifecycleBase.fireLifecycleEvent(LifecycleBase.java:109)
+		at org.apache.catalina.core.ContainerBase.backgroundProcess(ContainerBase.java:971)
+		at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.processChildren(ContainerBase.java:1170)
+		at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.processChildren(ContainerBase.java:1174)
+		at org.apache.catalina.core.ContainerBase$ContainerBackgroundProcessor.run(ContainerBase.java:1152)
+		at java.base/java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:572)
+		at java.base/java.util.concurrent.FutureTask.runAndReset(FutureTask.java:358)
+		at java.base/java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask.run(ScheduledThreadPoolExecutor.java:305)
+		at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+		at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+		at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:63)
+		at java.base/java.lang.Thread.run(Thread.java:1583)
+	Caused by: org.apache.catalina.LifecycleException: Failed to initialize component [org.apache.catalina.webresources.DirResourceSet@28c8dc41]
+		at org.apache.catalina.util.LifecycleBase.handleSubClassException(LifecycleBase.java:404)
+		at org.apache.catalina.util.LifecycleBase.init(LifecycleBase.java:125)
+		at org.apache.catalina.webresources.StandardRoot.initInternal(StandardRoot.java:698)
+		at org.apache.catalina.util.LifecycleBase.init(LifecycleBase.java:122)
+		at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:155)
+		at org.apache.catalina.core.StandardContext.resourcesStart(StandardContext.java:4160)
+		at org.apache.catalina.core.StandardContext.startInternal(StandardContext.java:4282)
+		at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:164)
+		at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:597)
+		... 24 more
+	Caused by: java.lang.IllegalArgumentException: The directory specified by base and internal path [D:/gitstudy/AppTuyenDung/target/classes]\[] does not exist.
+		at org.apache.catalina.webresources.DirResourceSet.checkType(DirResourceSet.java:319)
+		at org.apache.catalina.webresources.AbstractFileResourceSet.initInternal(AbstractFileResourceSet.java:248)
+		at org.apache.catalina.webresources.DirResourceSet.initInternal(DirResourceSet.java:326)
+		at org.apache.catalina.util.LifecycleBase.init(LifecycleBase.java:122)
+		... 31 more
+06-Jul-2026 10:09:15.516 INFO [Catalina-utility-1] org.apache.catalina.startup.HostConfig.deployDescriptor Deployment of deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml] has finished in [95] ms
+06-Jul-2026 10:42:21.075 INFO [Thread-1] org.apache.coyote.AbstractProtocol.pause Pausing ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 10:42:21.099 INFO [Thread-1] org.apache.catalina.core.StandardService.stopInternal Stopping service [Catalina]
+06-Jul-2026 10:42:21.128 INFO [Thread-1] org.apache.coyote.AbstractProtocol.stop Stopping ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 10:42:21.169 INFO [Thread-1] org.apache.coyote.AbstractProtocol.destroy Destroying ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 10:43:02.352 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version name:   Apache Tomcat/9.0.117
+06-Jul-2026 10:43:02.374 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          Mar 30 2026 18:21:16 UTC
+06-Jul-2026 10:43:02.376 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version number: 9.0.117.0
+06-Jul-2026 10:43:02.377 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Windows 10
+06-Jul-2026 10:43:02.378 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            10.0
+06-Jul-2026 10:43:02.378 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+06-Jul-2026 10:43:02.379 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             C:\Program Files\Java\jdk-21
+06-Jul-2026 10:43:02.380 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           21.0.5+9-LTS-239
+06-Jul-2026 10:43:02.381 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Oracle Corporation
+06-Jul-2026 10:43:02.381 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         D:\web\WebTuyenDung\AppTuyenDung
+06-Jul-2026 10:43:02.382 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         D:\Study Java\apache-tomcat-9.0.117
+06-Jul-2026 10:43:02.430 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.lang=ALL-UNNAMED
+06-Jul-2026 10:43:02.431 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.io=ALL-UNNAMED
+06-Jul-2026 10:43:02.433 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util=ALL-UNNAMED
+06-Jul-2026 10:43:02.434 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+06-Jul-2026 10:43:02.434 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED
+06-Jul-2026 10:43:02.435 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=D:\Study Java\apache-tomcat-9.0.117
+06-Jul-2026 10:43:02.436 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=D:\web\WebTuyenDung\AppTuyenDung
+06-Jul-2026 10:43:02.436 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=D:\web\WebTuyenDung\AppTuyenDung\temp
+06-Jul-2026 10:43:02.437 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=D:\web\WebTuyenDung\AppTuyenDung\conf\logging.properties
+06-Jul-2026 10:43:02.438 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+06-Jul-2026 10:43:02.439 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -javaagent:C:\Program Files\JetBrains\IntelliJ IDEA 2026.1.1\lib\idea_rt.jar=50765
+06-Jul-2026 10:43:02.440 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dfile.encoding=UTF-8
+06-Jul-2026 10:43:02.443 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dsun.stdout.encoding=UTF-8
+06-Jul-2026 10:43:02.444 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dsun.stderr.encoding=UTF-8
+06-Jul-2026 10:43:02.466 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent Loaded Apache Tomcat Native library [1.3.7] using APR version [1.7.6].
+06-Jul-2026 10:43:02.467 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR capabilities: IPv6 [true], sendfile [true], accept filters [false], random [true], UDS [true].
+06-Jul-2026 10:43:02.468 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent APR/OpenSSL configuration: useAprConnector [false], useOpenSSL [true]
+06-Jul-2026 10:43:02.539 INFO [main] org.apache.catalina.core.AprLifecycleListener.initializeSSL OpenSSL successfully initialized [OpenSSL 3.0.19 27 Jan 2026]
+06-Jul-2026 10:43:04.807 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 10:43:04.928 INFO [main] org.apache.catalina.startup.Catalina.load Server initialization in [3831] milliseconds
+06-Jul-2026 10:43:05.244 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service [Catalina]
+06-Jul-2026 10:43:05.245 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet engine: [Apache Tomcat/9.0.117]
+06-Jul-2026 10:43:05.281 INFO [main] org.apache.catalina.startup.HostConfig.deployDescriptor Deploying deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml]
+06-Jul-2026 10:43:15.119 INFO [main] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+06-Jul-2026 10:43:15.286 INFO [main] org.apache.catalina.startup.HostConfig.deployDescriptor Deployment of deployment descriptor [D:\web\WebTuyenDung\AppTuyenDung\conf\Catalina\localhost\AppTuyenDung.xml] has finished in [10,004] ms
+06-Jul-2026 10:43:15.299 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 10:43:15.341 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in [10407] milliseconds
+06-Jul-2026 10:48:54.522 INFO [Thread-1] org.apache.coyote.AbstractProtocol.pause Pausing ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 10:48:54.542 INFO [Thread-1] org.apache.catalina.core.StandardService.stopInternal Stopping service [Catalina]
+06-Jul-2026 10:48:54.576 INFO [Thread-1] org.apache.coyote.AbstractProtocol.stop Stopping ProtocolHandler ["http-nio-8080"]
+06-Jul-2026 10:48:54.596 INFO [Thread-1] org.apache.coyote.AbstractProtocol.destroy Destroying ProtocolHandler ["http-nio-8080"]

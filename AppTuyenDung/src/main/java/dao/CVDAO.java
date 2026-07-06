@@ -12,14 +12,14 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CVDAO extends DatabaseConfig  implements IDAO<CV>{
+public class CVDAO   implements IDAO<CV>{
     // thêm một CV mới(khi ứng viên upload CV lên hệ thômngs
     @Override
     public void add(CV cv) {
         String sql =  "INSERT INTO cvs(candidate_id, cv_title, file_url, avatar_url, description, version, created_at, update_at)"
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try(Connection conn = getConnection();
+        try(Connection conn = DatabaseConfig.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)){
 
             ps.setInt(1,cv.getCandidateId());
@@ -49,8 +49,8 @@ public class CVDAO extends DatabaseConfig  implements IDAO<CV>{
         List<CV> list = new ArrayList<>();
         String sql = "SELECT * FROM cvs WHERE candidate_id = ?";
 
-        try(Connection conn = getConnection();
-            PreparedStatement ps = getConnection().prepareStatement(sql)) {
+        try(Connection conn = DatabaseConfig.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, candidateID);
 
             try(ResultSet rs = ps.executeQuery()){
@@ -84,7 +84,7 @@ public class CVDAO extends DatabaseConfig  implements IDAO<CV>{
     @Override
     public void delete(int cvID){
         String sql = "DELETE FROM cvs WHERE id = ?";
-        try(Connection conn = getConnection();
+        try(Connection conn = DatabaseConfig.getConnection();
             PreparedStatement ps = conn.prepareStatement(sql)){
             ps.setInt(1, cvID);
 

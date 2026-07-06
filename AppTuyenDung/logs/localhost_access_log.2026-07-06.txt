@@ -1,0 +1,6 @@
+0:0:0:0:0:0:0:1 - - [06/Jul/2026:09:18:32 +0700] "POST /AppTuyenDung/UploadCV HTTP/1.1" 404 683
+0:0:0:0:0:0:0:1 - - [06/Jul/2026:09:19:15 +0700] "POST /AppTuyenDung/UploadCV HTTP/1.1" 404 683
+0:0:0:0:0:0:0:1 - - [06/Jul/2026:09:22:19 +0700] "POST /AppTuyenDung/UploadCV HTTP/1.1" 404 683
+0:0:0:0:0:0:0:1 - - [06/Jul/2026:09:33:41 +0700] "POST /AppTuyenDung/UploadCV HTTP/1.1" 200 71
+0:0:0:0:0:0:0:1 - - [06/Jul/2026:10:00:57 +0700] "POST /AppTuyenDung/UploadCV HTTP/1.1" 200 71
+0:0:0:0:0:0:0:1 - - [06/Jul/2026:10:04:23 +0700] "POST /AppTuyenDung/UploadCV HTTP/1.1" 200 71

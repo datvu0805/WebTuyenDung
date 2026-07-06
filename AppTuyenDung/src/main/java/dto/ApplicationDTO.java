@@ -3,6 +3,7 @@ package dto;
 import model.Application;
 import model.Candidates;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 // quản lý đơn ứng tuyển
@@ -12,13 +13,13 @@ public class ApplicationDTO {
     private String jobTitle;
     private String cvTitle;
     private String fileUrl;
-    private LocalTime applieAt;
+    private LocalDateTime applieAt;
     private int status;
 
     public ApplicationDTO() {
     }
 
-    public ApplicationDTO(Application applicationID, Candidates candidateName, String jobTitle, String cvTitle, String fileUrl, LocalTime applieAt, int status) {
+    public ApplicationDTO(Application applicationID, Candidates candidateName, String jobTitle, String cvTitle, String fileUrl, LocalDateTime applieAt, int status) {
         this.applicationID = applicationID;
         this.candidateName = candidateName;
         this.jobTitle = jobTitle;
@@ -68,11 +69,11 @@ public class ApplicationDTO {
         this.fileUrl = fileUrl;
     }
 
-    public LocalTime getApplieAt() {
+    public LocalDateTime getApplieAt() {
         return applieAt;
     }
 
-    public void setApplieAt(LocalTime applieAt) {
+    public void setApplieAt(LocalDateTime applieAt) {
         this.applieAt = applieAt;
     }
 
@@ -88,7 +89,7 @@ public class ApplicationDTO {
     public String toString() {
         return "ApplicationDTO{" +
                 "applicationID=" + applicationID +
-                ", candidateName='" + candidateName + '\'' +
+                ", candidateName=" + candidateName +
                 ", jobTitle='" + jobTitle + '\'' +
                 ", cvTitle='" + cvTitle + '\'' +
                 ", fileUrl='" + fileUrl + '\'' +

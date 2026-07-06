@@ -13,7 +13,7 @@ public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> 
 
     @Override
     public void add(Application app) {
-        String sql = "INSERT INTO applications(candidate_id, job_id, cv_id, applied_at, cover_letter, description, status, created_at, update_at" +
+        String sql = "INSERT INTO applications(candidate_id, job_id, cv_id, applied_at, cover_letter, description, status, created_at, update_at)" +
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -35,8 +35,18 @@ public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> 
     }
 
     @Override
-    public void update(Application entity) {
+    public void update(Application app) {
+        String sql = "UPDATE applications SET status = ?, updated_at = ? WHERE id = ?";
+        try(Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, app.getStatus());
+            ps.setObject(2, app.getUpdatedAt());
+            ps.setInt(3, app.getId());
 
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

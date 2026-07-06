@@ -16,7 +16,7 @@ public class CVDAO   implements IDAO<CV>{
     // thêm một CV mới(khi ứng viên upload CV lên hệ thômngs
     @Override
     public void add(CV cv) {
-        String sql =  "INSERT INTO cvs(candidate_id, cv_title, file_url, avatar_url, description, version, created_at, update_at)"
+        String sql =  "INSERT INTO cvs(candidate_id, cv_title, file_url, avatar_url, description, version, created_at, updated_at)"
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try(Connection conn = DatabaseConfig.getConnection();

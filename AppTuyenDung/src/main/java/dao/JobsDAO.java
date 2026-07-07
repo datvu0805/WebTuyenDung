@@ -187,6 +187,6 @@ public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return List.of();
+        return list;
     }
 }

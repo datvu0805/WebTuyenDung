@@ -89,20 +89,26 @@
       <artifactId>slf4j-simple</artifactId>
       <version>2.0.17</version>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <version>1.7.36</version>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-jsr310</artifactId>
-      <version>2.15.2</version> </dependency>
   </dependencies>
 
   <build>
     <finalName>AppTuyenDung</finalName>
     <plugins>
+      <!-- Jetty 9 hỗ trợ Servlet 3.1 + Java 17, thay thế tomcat7 cũ -->
+      <plugin>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-maven-plugin</artifactId>
+        <version>9.4.54.v20240208</version>
+        <configuration>
+          <httpConnector>
+            <port>8080</port>
+          </httpConnector>
+          <webApp>
+            <contextPath>/AppTuyenDung</contextPath>
+          </webApp>
+        </configuration>
+      </plugin>
+      <!-- Giữ lại tomcat7 cho dev dùng IDE nếu cần -->
       <plugin>
         <groupId>org.apache.tomcat.maven</groupId>
         <artifactId>tomcat7-maven-plugin</artifactId>

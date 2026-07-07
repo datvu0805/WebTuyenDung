@@ -13,7 +13,7 @@ public class ApplicationService {
 
     public void submitApplication(Application app){
         int candidateID = app.getCandidateID().getId();
-        int jobId = app.getCandidateID().getId();
+        int jobId = app.getJodID().getId();
 
         int appliadCount = applicationDAO.countApplications(candidateID, jobId);
         if (appliadCount >=3){

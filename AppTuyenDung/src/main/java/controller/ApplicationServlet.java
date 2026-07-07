@@ -45,7 +45,7 @@ public class ApplicationServlet extends HttpServlet {
         String action =  req.getParameter("action");
         if("viewList".equals(action)){
             try {
-                int recruiteriD = 1;
+                int recruiteriD = (int) req.getSession().getAttribute("userId");
                 List<ApplicationDTO> dtoList = applicationService.getRecruiteDashboard(recruiteriD);
                 ApiResponse<List<ApplicationDTO>> apiResponse = new ApiResponse<>(true, "Lấy ra danh sách đơn hnagf thành công", dtoList);
                 sendJsonResponse(resp, HttpServletResponse.SC_OK, apiResponse);

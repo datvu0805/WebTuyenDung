@@ -1,0 +1,140 @@
+*, *::before, *::after { box-sizing: border-box; }
+
+body { margin: 0; background: #f4f5f6; }
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive nav */
+@media (max-width: 768px) {
+  .desktop-menu { display: none !important; }
+  .username-text { display: none !important; }
+  .mobile-menu-btn { display: inline-flex !important; }
+}
+@media (min-width: 769px) {
+  .desktop-menu { display: flex !important; }
+  .username-text { display: inline !important; }
+  .mobile-menu-btn { display: none !important; }
+}
+
+/* Ant Design overrides */
+.ant-layout { background: #f4f5f6 !important; }
+.ant-layout-content { background: #f4f5f6 !important; }
+
+.ant-btn-primary {
+  background: #00b14f !important;
+  border-color: #00b14f !important;
+}
+.ant-btn-primary:hover {
+  background: #009940 !important;
+  border-color: #009940 !important;
+}
+
+/* Job card hover */
+.job-card {
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  cursor: pointer;
+}
+.job-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.10) !important;
+}
+
+/* Page container */
+.page-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  width: 100%;
+}
+
+/* Hero banner */
+.hero-banner {
+  background: linear-gradient(135deg, #00b14f 0%, #007a38 100%);
+  padding: 48px 24px;
+  text-align: center;
+}
+
+/* Stat chip */
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 4px 14px;
+  color: #fff;
+  font-size: 13px;
+}
+
+/* Sidebar card */
+.filter-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  position: sticky;
+  top: 80px;
+}
+
+/* Company logo placeholder */
+.company-logo {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  background: #f0faf4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid #e8f5ee;
+  color: #00b14f;
+  font-weight: 700;
+  font-size: 18px;
+}
+
+/* Auth layout */
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  background: #f4f5f6;
+}
+.auth-left {
+  flex: 1;
+  background: linear-gradient(160deg, #00b14f 0%, #007a38 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  color: #fff;
+}
+.auth-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  overflow-y: auto;
+}
+@media (max-width: 768px) {
+  .auth-left { display: none; }
+  .auth-right { flex: 1; background: #fff; }
+}
+
+/* Status badge */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 4px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}

@@ -1,0 +1,26 @@
+services:
+  backend:
+    build:
+      context: ./AppTuyenDung
+      dockerfile: Dockerfile
+    container_name: webtuyendung-be
+    restart: unless-stopped
+    networks:
+      - webtuyendung-net
+
+  frontend:
+    build:
+      context: ./fe-tuyendung
+      dockerfile: Dockerfile
+    container_name: webtuyendung-fe
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - webtuyendung-net
+
+networks:
+  webtuyendung-net:
+    driver: bridge

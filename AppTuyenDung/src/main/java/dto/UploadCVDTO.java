@@ -8,7 +8,7 @@ public class UploadCVDTO {
     private String description;
     private String version;
     private Part fileCV;
-    private Part fileAvatar;
+//    private Part fileAvatar;
 
     public UploadCVDTO() {}
 
@@ -22,6 +22,6 @@ public class UploadCVDTO {
     public void setVersion(String version) { this.version = version; }
     public Part getFileCV() { return fileCV; }
     public void setFileCV(Part fileCV) { this.fileCV = fileCV; }
-    public Part getFileAvatar() { return fileAvatar; }
-    public void setFileAvatar(Part fileAvatar) { this.fileAvatar = fileAvatar; }
+//    public Part getFileAvatar() { return fileAvatar; }
+//    public void setFileAvatar(Part fileAvatar) { this.fileAvatar = fileAvatar; }
 }

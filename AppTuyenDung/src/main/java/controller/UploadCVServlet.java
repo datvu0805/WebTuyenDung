@@ -38,7 +38,7 @@ public class UploadCVServlet extends HttpServlet {
             dto.setDescription(request.getParameter("description"));
             dto.setVersion(request.getParameter("version"));
             dto.setFileCV(request.getPart("file"));
-            dto.setFileAvatar(request.getPart("avatar_url"));
+//            dto.setFileAvatar(request.getPart("avatar_url"));
 
             CV saveCV = cvService.handleUploadCV(dto);
 

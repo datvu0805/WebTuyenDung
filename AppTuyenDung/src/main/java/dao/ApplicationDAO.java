@@ -6,10 +6,7 @@ import exception.BusinessException;
 import model.Application;
 import model.Candidates;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +18,7 @@ public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> 
         String sql = "INSERT INTO applications(candidate_id, job_id, cv_id, applied_at, cover_letter, description, status, created_at, updated_at)" +
                 "VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, app.getCandidateID().getId());
             ps.setInt(2, app.getJodID().getId());
             ps.setInt(3, app.getCvID().getId());

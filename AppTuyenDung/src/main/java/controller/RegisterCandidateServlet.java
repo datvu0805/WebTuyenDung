@@ -11,7 +11,10 @@ import javax.servlet.http.*;
 import java.io.IOException;
 
 @WebServlet("/register-candidate")
-@MultipartConfig(maxFileSize = 1024 * 1024 * 5)
+@MultipartConfig(
+        maxFileSize = 1024 * 1024 * 3,
+        maxRequestSize = 1024 * 1024 * 5
+)
 public class RegisterCandidateServlet extends BaseServlet {
 
     private final Gson gson = new Gson();

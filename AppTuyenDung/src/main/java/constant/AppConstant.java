@@ -1,4 +1,4 @@
-package org.example.constant;
+package constant;
 
 public class AppConstant {
 }

@@ -42,6 +42,8 @@ public class UploadCVServlet extends HttpServlet {
 
             CV saveCV = cvService.handleUploadCV(dto);
 
+            saveCV.setCreatedAt(null);
+            saveCV.setUpdatedAt(null);
             if (saveCV != null) {
                 response.setStatus(HttpServletResponse.SC_OK);
                 ApiResponse<CV> apiResponse = new ApiResponse<>(true, "Hệ thống đã ẩy file lên MinIO thành công", saveCV);

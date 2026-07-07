@@ -9,6 +9,7 @@ import model.Users;
 import utils.PasswordUtil;
 import validator.UserValidator;
 
+import javax.servlet.http.Part;
 import java.sql.SQLException;
 
 public class AuthService {
@@ -21,7 +22,10 @@ public class AuthService {
 
     private final UserValidator validator = new UserValidator();
 
-    public String registerCandidate(RegisterCandidateDTO dto) {
+    private final FileService fileService = new FileService();
+
+
+    public String registerCandidate(RegisterCandidateDTO dto, Part avatar) {
 
         Users user = new Users();
 
@@ -56,9 +60,19 @@ public class AuthService {
             return "Tạo tài khoản thất bại";
         }
 
+        String avatarUrl = fileService.uploadImage(avatar, "avatar", userId);
+
+        if (avatarUrl != null) {
+            boolean updatedAvatar = userDAO.updateAvatar(userId, avatarUrl);
+
+            if (!updatedAvatar) {
+                return "Cập nhật avatar thất bại";
+            }
+        }
+
         boolean createCandidate = candicateDAO.add(userId);
 
-        if(!createCandidate) {
+        if (!createCandidate) {
             return "Tạo candidate thất bại";
         }
 
@@ -144,5 +158,8 @@ public class AuthService {
 
         return user;
     }
+
+
+
 
 }

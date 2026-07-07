@@ -1,5 +1,6 @@
 package dto;
 
+
 public class RegisterCandidateDTO {
 
     private String username;

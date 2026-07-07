@@ -1,7 +1,8 @@
 package controller;
 
 import com.google.gson.Gson;
-import model.Users;
+import dto.RegisterCandidateDTO;
+
 import service.AuthService;
 
 import javax.servlet.annotation.WebServlet;
@@ -24,20 +25,21 @@ public class RegisterCandidateServlet extends BaseServlet {
         resp.setContentType("application/json;charset=UTF-8");
 
         Map<String, Object> result = new HashMap<>();
+        RegisterCandidateDTO dto = new RegisterCandidateDTO();
 
         try {
             AuthService authService = new AuthService();
 
-            Users user = new Users();
-            user.setUsername(req.getParameter("username"));
-            user.setPassword(req.getParameter("password"));
-            user.setFullName(req.getParameter("fullName"));
-            user.setAvatarUrl(req.getParameter("avatarUrl"));
-            user.setEmail(req.getParameter("email"));
-            user.setPhoneNumber(req.getParameter("phoneNumber"));
-            user.setAddress(req.getParameter("address"));
+            
+            dto.setUsername(req.getParameter("username"));
+            dto.setPassword(req.getParameter("password"));
+            dto.setFullName(req.getParameter("fullName"));
+            dto.setAvatarUrl(req.getParameter("avatarUrl"));
+            dto.setEmail(req.getParameter("email"));
+            dto.setPhoneNumber(req.getParameter("phoneNumber"));
+            dto.setAddress(req.getParameter("address"));
 
-            String error = authService.registerCandidate(user);
+            String error = authService.registerCandidate(dto);
 
             if (error != null) {
                 result.put("success", false);

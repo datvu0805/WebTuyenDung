@@ -1,6 +1,8 @@
 package service;
 
 import dao.*;
+import dto.RegisterCandidateDTO;
+import dto.RegisterEmployerDTO;
 import model.Company;
 import model.Role;
 import model.Users;
@@ -16,9 +18,21 @@ public class AuthService {
     private final EmployerDAO employerDAO = new EmployerDAO();
     private final CompanyDAO companyDAO = new CompanyDAO();
 
+
     private final UserValidator validator = new UserValidator();
 
-    public String registerCandidate(Users user) {
+    public String registerCandidate(RegisterCandidateDTO dto) {
+
+        Users user = new Users();
+
+        user.setUsername(dto.getUsername());
+        user.setPassword(dto.getPassword());
+        user.setFullName(dto.getFullName());
+        user.setAvatarUrl(dto.getAvatarUrl());
+        user.setEmail(dto.getEmail());
+        user.setPhoneNumber(dto.getPhoneNumber());
+        user.setAddress(dto.getAddress());
+
         String error = validator.validRegister(user.getUsername(),user.getPassword(),user.getEmail(), user.getPhoneNumber());
 
         if(error != null) {
@@ -52,7 +66,20 @@ public class AuthService {
         return null;
     }
 
-    public String registerEmployer(Users user,Company company) throws SQLException, ClassNotFoundException {
+    public String registerEmployer(RegisterEmployerDTO dto) throws SQLException, ClassNotFoundException {
+
+        Users user = new Users();
+        user.setUsername(dto.getUsername());
+        user.setPassword(dto.getPassword());
+        user.setFullName(dto.getFullName());
+        user.setAvatarUrl(dto.getAvatarUrl());
+        user.setEmail(dto.getEmail());
+        user.setPhoneNumber(dto.getPhoneNumber());
+        user.setAddress(dto.getAddress());
+
+        Company company = new Company();
+        company.setCompanyName(dto.getCompanyName());
+        company.setDescription(dto.getDescription());
 
         String error = validator.validRegister(
                 user.getUsername(),

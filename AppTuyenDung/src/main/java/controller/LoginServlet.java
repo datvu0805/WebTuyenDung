@@ -1,14 +1,14 @@
 package controller;
 
 import com.google.gson.Gson;
+import dto.ApiResponse;
+import dto.LoginResponseDTO;
 import model.Users;
 import service.AuthService;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 @WebServlet("/login")
 public class LoginServlet extends BaseServlet {
@@ -24,7 +24,7 @@ public class LoginServlet extends BaseServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
 
-        Map<String, Object> result = new HashMap<>();
+        ApiResponse<?> result;
 
         try {
             String username = req.getParameter("username");
@@ -33,8 +33,11 @@ public class LoginServlet extends BaseServlet {
             Users user = authService.login(username, password);
 
             if (user == null) {
-                result.put("success", false);
-                result.put("message", "Sai tài khoản hoặc mật khẩu");
+                result = new ApiResponse<>(
+                        false,
+                        "Sai tài khoản hoặc mật khẩu",
+                        null
+                );
             } else {
                 HttpSession session = req.getSession();
 
@@ -42,17 +45,32 @@ public class LoginServlet extends BaseServlet {
                 session.setAttribute("userId", user.getId());
                 session.setAttribute("role", user.getRole().getRoleName());
 
-                result.put("success", true);
-                result.put("message", "Đăng nhập thành công");
-                result.put("userId", user.getId());
-                result.put("username", user.getUsername());
-                result.put("role", user.getRole().getRoleName());
+                LoginResponseDTO data = new LoginResponseDTO();
+
+                data.setUserId(user.getId());
+                data.setUsername(user.getUsername());
+                data.setFullName(user.getFullName());
+                data.setAvatarUrl(user.getAvatarUrl());
+                data.setEmail(user.getEmail());
+                data.setPhoneNumber(user.getPhoneNumber());
+                data.setAddress(user.getAddress());
+                data.setRole(user.getRole().getRoleName());
+
+                result = new ApiResponse<>(
+                        true,
+                        "Đăng nhập thành công",
+                        data
+                );
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            result.put("success", false);
-            result.put("message", e.getClass().getName() + ": " + e.getMessage());
+
+            result = new ApiResponse<>(
+                    false,
+                    e.getClass().getName() + ": " + e.getMessage(),
+                    null
+            );
         }
 
         resp.getWriter().write(gson.toJson(result));

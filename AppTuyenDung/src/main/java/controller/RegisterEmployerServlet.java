@@ -1,6 +1,7 @@
 package controller;
 
 import com.google.gson.Gson;
+import dto.RegisterEmployerDTO;
 import model.Company;
 import model.Users;
 import service.AuthService;
@@ -20,6 +21,8 @@ public class RegisterEmployerServlet extends BaseServlet {
     private final Gson gson = new Gson();
     private final AuthService authService = new AuthService();
 
+
+
     @Override
     protected void doPost(HttpServletRequest req,
                           HttpServletResponse resp)
@@ -28,24 +31,26 @@ public class RegisterEmployerServlet extends BaseServlet {
         req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
 
-        // ===== User =====
-        Users user = new Users();
-        user.setUsername(req.getParameter("username"));
-        user.setPassword(req.getParameter("password"));
-        user.setFullName(req.getParameter("fullName"));
-        user.setAvatarUrl(req.getParameter("avatarUrl"));
-        user.setEmail(req.getParameter("email"));
-        user.setPhoneNumber(req.getParameter("phoneNumber"));
-        user.setAddress(req.getParameter("address"));
+        RegisterEmployerDTO dto = new RegisterEmployerDTO();
+        
+        // ===== dto =====
+
+        dto.setUsername(req.getParameter("username"));
+        dto.setPassword(req.getParameter("password"));
+        dto.setFullName(req.getParameter("fullName"));
+        dto.setAvatarUrl(req.getParameter("avatarUrl"));
+        dto.setEmail(req.getParameter("email"));
+        dto.setPhoneNumber(req.getParameter("phoneNumber"));
+        dto.setAddress(req.getParameter("address"));
 
         // ===== Company =====
-        Company company = new Company();
-        company.setCompanyName(req.getParameter("companyName"));
-        company.setDescription(req.getParameter("description"));
+
+        dto.setCompanyName(req.getParameter("companyName"));
+        dto.setDescription(req.getParameter("description"));
 
         String error = null;
         try {
-            error = authService.registerEmployer(user, company);
+            error = authService.registerEmployer(dto);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         } catch (ClassNotFoundException e) {

@@ -32,7 +32,31 @@ public class UserDAO extends DatabaseConfig {
         user.setId(rs.getInt("id"));
         return user;
     }
+    public boolean updateAvatar(int userId, String avatarUrl) {
 
+        String sql = """
+            UPDATE users
+            SET avatar_url = ?,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = ?
+            """;
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, avatarUrl);
+            ps.setInt(2, userId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
     public Users getByID(int id) {
         String sql = """
             SELECT u.*, r.id AS role_id, r.role_name

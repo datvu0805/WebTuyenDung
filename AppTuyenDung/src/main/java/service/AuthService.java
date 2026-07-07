@@ -1,12 +1,15 @@
 package service;
 
 import dao.*;
+import dto.RegisterCandidateDTO;
+import dto.RegisterEmployerDTO;
 import model.Company;
 import model.Role;
 import model.Users;
 import utils.PasswordUtil;
 import validator.UserValidator;
 
+import javax.servlet.http.Part;
 import java.sql.SQLException;
 
 public class AuthService {
@@ -16,9 +19,24 @@ public class AuthService {
     private final EmployerDAO employerDAO = new EmployerDAO();
     private final CompanyDAO companyDAO = new CompanyDAO();
 
+
     private final UserValidator validator = new UserValidator();
 
-    public String registerCandidate(Users user) {
+    private final FileService fileService = new FileService();
+
+
+    public String registerCandidate(RegisterCandidateDTO dto, Part avatar) {
+
+        Users user = new Users();
+
+        user.setUsername(dto.getUsername());
+        user.setPassword(dto.getPassword());
+        user.setFullName(dto.getFullName());
+        user.setAvatarUrl(dto.getAvatarUrl());
+        user.setEmail(dto.getEmail());
+        user.setPhoneNumber(dto.getPhoneNumber());
+        user.setAddress(dto.getAddress());
+
         String error = validator.validRegister(user.getUsername(),user.getPassword(),user.getEmail(), user.getPhoneNumber());
 
         if(error != null) {
@@ -42,9 +60,19 @@ public class AuthService {
             return "Tạo tài khoản thất bại";
         }
 
+        String avatarUrl = fileService.uploadImage(avatar, "avatar", userId);
+
+        if (avatarUrl != null) {
+            boolean updatedAvatar = userDAO.updateAvatar(userId, avatarUrl);
+
+            if (!updatedAvatar) {
+                return "Cập nhật avatar thất bại";
+            }
+        }
+
         boolean createCandidate = candicateDAO.add(userId);
 
-        if(!createCandidate) {
+        if (!createCandidate) {
             return "Tạo candidate thất bại";
         }
 
@@ -52,7 +80,20 @@ public class AuthService {
         return null;
     }
 
-    public String registerEmployer(Users user,Company company) throws SQLException, ClassNotFoundException {
+    public String registerEmployer(RegisterEmployerDTO dto) throws SQLException, ClassNotFoundException {
+
+        Users user = new Users();
+        user.setUsername(dto.getUsername());
+        user.setPassword(dto.getPassword());
+        user.setFullName(dto.getFullName());
+        user.setAvatarUrl(dto.getAvatarUrl());
+        user.setEmail(dto.getEmail());
+        user.setPhoneNumber(dto.getPhoneNumber());
+        user.setAddress(dto.getAddress());
+
+        Company company = new Company();
+        company.setCompanyName(dto.getCompanyName());
+        company.setDescription(dto.getDescription());
 
         String error = validator.validRegister(
                 user.getUsername(),
@@ -117,5 +158,8 @@ public class AuthService {
 
         return user;
     }
+
+
+
 
 }

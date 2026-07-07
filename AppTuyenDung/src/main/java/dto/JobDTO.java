@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 public class JobDTO {
 
-    private Integer employerId;
     private String title;
     private String description;
     private Double salary;
@@ -20,8 +19,7 @@ public class JobDTO {
     public JobDTO() {
     }
 
-    public JobDTO(Integer employerId, String title, String description, Double salary, String location, String experience, Integer quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status, Boolean hiddenOnExpiry) {
-        this.employerId = employerId;
+    public JobDTO( String title, String description, Double salary, String location, String experience, Integer quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status, Boolean hiddenOnExpiry) {
         this.title = title;
         this.description = description;
         this.salary = salary;
@@ -35,13 +33,7 @@ public class JobDTO {
         this.hiddenOnExpiry = hiddenOnExpiry;
     }
 
-    public Integer getEmployerId() {
-        return employerId;
-    }
 
-    public void setEmployerId(Integer employerId) {
-        this.employerId = employerId;
-    }
 
     public String getTitle() {
         return title;

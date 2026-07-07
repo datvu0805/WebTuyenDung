@@ -11,7 +11,6 @@ public class JobRequestMapper {
 
         JobDTO dto = new JobDTO();
 
-        dto.setEmployerId(Integer.parseInt(req.getParameter("employerId")));
         dto.setTitle(req.getParameter("title"));
         dto.setDescription(req.getParameter("description"));
         dto.setSalary(Double.parseDouble(req.getParameter("salary")));

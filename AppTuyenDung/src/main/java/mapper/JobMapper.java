@@ -46,7 +46,6 @@ public class JobMapper {
 
         Jobs job = new Jobs();
 
-        job.setEmployerID(new Employers(dto.getEmployerId()));
         job.setTitle(dto.getTitle());
         job.setDescription(dto.getDescription());
         job.setSalary(dto.getSalary());

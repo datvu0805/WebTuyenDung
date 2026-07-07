@@ -18,7 +18,7 @@ import java.util.List;
 @WebServlet(urlPatterns = {"/jobs/*"})
 public class JobSevrlet extends BaseServlet {
     private final JobService jobService = new JobService();
-    // chuyển đổi để json đọc được data từ kiê localdatetime
+    // chuyển đổi để json đọc được data từ kiểu localdatetime
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
 
@@ -35,9 +35,9 @@ public class JobSevrlet extends BaseServlet {
             // GET /jobs
             if (pathInfo == null || pathInfo.equals("/")) {
 
-                List<Jobs> jobs = jobService.getAllJobs();
+                List<JobDTO> jobs = jobService.getAllJobs();
 
-                ApiResponse<List<Jobs>> response = new ApiResponse<>(true, "Lấy danh sách công việc thành công!", jobs);
+                ApiResponse<List<JobDTO>> response = new ApiResponse<>(true, "Lấy danh sách công việc thành công!", jobs);
 
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.getWriter().print(objectMapper.writeValueAsString(response));

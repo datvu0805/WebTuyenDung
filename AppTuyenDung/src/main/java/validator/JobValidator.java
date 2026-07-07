@@ -20,10 +20,10 @@ public class JobValidator {
             return errors;
         }
 
-        // employer
-        if (dto.getEmployerId() == null || dto.getEmployerId() <= 0) {
-            errors.add("Nhà tuyển dụng không hợp lệ");
-        }
+//        // employer
+//        if (dto.getEmployerId() == null || dto.getEmployerId() <= 0) {
+//            errors.add("Nhà tuyển dụng không hợp lệ");
+//        }
 
         // title
         if (isEmpty(dto.getTitle())) {

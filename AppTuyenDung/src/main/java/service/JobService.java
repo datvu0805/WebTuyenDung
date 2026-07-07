@@ -8,6 +8,8 @@ import validator.JobValidator;
 
 import model.JobSkills;
 import model.Skills;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class JobService {
@@ -74,8 +76,14 @@ public class JobService {
     }
 
 
-    public List<Jobs> getAllJobs() {
-        return jobsDAO.getAll();
+    public List<JobDTO> getAllJobs() {
+        List<JobDTO> jobDTOList = new ArrayList<>();
+        JobDTO jobDTO1 = new JobDTO();
+        List<Jobs> jobList = jobsDAO.getAll();
+         jobList.stream().forEach(x -> {
+            jobDTOList.add(new JobDTO(x.getTitle(), x.getDescription(), x.getSalary(), x.getLocation(), x.getExperience(), x.getQuantity(),x.getPostedAt(),x.getExpiredAt(),x.getApplicationDeadline(),x.getStatus(),x.getHiddenOnExpiry()));
+        });
+         return jobDTOList;
     }
 
 

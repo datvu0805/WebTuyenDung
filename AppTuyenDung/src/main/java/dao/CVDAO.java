@@ -4,10 +4,7 @@ import config.DatabaseConfig;
 import model.CV;
 import model.Candidates;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,20 +13,20 @@ public class CVDAO   implements IDAO<CV>{
     // thêm một CV mới(khi ứng viên upload CV lên hệ thômngs
     @Override
     public void add(CV cv) {
-        String sql =  "INSERT INTO cvs(candidate_id, cv_title, file_url, avatar_url, description, version, created_at, updated_at)"
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql =  "INSERT INTO cvs(candidate_id, cv_title, file_url, description, version, created_at, updated_at)"
+                + "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try(Connection conn = DatabaseConfig.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)){
+            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)){
 
             ps.setInt(1,cv.getCandidateId());
             ps.setString(2, cv.getCvTitle());
             ps.setString(3, cv.getFileUrl());
-            ps.setString(4, cv.getAvatarURl());
-            ps.setString(5, cv.getDescription());
-            ps.setString(6, cv.getVersion());
-            ps.setObject(7, cv.getCreatedAt());
-            ps.setObject(8, cv.getUpdatedAt());
+//            ps.setString(4, cv.getAvatarURl());
+            ps.setString(4, cv.getDescription());
+            ps.setString(5, cv.getVersion());
+            ps.setObject(6, cv.getCreatedAt());
+            ps.setObject(7, cv.getUpdatedAt());
 
             ps.executeUpdate();
 
@@ -72,7 +69,7 @@ public class CVDAO   implements IDAO<CV>{
 
                     cv.setCvTitle(rs.getString("cv_title"));
                     cv.setFileUrl(rs.getString("file_url"));
-                    cv.setAvatarURl(rs.getString("avatar_url"));
+//                    cv.setAvatarURl(rs.getString("avatar_url"));
                     cv.setDescription(rs.getString("description"));
                     cv.setVersion(rs.getString("version"));
                     cv.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));

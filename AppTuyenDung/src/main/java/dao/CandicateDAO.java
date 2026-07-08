@@ -6,6 +6,8 @@ import model.Role;
 import model.Users;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CandicateDAO extends DatabaseConfig {
 
@@ -26,6 +28,46 @@ public class CandicateDAO extends DatabaseConfig {
         return false;
     }
 
+    public List<Candidates> findAll() {
+
+        String sql = """
+        SELECT
+            c.id AS candidate_id,
+            u.id AS user_id,
+            u.username,
+            u.password,
+            u.full_name,
+            u.avatar_url,
+            u.email,
+            u.date_of_birth,
+            u.phone_number,
+            u.address,
+            r.id AS role_id,
+            r.role_name
+        FROM candidates c
+        JOIN users u ON c.user_id = u.id
+        JOIN roles r ON u.role_id = r.id
+        ORDER BY c.id DESC
+    """;
+
+        List<Candidates> candidates = new ArrayList<>();
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()
+        ) {
+
+            while (rs.next()) {
+                candidates.add(mapCandidate(rs));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return candidates;
+    }
     private Candidates mapCandidate(ResultSet rs) throws SQLException {
         Role role = new Role();
         role.setId(rs.getInt("role_id"));

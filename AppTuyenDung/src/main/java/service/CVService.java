@@ -51,20 +51,20 @@ public class CVService {
             );
         }
 
-        // Đẩy file Ảnh đại diện lên MinIO nếu có
-        String avatarObjectName = null;
-        if (dto.getFileAvatar() != null && dto.getFileAvatar().getSize() > 0) {
-            String originalAvatarName = dto.getFileAvatar().getSubmittedFileName().replaceAll("\\s+", "_");
-            avatarObjectName = "candidates/" + candidateID + "/avatars/avatar_" + timestamp + "_" + originalAvatarName;
-
-            try (InputStream avatarStream = dto.getFileAvatar().getInputStream()) {
-                minioClient.putObject(
-                        PutObjectArgs.builder().bucket(BUCKET_NAME)
-                                .object(avatarObjectName).stream(avatarStream, dto.getFileAvatar().getSize(), (long) -1)
-                                .contentType(dto.getFileAvatar().getContentType()).build()
-                );
-            }
-        }
+//        // Đẩy file Ảnh đại diện lên MinIO nếu có
+//        String avatarObjectName = null;
+//        if (dto.getFileAvatar() != null && dto.getFileAvatar().getSize() > 0) {
+//            String originalAvatarName = dto.getFileAvatar().getSubmittedFileName().replaceAll("\\s+", "_");
+//            avatarObjectName = "candidates/" + candidateID + "/avatars/avatar_" + timestamp + "_" + originalAvatarName;
+//
+//            try (InputStream avatarStream = dto.getFileAvatar().getInputStream()) {
+//                minioClient.putObject(
+//                        PutObjectArgs.builder().bucket(BUCKET_NAME)
+//                                .object(avatarObjectName).stream(avatarStream, dto.getFileAvatar().getSize(), (long) -1)
+//                                .contentType(dto.getFileAvatar().getContentType()).build()
+//                );
+//             }
+//        }
 
         // 3. Khởi tạo thực thể Entity để chuẩn bị lưu xuống DB
         CV cv = new CV();
@@ -76,7 +76,7 @@ public class CVService {
 
         //Chỉ lưu tên Object thô gọn gàng vào Database
         cv.setFileUrl(cvObjectName);
-        cv.setAvatarURl(avatarObjectName);
+//        cv.setAvatarURl(avatarObjectName);
 
         cv.setDescription(dto.getDescription() != null ? dto.getDescription() : "");
         cv.setVersion(version);
@@ -86,7 +86,7 @@ public class CVService {
         // 4. BIẾN ĐỔI THÀNH LINK ĐỘNG (PRESIGNED URL) TRƯỚC KHI TRẢ VỀ POSTMAN
         // Bước này giúp đối tượng trả về Servlet chứa link full đầy đủ chìa khóa
         cv.setFileUrl(genarateMinioURL(cvObjectName));
-        cv.setAvatarURl(genarateMinioURL(avatarObjectName));
+//        cv.setAvatarURl(genarateMinioURL(avatarObjectName));
         // Gọi DAO lưu xuống PostgreSQL
         cvdao.add(cv);
 

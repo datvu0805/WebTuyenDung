@@ -6,7 +6,7 @@ public class CV extends BaseEntity{
     private Candidates candidateId;
     private String cvTitle;
     private String fileUrl;
-    private String avatarURl;
+
     private String description;
     private String version;
 
@@ -14,11 +14,10 @@ public class CV extends BaseEntity{
     }
 
 
-    public CV(Candidates candidateId, String cvTitle, String fileUrl, String avatarURl, String description, String version) {
+    public CV(Candidates candidateId, String cvTitle, String fileUrl, String description, String version) {
         this.candidateId = candidateId;
         this.cvTitle = cvTitle;
         this.fileUrl = fileUrl;
-        this.avatarURl = avatarURl;
         this.description = description;
         this.version = version;
     }
@@ -28,7 +27,6 @@ public class CV extends BaseEntity{
         this.candidateId = candidateId;
         this.cvTitle = cvTitle;
         this.fileUrl = fileUrl;
-        this.avatarURl = avatarURl;
         this.description = description;
         this.version = version;
     }
@@ -57,13 +55,7 @@ public class CV extends BaseEntity{
         this.fileUrl = fileUrl;
     }
 
-    public String getAvatarURl() {
-        return avatarURl;
-    }
 
-    public void setAvatarURl(String avatarURl) {
-        this.avatarURl = avatarURl;
-    }
 
     public String getDescription() {
         return description;

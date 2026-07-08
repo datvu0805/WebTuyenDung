@@ -6,6 +6,7 @@ import javax.servlet.http.Part;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class FileService {
 
@@ -94,7 +95,21 @@ public class FileService {
             );
         }
 
-        return objectName;
+        return getPresignedUrl(objectName);
+    }
+
+
+    public String getPresignedUrl(String objectName) throws Exception {
+        MinioClient client = MinIOConfig.getClient();
+
+        return client.getPresignedObjectUrl(
+                GetPresignedObjectUrlArgs.builder()
+                        .method(Http.Method.GET)
+                        .bucket(BUCKET_NAME)
+                        .object(objectName)
+                        .expiry(100, TimeUnit.DAYS)
+                        .build()
+        );
     }
 
     public String getFileUrl(String objectName) {

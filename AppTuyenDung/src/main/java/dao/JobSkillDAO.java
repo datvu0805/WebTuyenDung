@@ -1,9 +1,9 @@
 package dao;
 
 import config.DatabaseConfig;
-import model.JobSkills;
-import model.Jobs;
-import model.Skills;
+import model.JobSkill;
+import model.Job;
+import model.Skill;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +13,7 @@ import java.util.List;
 
 public class JobSkillDAO extends DatabaseConfig {
 
-    public void add(JobSkills jobSkill) {
+    public void add(JobSkill jobSkill) {
 
         String sql = "INSERT INTO jobs_skills (jobs_id, skills_id) VALUES (?, ?)";
 
@@ -29,7 +29,7 @@ public class JobSkillDAO extends DatabaseConfig {
         }
     }
 
-    public void delete(JobSkills jobSkill) {
+    public void delete(JobSkill jobSkill) {
 
         String sql = "DELETE FROM jobs_skills WHERE jobs_id = ? AND skills_id = ?";
 
@@ -45,11 +45,11 @@ public class JobSkillDAO extends DatabaseConfig {
         }
     }
 
-    public List<JobSkills> getByJobId(int jobId) {
+    public List<JobSkill> getByJobId(int jobId) {
 
         String sql = "SELECT * FROM jobs_skills WHERE jobs_id = ?";
 
-        List<JobSkills> list = new ArrayList<>();
+        List<JobSkill> list = new ArrayList<>();
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -59,10 +59,10 @@ public class JobSkillDAO extends DatabaseConfig {
 
                 while (rs.next()) {
 
-                    JobSkills jobSkill = new JobSkills();
+                    JobSkill jobSkill = new JobSkill();
 
-                    jobSkill.setJobID(new Jobs(rs.getInt("jobs_id")));
-                    jobSkill.setSkillID(new Skills(rs.getInt("skills_id")));
+                    jobSkill.setJobID(new Job(rs.getInt("jobs_id")));
+                    jobSkill.setSkillID(new Skill(rs.getInt("skills_id")));
 
                     list.add(jobSkill);
                 }
@@ -75,11 +75,11 @@ public class JobSkillDAO extends DatabaseConfig {
         return list;
     }
 
-    public List<JobSkills> getBySkillId(int skillId) {
+    public List<JobSkill> getBySkillId(int skillId) {
 
         String sql = "SELECT * FROM jobs_skills WHERE skills_id = ?";
 
-        List<JobSkills> list = new ArrayList<>();
+        List<JobSkill> list = new ArrayList<>();
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -89,10 +89,10 @@ public class JobSkillDAO extends DatabaseConfig {
 
                 while (rs.next()) {
 
-                    JobSkills jobSkill = new JobSkills();
+                    JobSkill jobSkill = new JobSkill();
 
-                    jobSkill.setJobID(new Jobs(rs.getInt("jobs_id")));
-                    jobSkill.setSkillID(new Skills(rs.getInt("skills_id")));
+                    jobSkill.setJobID(new Job(rs.getInt("jobs_id")));
+                    jobSkill.setSkillID(new Skill(rs.getInt("skills_id")));
 
                     list.add(jobSkill);
                 }

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dto.ApiResponse;
 import dto.JobDTO;
 import mapper.JobRequestMapper;
-import model.Jobs;
 import service.JobService;
 
 import javax.servlet.ServletException;
@@ -47,18 +46,18 @@ public class JobSevrlet extends BaseServlet {
                 // GET /jobs/5
                 int id = Integer.parseInt(pathInfo.substring(1));
 
-                Jobs job = jobService.getJobById(id);
+                JobDTO jobDTO = jobService.getJobById(id);
 
-                if (job == null) {
+                if (jobDTO == null) {
 
-                    ApiResponse<Jobs> response = new ApiResponse<>(false, "Không tìm thấy công việc", null);
+                    ApiResponse<JobDTO> response = new ApiResponse<>(false, "Không tìm thấy công việc", null);
 
                     resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
                     resp.getWriter().print(objectMapper.writeValueAsString(response));
                     return;
                 }
 
-                ApiResponse<Jobs> response = new ApiResponse<>(true, "Lấy công việc thành công!", job);
+                ApiResponse<JobDTO> response = new ApiResponse<>(true, "Lấy công việc thành công!", jobDTO);
 
                 resp.setStatus(HttpServletResponse.SC_OK);
                 resp.getWriter().print(objectMapper.writeValueAsString(response));

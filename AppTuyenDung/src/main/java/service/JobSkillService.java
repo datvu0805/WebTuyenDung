@@ -1,7 +1,7 @@
 package service;
 
 import dao.JobSkillDAO;
-import model.JobSkills;
+import model.JobSkill;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ public class JobSkillService {
 
     private final JobSkillDAO jobSkillDAO = new JobSkillDAO();
 
-    public void add(JobSkills jobSkill) {
+    public void add(JobSkill jobSkill) {
 
         if (jobSkillDAO.exists(jobSkill.getJobID().getId(), jobSkill.getSkillID().getId())) {
 
@@ -19,15 +19,15 @@ public class JobSkillService {
         jobSkillDAO.add(jobSkill);
     }
 
-    public void delete(JobSkills jobSkill) {
+    public void delete(JobSkill jobSkill) {
         jobSkillDAO.delete(jobSkill);
     }
 
-    public List<JobSkills> getByJobId(int jobId) {
+    public List<JobSkill> getByJobId(int jobId) {
         return jobSkillDAO.getByJobId(jobId);
     }
 
-    public List<JobSkills> getBySkillId(int skillId) {
+    public List<JobSkill> getBySkillId(int skillId) {
         return jobSkillDAO.getBySkillId(skillId);
     }
 }

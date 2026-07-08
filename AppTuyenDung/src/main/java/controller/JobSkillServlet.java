@@ -2,9 +2,9 @@ package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dto.ApiResponse;
-import model.JobSkills;
-import model.Jobs;
-import model.Skills;
+import model.JobSkill;
+import model.Job;
+import model.Skill;
 import service.JobSkillService;
 
 import javax.servlet.ServletException;
@@ -32,15 +32,15 @@ public class JobSkillServlet extends BaseServlet {
             int jobId = Integer.parseInt(req.getParameter("jobId"));
             int skillId = Integer.parseInt(req.getParameter("skillId"));
 
-            JobSkills jobSkill = new JobSkills();
-            jobSkill.setJobID(new Jobs(jobId));
-            jobSkill.setSkillID(new Skills(skillId));
+            JobSkill jobSkill = new JobSkill();
+            jobSkill.setJobID(new Job(jobId));
+            jobSkill.setSkillID(new Skill(skillId));
 
             jobSkillService.add(jobSkill);
 
             resp.setStatus(HttpServletResponse.SC_OK);
 
-            ApiResponse<JobSkills> response = new ApiResponse<>(true, "Thêm skill cho job thành công!", jobSkill);
+            ApiResponse<JobSkill> response = new ApiResponse<>(true, "Thêm skill cho job thành công!", jobSkill);
 
             resp.getWriter().print(objectMapper.writeValueAsString(response));
 
@@ -48,7 +48,7 @@ public class JobSkillServlet extends BaseServlet {
 
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-            ApiResponse<JobSkills> response = new ApiResponse<>(false, e.getMessage(), null);
+            ApiResponse<JobSkill> response = new ApiResponse<>(false, e.getMessage(), null);
 
             resp.getWriter().print(objectMapper.writeValueAsString(response));
         }
@@ -66,13 +66,13 @@ public class JobSkillServlet extends BaseServlet {
             int jobId = Integer.parseInt(req.getParameter("jobId"));
             int skillId = Integer.parseInt(req.getParameter("skillId"));
 
-            JobSkills jobSkill = new JobSkills();
-            jobSkill.setJobID(new Jobs(jobId));
-            jobSkill.setSkillID(new Skills(skillId));
+            JobSkill jobSkill = new JobSkill();
+            jobSkill.setJobID(new Job(jobId));
+            jobSkill.setSkillID(new Skill(skillId));
 
             jobSkillService.delete(jobSkill);
 
-            ApiResponse<JobSkills> response = new ApiResponse<>(true, "Xóa skill khỏi job thành công!", jobSkill);
+            ApiResponse<JobSkill> response = new ApiResponse<>(true, "Xóa skill khỏi job thành công!", jobSkill);
 
             resp.getWriter().print(objectMapper.writeValueAsString(response));
 
@@ -80,7 +80,7 @@ public class JobSkillServlet extends BaseServlet {
 
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-            ApiResponse<JobSkills> response = new ApiResponse<>(false, e.getMessage(), null);
+            ApiResponse<JobSkill> response = new ApiResponse<>(false, e.getMessage(), null);
 
             resp.getWriter().print(objectMapper.writeValueAsString(response));
         }
@@ -99,17 +99,17 @@ public class JobSkillServlet extends BaseServlet {
 
             if (jobId != null) {
 
-                List<JobSkills> list = jobSkillService.getByJobId(Integer.parseInt(jobId));
+                List<JobSkill> list = jobSkillService.getByJobId(Integer.parseInt(jobId));
 
-                ApiResponse<List<JobSkills>> response = new ApiResponse<>(true, "Danh sách skill của job", list);
+                ApiResponse<List<JobSkill>> response = new ApiResponse<>(true, "Danh sách skill của job", list);
 
                 resp.getWriter().print(objectMapper.writeValueAsString(response));
 
             } else if (skillId != null) {
 
-                List<JobSkills> list = jobSkillService.getBySkillId(Integer.parseInt(skillId));
+                List<JobSkill> list = jobSkillService.getBySkillId(Integer.parseInt(skillId));
 
-                ApiResponse<List<JobSkills>> response = new ApiResponse<>(true, "Danh sách job theo skill", list);
+                ApiResponse<List<JobSkill>> response = new ApiResponse<>(true, "Danh sách job theo skill", list);
 
                 resp.getWriter().print(objectMapper.writeValueAsString(response));
 

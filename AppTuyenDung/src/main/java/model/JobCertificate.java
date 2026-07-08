@@ -1,42 +1,40 @@
 package model;
 
 
-import constant.ScoreType;
-
 // Bảng chứng chỉ yêu cầu của công việc
-public class JobCertificates extends BaseEntity{
-    private Jobs jobID;
-    private Certificates certificatesID;
+public class JobCertificate extends BaseEntity{
+    private Job jobID;
+    private Certificate certificatesID;
 
 // Điểm tối thiểu yêu cầu
     private String requiredScore;
 
-    public JobCertificates(Jobs jobID, Certificates certificatesID, String requiredScore) {
+    public JobCertificate(Job jobID, Certificate certificatesID, String requiredScore) {
         this.jobID = jobID;
         this.certificatesID = certificatesID;
         this.requiredScore = requiredScore;
     }
 
-    public JobCertificates(int id, Jobs jobID, Certificates certificatesID, String requiredScore) {
+    public JobCertificate(int id, Job jobID, Certificate certificatesID, String requiredScore) {
         super(id);
         this.jobID = jobID;
         this.certificatesID = certificatesID;
         this.requiredScore = requiredScore;
     }
 
-    public Jobs getJobID() {
+    public Job getJobID() {
         return jobID;
     }
 
-    public void setJobID(Jobs jobID) {
+    public void setJobID(Job jobID) {
         this.jobID = jobID;
     }
 
-    public Certificates getCertificatesID() {
+    public Certificate getCertificatesID() {
         return certificatesID;
     }
 
-    public void setCertificatesID(Certificates certificatesID) {
+    public void setCertificatesID(Certificate certificatesID) {
         this.certificatesID = certificatesID;
     }
 

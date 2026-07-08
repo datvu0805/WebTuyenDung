@@ -1,20 +1,20 @@
 package dao;
 
 import config.DatabaseConfig;
-import model.Certificates;
+import model.Certificate;
 
 import java.util.List;
 
-public class CertificateDAO extends DatabaseConfig implements TDAO<Certificates>{
+public class CertificateDAO extends DatabaseConfig implements TDAO<Certificate>{
 
 
     @Override
-    public void add(Certificates entity) {
+    public void add(Certificate entity) {
 
     }
 
     @Override
-    public void update(Certificates entity) {
+    public void update(Certificate entity) {
 
     }
 
@@ -24,12 +24,12 @@ public class CertificateDAO extends DatabaseConfig implements TDAO<Certificates>
     }
 
     @Override
-    public Certificates getById(int id) {
+    public Certificate getById(int id) {
         return null;
     }
 
     @Override
-    public List<Certificates> getAll() {
+    public List<Certificate> getAll() {
         return List.of();
     }
 

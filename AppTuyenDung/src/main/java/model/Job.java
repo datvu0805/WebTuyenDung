@@ -2,7 +2,7 @@ package model;
 
 import java.time.LocalDateTime;
 
-public class Jobs extends BaseEntity{
+public class Job extends BaseEntity{
     private Employers employerID;
     private String title;
     private String description;
@@ -16,7 +16,7 @@ public class Jobs extends BaseEntity{
     private Short status;
     private Boolean isHiddenOnExpiry;
 
-    public Jobs(Employers employerID, String title, String description, Double salary, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status, Boolean isHiddenOnExpiry) {
+    public Job(Employers employerID, String title, String description, Double salary, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status, Boolean isHiddenOnExpiry) {
         this.employerID = employerID;
         this.title = title;
         this.description = description;
@@ -31,7 +31,7 @@ public class Jobs extends BaseEntity{
         this.isHiddenOnExpiry = isHiddenOnExpiry;
     }
 
-    public Jobs(int id, Employers employerID, String title, String description, Double salary, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status, Boolean isHiddenOnExpiry) {
+    public Job(int id, Employers employerID, String title, String description, Double salary, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status, Boolean isHiddenOnExpiry) {
         super(id);
         this.employerID = employerID;
         this.title = title;
@@ -47,10 +47,10 @@ public class Jobs extends BaseEntity{
         this.isHiddenOnExpiry = isHiddenOnExpiry;
     }
 
-    public Jobs() {
+    public Job() {
 
     }
-    public Jobs(int id) {
+    public Job(int id) {
         super(id);
     }
 

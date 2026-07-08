@@ -1,10 +1,10 @@
 package controller;
 
-import com.google.gson.Gson;
-import dao.SkillDAO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dto.ApiResponse;
-import exception.BusinessException;
-import model.Skills;
+import dto.SkillDTO;
+import mapper.SkillRequestMapper;
+import service.SkillService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -13,118 +13,199 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/skills")
+@WebServlet(urlPatterns = {"/skill/*"})
 public class SkillServlet extends BaseServlet {
 
-    private final SkillDAO skillDAO = new SkillDAO();
-    private final Gson gson = new Gson();
-
-    private void sendJson(HttpServletResponse resp, int status, Object body) throws IOException {
-        resp.setContentType("application/json;charset=UTF-8");
-        resp.setStatus(status);
-        resp.getWriter().write(gson.toJson(body));
-    }
+    private final SkillService skillService = new SkillService();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        String idRaw = req.getParameter("id");
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
         try {
-            if (idRaw != null) {
-                Skills skill = skillDAO.getById(Integer.parseInt(idRaw));
-                if (skill == null) {
-                    sendJson(resp, HttpServletResponse.SC_NOT_FOUND,
-                            new ApiResponse<>(false, "Không tìm thấy kỹ năng"));
-                } else {
-                    sendJson(resp, HttpServletResponse.SC_OK,
-                            new ApiResponse<>(true, "Thành công", skill));
-                }
+
+            String pathInfo = req.getPathInfo();
+
+            // GET /skills
+            if (pathInfo == null || pathInfo.equals("/")) {
+
+                List<SkillDTO> skills = skillService.getAllSkills();
+
+                ApiResponse<List<SkillDTO>> response = new ApiResponse<>(true, "Lấy danh sách kỹ năng thành công!", skills);
+
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.getWriter().print(objectMapper.writeValueAsString(response));
+
             } else {
-                List<Skills> list = skillDAO.getAll();
-                sendJson(resp, HttpServletResponse.SC_OK,
-                        new ApiResponse<>(true, "Danh sách kỹ năng", list));
+
+                // GET /skills/1
+                int id = Integer.parseInt(pathInfo.substring(1));
+
+                SkillDTO dto = skillService.getSkillById(id);
+
+                if (dto == null) {
+
+                    ApiResponse<SkillDTO> response = new ApiResponse<>(false, "Không tìm thấy kỹ năng", null);
+
+                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    resp.getWriter().print(objectMapper.writeValueAsString(response));
+                    return;
+                }
+
+                ApiResponse<SkillDTO> response = new ApiResponse<>(true, "Lấy kỹ năng thành công!", dto);
+
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.getWriter().print(objectMapper.writeValueAsString(response));
             }
+
+        } catch (NumberFormatException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            ApiResponse<Object> response = new ApiResponse<>(false, "ID không hợp lệ", null);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
         } catch (Exception e) {
-            sendJson(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    new ApiResponse<>(false, "Lỗi máy chủ: " + e.getMessage()));
+
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+            ApiResponse<Object> response = new ApiResponse<>(false, e.getMessage(), null);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
         req.setCharacterEncoding("UTF-8");
-        String skillName = req.getParameter("skillName");
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
         try {
-            if (skillName == null || skillName.trim().isEmpty()) {
-                throw new BusinessException("Tên kỹ năng không được để trống");
-            }
-            Skills skill = new Skills(skillName.trim());
-            skillDAO.add(skill);
-            sendJson(resp, HttpServletResponse.SC_CREATED,
-                    new ApiResponse<>(true, "Thêm kỹ năng thành công", skill));
-        } catch (BusinessException e) {
-            sendJson(resp, HttpServletResponse.SC_BAD_REQUEST,
-                    new ApiResponse<>(false, e.getMessage()));
+
+            SkillDTO dto = SkillRequestMapper.toDTO(req);
+
+            skillService.addSkill(dto);
+
+            ApiResponse<SkillDTO> response = new ApiResponse<>(true, "Thêm kỹ năng thành công!", dto);
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+        } catch (IllegalArgumentException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            ApiResponse<Object> response = new ApiResponse<>(false, e.getMessage(), null);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
         } catch (Exception e) {
-            sendJson(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    new ApiResponse<>(false, "Lỗi máy chủ: " + e.getMessage()));
+
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+            ApiResponse<Object> response = new ApiResponse<>(false, "Có lỗi hệ thống xảy ra: " + e.getMessage(), null);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+        } finally {
+
+            resp.getWriter().flush();
         }
     }
 
     @Override
-    protected void doPut(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
         req.setCharacterEncoding("UTF-8");
-        String idRaw = req.getParameter("id");
-        String skillName = req.getParameter("skillName");
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
         try {
-            if (idRaw == null || skillName == null || skillName.trim().isEmpty()) {
-                throw new BusinessException("id và skillName là bắt buộc");
-            }
-            Skills skill = skillDAO.getById(Integer.parseInt(idRaw));
-            if (skill == null) {
-                sendJson(resp, HttpServletResponse.SC_NOT_FOUND,
-                        new ApiResponse<>(false, "Không tìm thấy kỹ năng"));
-                return;
-            }
-            skill.setSkillName(skillName.trim());
-            skillDAO.update(skill);
-            sendJson(resp, HttpServletResponse.SC_OK,
-                    new ApiResponse<>(true, "Cập nhật kỹ năng thành công", skill));
-        } catch (BusinessException e) {
-            sendJson(resp, HttpServletResponse.SC_BAD_REQUEST,
-                    new ApiResponse<>(false, e.getMessage()));
+
+            int id = Integer.parseInt(req.getParameter("id"));
+
+            SkillDTO dto = SkillRequestMapper.toDTO(req);
+
+            skillService.updateSkill(id, dto);
+
+            ApiResponse<SkillDTO> response = new ApiResponse<>(true, "Cập nhật kỹ năng thành công!", dto);
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+        } catch (NumberFormatException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            ApiResponse<Object> response = new ApiResponse<>(false, "ID không hợp lệ", null);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+        } catch (IllegalArgumentException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            ApiResponse<Object> response = new ApiResponse<>(false, e.getMessage(), null);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
         } catch (Exception e) {
-            sendJson(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    new ApiResponse<>(false, "Lỗi máy chủ: " + e.getMessage()));
+
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+            ApiResponse<Object> response = new ApiResponse<>(false, e.getMessage(), null);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
         }
     }
 
     @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        String idRaw = req.getParameter("id");
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
         try {
-            if (idRaw == null) {
-                throw new BusinessException("Thiếu id kỹ năng");
-            }
-            int id = Integer.parseInt(idRaw);
-            Skills skill = skillDAO.getById(id);
-            if (skill == null) {
-                sendJson(resp, HttpServletResponse.SC_NOT_FOUND,
-                        new ApiResponse<>(false, "Không tìm thấy kỹ năng"));
-                return;
-            }
-            skillDAO.delete(id);
-            sendJson(resp, HttpServletResponse.SC_OK,
-                    new ApiResponse<>(true, "Xóa kỹ năng thành công"));
-        } catch (BusinessException e) {
-            sendJson(resp, HttpServletResponse.SC_BAD_REQUEST,
-                    new ApiResponse<>(false, e.getMessage()));
+
+            int id = Integer.parseInt(req.getParameter("id"));
+
+            skillService.deleteSkill(id);
+
+            ApiResponse<Integer> response = new ApiResponse<>(true, "Xóa kỹ năng thành công!", id);
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+        } catch (NumberFormatException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            ApiResponse<Object> response = new ApiResponse<>(false, "ID không hợp lệ", null);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+        } catch (IllegalArgumentException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            ApiResponse<Object> response = new ApiResponse<>(false, e.getMessage(), null);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
         } catch (Exception e) {
-            sendJson(resp, HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                    new ApiResponse<>(false, "Lỗi máy chủ: " + e.getMessage()));
+
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+            ApiResponse<Object> response = new ApiResponse<>(false, e.getMessage(), null);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
         }
     }
 }

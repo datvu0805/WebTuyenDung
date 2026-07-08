@@ -1,18 +1,18 @@
 package dao;
 
 import config.DatabaseConfig;
-import model.JobCertificates;
+import model.JobCertificate;
 
 import java.util.List;
 
-public class JobCertificateDAO extends DatabaseConfig implements TDAO<JobCertificates> {
+public class JobCertificateDAO extends DatabaseConfig implements TDAO<JobCertificate> {
     @Override
-    public void add(JobCertificates entity) {
+    public void add(JobCertificate entity) {
 
     }
 
     @Override
-    public void update(JobCertificates entity) {
+    public void update(JobCertificate entity) {
 
     }
 
@@ -22,12 +22,12 @@ public class JobCertificateDAO extends DatabaseConfig implements TDAO<JobCertifi
     }
 
     @Override
-    public JobCertificates getById(int id) {
+    public JobCertificate getById(int id) {
         return null;
     }
 
     @Override
-    public List<JobCertificates> getAll() {
+    public List<JobCertificate> getAll() {
         return List.of();
     }
 }

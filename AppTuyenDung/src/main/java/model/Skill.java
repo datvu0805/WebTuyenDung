@@ -1,21 +1,21 @@
 package model;
 
-public class Skills extends BaseEntity{
+public class Skill extends BaseEntity{
     private String skillName;
 
-    public Skills(String skillName) {
+    public Skill(String skillName) {
         this.skillName = skillName;
     }
 
-    public Skills(int id, String skillName) {
+    public Skill(int id, String skillName) {
         super(id);
         this.skillName = skillName;
     }
 
-    public Skills() {
+    public Skill() {
 
     }
-    public Skills(int id) {
+    public Skill(int id) {
         super(id);
     }
     public String getSkillName() {

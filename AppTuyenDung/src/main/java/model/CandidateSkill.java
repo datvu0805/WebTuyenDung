@@ -1,15 +1,15 @@
 package model;
 
-public class CandidateSkills extends BaseEntity{
+public class CandidateSkill extends BaseEntity{
     private Candidates candidateID;
-    private Skills skillID;
+    private Skill skillID;
 
-    public CandidateSkills(Candidates candidateID, Skills skillID) {
+    public CandidateSkill(Candidates candidateID, Skill skillID) {
         this.candidateID = candidateID;
         this.skillID = skillID;
     }
 
-    public CandidateSkills(int id, Candidates candidateID, Skills skillID) {
+    public CandidateSkill(int id, Candidates candidateID, Skill skillID) {
         super(id);
         this.candidateID = candidateID;
         this.skillID = skillID;
@@ -23,11 +23,11 @@ public class CandidateSkills extends BaseEntity{
         this.candidateID = candidateID;
     }
 
-    public Skills getSkillID() {
+    public Skill getSkillID() {
         return skillID;
     }
 
-    public void setSkillID(Skills skillID) {
+    public void setSkillID(Skill skillID) {
         this.skillID = skillID;
     }
 

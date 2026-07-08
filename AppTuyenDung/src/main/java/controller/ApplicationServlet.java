@@ -8,7 +8,7 @@ import exception.BusinessException;
 import model.Application;
 import model.CV;
 import model.Candidates;
-import model.Jobs;
+import model.Job;
 import service.ApplicationService;
 import validator.ApplicationValidator;
 
@@ -36,7 +36,6 @@ public class ApplicationServlet extends HttpServlet {
         try (PrintWriter out = response.getWriter()){
             out.print(this.objectMapper.writeValueAsString(apiResponse));
             out.flush();
-
         }
     }
 
@@ -88,7 +87,7 @@ public class ApplicationServlet extends HttpServlet {
                 candidates.setId(Integer.parseInt(candidateIDRaw));
                 app.setCandidateID(candidates);
 
-                Jobs jobs = new Jobs();
+                Job jobs = new Job();
                 jobs.setId(Integer.parseInt(jobIDRaw));
                 app.setJodID(jobs);
 

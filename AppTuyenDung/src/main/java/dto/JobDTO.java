@@ -3,7 +3,7 @@ package dto;
 import java.time.LocalDateTime;
 
 public class JobDTO {
-
+    private int id;
     private String title;
     private String description;
     private Double salary;
@@ -19,7 +19,8 @@ public class JobDTO {
     public JobDTO() {
     }
 
-    public JobDTO( String title, String description, Double salary, String location, String experience, Integer quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status, Boolean hiddenOnExpiry) {
+    public JobDTO(Integer id, String title, String description, Double salary, String location, String experience, Integer quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status, Boolean hiddenOnExpiry) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.salary = salary;
@@ -33,7 +34,13 @@ public class JobDTO {
         this.hiddenOnExpiry = hiddenOnExpiry;
     }
 
+    public int getId() {
+        return id;
+    }
 
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;

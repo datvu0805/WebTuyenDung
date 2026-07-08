@@ -1,18 +1,18 @@
 package dao;
 
 import config.DatabaseConfig;
-import model.FavoriteJobs;
+import model.FavoriteJob;
 
 import java.util.List;
 
-public class FavoriteJobDAO extends DatabaseConfig implements TDAO<FavoriteJobs> {
+public class FavoriteJobDAO extends DatabaseConfig implements TDAO<FavoriteJob> {
     @Override
-    public void add(FavoriteJobs entity) {
+    public void add(FavoriteJob entity) {
 
     }
 
     @Override
-    public void update(FavoriteJobs entity) {
+    public void update(FavoriteJob entity) {
 
     }
 
@@ -22,12 +22,12 @@ public class FavoriteJobDAO extends DatabaseConfig implements TDAO<FavoriteJobs>
     }
 
     @Override
-    public FavoriteJobs getById(int id) {
+    public FavoriteJob getById(int id) {
         return null;
     }
 
     @Override
-    public List<FavoriteJobs> getAll() {
+    public List<FavoriteJob> getAll() {
         return List.of();
     }
 }

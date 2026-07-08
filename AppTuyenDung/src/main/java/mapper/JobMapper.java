@@ -2,7 +2,7 @@ package mapper;
 
 import dto.JobDTO;
 import model.Employers;
-import model.Jobs;
+import model.Job;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,9 +13,9 @@ public class JobMapper {
 
 //      ResultSet -> Jobs
 
-    public static Jobs map(ResultSet rs) throws SQLException {
+    public static Job map(ResultSet rs) throws SQLException {
 
-        Jobs job = new Jobs();
+        Job job = new Job();
 
         job.setId(rs.getInt("id"));
         job.setEmployerID(new Employers(rs.getInt("employer_id")));
@@ -40,11 +40,11 @@ public class JobMapper {
     }
 
 
-     // JobDTO -> Jobs
+    // JobDTO -> Jobs
 
-    public static Jobs toEntity(JobDTO dto) {
+    public static Job toEntity(JobDTO dto) {
 
-        Jobs job = new Jobs();
+        Job job = new Job();
 
         job.setTitle(dto.getTitle());
         job.setDescription(dto.getDescription());
@@ -61,5 +61,30 @@ public class JobMapper {
         job.setHiddenOnExpiry(dto.getHiddenOnExpiry());
 
         return job;
+    }
+    // JobDTO -> Jobs nhưng theo id
+
+    public static JobDTO toDTO(Job job) {
+
+        if (job == null) {
+            return null;
+        }
+        JobDTO dto = new JobDTO();
+
+        dto.setTitle(job.getTitle());
+        dto.setDescription(job.getDescription());
+        dto.setSalary(job.getSalary());
+        dto.setLocation(job.getLocation());
+        dto.setExperience(job.getExperience());
+        dto.setQuantity(job.getQuantity());
+
+        dto.setPostedAt(job.getPostedAt());
+        dto.setExpiredAt(job.getExpiredAt());
+        dto.setApplicationDeadline(job.getApplicationDeadline());
+
+        dto.setStatus(job.getStatus());
+        dto.setHiddenOnExpiry(job.getHiddenOnExpiry());
+
+        return dto;
     }
 }

@@ -87,42 +87,4 @@ public class JobService {
         });
          return jobDTOList;
     }
-
-
-    public void addSkillToJob(int jobId, int skillId) {
-
-        if (jobId <= 0) {
-            throw new IllegalArgumentException("ID công việc không hợp lệ");
-        }
-
-        if (skillId <= 0) {
-            throw new IllegalArgumentException("ID kỹ năng không hợp lệ");
-        }
-
-        JobDAO.addSkill(new Job(jobId), new Skill(skillId));
-    }
-
-
-    public void removeSkillFromJob(int jobId, int skillId) {
-
-        if (jobId <= 0) {
-            throw new IllegalArgumentException("ID công việc không hợp lệ");
-        }
-
-        if (skillId <= 0) {
-            throw new IllegalArgumentException("ID kỹ năng không hợp lệ");
-        }
-
-        JobDAO.deleteSkill(new Job(jobId), new Skill(skillId));
-    }
-
-
-    public List<JobSkill> getSkillsByJob(int jobId) {
-
-        if (jobId <= 0) {
-            throw new IllegalArgumentException("ID công việc không hợp lệ");
-        }
-
-        return JobDAO.getSkillsByJob(jobId);
-    }
 }

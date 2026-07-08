@@ -113,7 +113,7 @@ public class JobSevrlet extends BaseServlet {
 
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-            ApiResponse<JobDTO> apiResponse = new ApiResponse<>(false, "Dữ liệu số không hợp lệ hoặc bị trống!", null);
+            ApiResponse<Object> apiResponse = new ApiResponse<>(false, "Dữ liệu số không hợp lệ hoặc bị trống!", null);
 
             String jsonResult = objectMapper.writeValueAsString(apiResponse);
             resp.getWriter().print(jsonResult);
@@ -122,7 +122,7 @@ public class JobSevrlet extends BaseServlet {
 
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-            ApiResponse<JobDTO> apiResponse = new ApiResponse<>(false, e.getMessage(), null);
+            ApiResponse<Object> apiResponse = new ApiResponse<>(false, e.getMessage(), null);
 
             String jsonResult = objectMapper.writeValueAsString(apiResponse);
             resp.getWriter().print(jsonResult);
@@ -131,7 +131,7 @@ public class JobSevrlet extends BaseServlet {
 
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
-            ApiResponse<JobDTO> apiResponse = new ApiResponse<>(false, "Có lỗi hệ thống xảy ra: " + e.getMessage(), null);
+            ApiResponse<Object> apiResponse = new ApiResponse<>(false, "Có lỗi hệ thống xảy ra: " + e.getMessage(), null);
 
             String jsonResult = objectMapper.writeValueAsString(apiResponse);
             resp.getWriter().print(jsonResult);

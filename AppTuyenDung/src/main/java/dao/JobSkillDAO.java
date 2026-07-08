@@ -44,7 +44,7 @@ public class JobSkillDAO extends DatabaseConfig {
             throw new RuntimeException(e);
         }
     }
-
+// tìm kiếm trong job này đang có yêu cầu kỹ năng nào
     public List<JobSkill> getByJobId(int jobId) {
 
         String sql = "SELECT * FROM jobs_skills WHERE jobs_id = ?";
@@ -74,7 +74,7 @@ public class JobSkillDAO extends DatabaseConfig {
 
         return list;
     }
-
+// ngược lại tìm xem skill thì có nhưng job nào đang cần  tới nó
     public List<JobSkill> getBySkillId(int skillId) {
 
         String sql = "SELECT * FROM jobs_skills WHERE skills_id = ?";
@@ -104,7 +104,7 @@ public class JobSkillDAO extends DatabaseConfig {
 
         return list;
     }
-
+//kiểm tra xem trong data thì job đó đã có skill đó chưa khác với validator
     public boolean exists(int jobId, int skillId) {
 
         String sql = " SELECT 1 FROM jobs_skills WHERE jobs_id = ? AND skills_id = ? ";

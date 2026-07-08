@@ -2,17 +2,17 @@ package model;
 
 // gói dịch vụ VIP
 public class ServicePackages extends BaseEntity{
-    private ServicePackages packageName;
-    private String targetAudience;
+    private String packageName;
+    private String targetAudience; // đối tượng áp dụng
     private Double price;
     private int durationDays;
-    private  String benifitType;
+    private  String benifitType;// loại đặc quyền
     private String description;
 
     public ServicePackages() {
     }
 
-    public ServicePackages(ServicePackages packageName, String targetAudience, Double price, int durationDays, String benifitType, String description) {
+    public ServicePackages(String packageName, String targetAudience, Double price, int durationDays, String benifitType, String description) {
         this.packageName = packageName;
         this.targetAudience = targetAudience;
         this.price = price;
@@ -21,7 +21,7 @@ public class ServicePackages extends BaseEntity{
         this.description = description;
     }
 
-    public ServicePackages(int id, ServicePackages packageName, String targetAudience, Double price, int durationDays, String benifitType, String description) {
+    public ServicePackages(int id, String packageName, String targetAudience, Double price, int durationDays, String benifitType, String description) {
         super(id);
         this.packageName = packageName;
         this.targetAudience = targetAudience;
@@ -31,11 +31,11 @@ public class ServicePackages extends BaseEntity{
         this.description = description;
     }
 
-    public ServicePackages getPackageName() {
+    public String getPackageName() {
         return packageName;
     }
 
-    public void setPackageName(ServicePackages packageName) {
+    public void setPackageName(String packageName) {
         this.packageName = packageName;
     }
 
@@ -81,6 +81,7 @@ public class ServicePackages extends BaseEntity{
 
     @Override
     public String getInfo() {
-        return "";
+
+        return "Package: " + this.packageName + " - Target: " + this.targetAudience;
     }
 }

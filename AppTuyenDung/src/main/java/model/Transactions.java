@@ -33,7 +33,7 @@ public class Transactions extends BaseEntity{
         return userID;
     }
 
-    public void setUserID(Users userID) {
+    public void setUserID(int userID) {
         this.userID = userID;
     }
 

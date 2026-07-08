@@ -2,13 +2,13 @@ package model;
 
 import java.time.LocalDate;
 
-// lịch sử đăng kí dịch vu
+// lịch sử đăng kí dịch vụ VIP
 public class UserServicesMD extends BaseEntity{
     private Users userID;
     private ServicePackages packageID;
     private LocalDate startDate;
     private LocalDate endDate;
-    private String status;
+    private String status; // 1 là đang kích hoạt; 0 : hết hạn
 
     public UserServicesMD() {
     }

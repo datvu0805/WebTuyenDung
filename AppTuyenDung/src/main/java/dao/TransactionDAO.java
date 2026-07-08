@@ -9,21 +9,19 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class TransactionDAO extends DatabaseConfig implements IDAO<Transactions> {
-
     // ghi lại lịch sử dòng tiền
-    @Override
-    public void add(Transactions transactions) {
+
+    public void insertTransaction(Connection conn, Transactions transactions) {
         String sql = "INSERT INTO transactions(user_id, transaction_type, amount, status, content, created_at, update_at)" +
-                "VALUES(?, ?, ?, ?, ?, ?, ?)";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)){
-//           ps.setInt(1, transactions.getUserID());
+                "VALUES(?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)){
+           ps.setInt(1, transactions.getUserID().getId());
            ps.setString(2, transactions.getTransactionType());
            ps.setDouble(3, transactions.getAmount());
            ps.setInt(4, transactions.getStatus());
            ps.setString(5, transactions.getContent());
-           ps.setObject(6, transactions.getCreatedAt());
-           ps.setObject(7, transactions.getUpdatedAt());
+//           ps.setObject(6, transactions.getCreatedAt());
+//           ps.setObject(7, transactions.getUpdatedAt());
 
            ps.executeUpdate();
 
@@ -31,6 +29,11 @@ public class TransactionDAO extends DatabaseConfig implements IDAO<Transactions>
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void add(Transactions entity) {
+
     }
 
     @Override

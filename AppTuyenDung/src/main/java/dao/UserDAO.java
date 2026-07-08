@@ -293,4 +293,20 @@ public class UserDAO extends DatabaseConfig {
             e.printStackTrace();
         }
     }
+
+    public Users getUserByIDForUpdate(Connection conn, int userId) throws SQLException{
+        String sql = "SELECT u.*, r.id AS role_id, r.role_name" +
+                            "FROM users u" +
+                            "JOIN roles r ON u.role_id = r.id" +
+                            "WHERE u.id = ? FOR UPDATE";
+        try (PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setInt(1, userId);
+            try (ResultSet rs = ps.executeQuery()){
+                if(rs.next()){
+                    return  mapUser(rs);
+                }
+            }
+        }
+        return null;
+    }
 }

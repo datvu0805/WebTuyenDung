@@ -2,12 +2,11 @@ package service;
 
 import dao.JobDAO;
 import dto.JobDTO;
+import dto.JobSearchDTO;
 import mapper.JobMapper;
 import model.Job;
 import validator.JobValidator;
 
-import model.JobSkill;
-import model.Skill;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +21,7 @@ public class JobService {
         this.validator = new JobValidator();
     }
 
-
+    //thêm add xog trả về id cũng được
     public void addJob(JobDTO dto) {
 
         List<String> errors = validator.validateJob(dto);
@@ -82,9 +81,24 @@ public class JobService {
         List<JobDTO> jobDTOList = new ArrayList<>();
         JobDTO jobDTO1 = new JobDTO();
         List<Job> jobList = JobDAO.getAll();
-         jobList.stream().forEach(x -> {
-            jobDTOList.add(new JobDTO(x.getId(),x.getTitle(), x.getDescription(), x.getSalary(), x.getLocation(), x.getExperience(), x.getQuantity(),x.getPostedAt(),x.getExpiredAt(),x.getApplicationDeadline(),x.getStatus(),x.getHiddenOnExpiry()));
+        jobList.stream().forEach(x -> {
+            jobDTOList.add(new JobDTO(x.getId(), x.getEmployerID().getId(), x.getTitle(), x.getDescription(), x.getMinSalary(), x.getMaxSalary(), x.getCurrency(), x.getLocation(), x.getExperience(), x.getQuantity(), x.getPostedAt(), x.getExpiredAt(), x.getApplicationDeadline(), x.getStatus().getValue(), x.getHiddenOnExpiry()));
         });
-         return jobDTOList;
+        return jobDTOList;
+    }
+
+    //    public List<JobDTO> getAllJobs() {
+//
+//        return JobDAO.getAll()
+//                .stream()
+//                .map(JobMapper::toDTO)
+//                .toList();
+//    }
+    public List<JobDTO> search(JobSearchDTO searchDTO) {
+
+        return JobDAO.search(searchDTO)
+                .stream()
+                .map(JobMapper::toDTO)
+                .toList();
     }
 }

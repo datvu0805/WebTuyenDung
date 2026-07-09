@@ -33,25 +33,40 @@ public class JobValidator {
         }
 
         // description
-        if (dto.getDescription() != null
-                && dto.getDescription().length() > 5000) {
+        if (dto.getDescription() != null && dto.getDescription().length() > 5000) {
             errors.add("Mô tả công việc quá dài");
         }
+        // minSalary
+        if (dto.getMinSalary() == null) {
+            errors.add("Mức lương tối thiểu không được để trống");
+        } else if (dto.getMinSalary() < 0) {
+            errors.add("Mức lương tối thiểu không được nhỏ hơn 0");
+        }
 
-        // salary
-        if (dto.getSalary() != null && dto.getSalary() < 0) {
-            errors.add("Mức lương không được nhỏ hơn 0");
+        // maxSalary
+        if (dto.getMaxSalary() == null) {
+            errors.add("Mức lương tối đa không được để trống");
+        } else if (dto.getMaxSalary() < 0) {
+            errors.add("Mức lương tối đa không được nhỏ hơn 0");
+        }
+
+        // So sánh khoảng lương
+        if (dto.getMinSalary() != null && dto.getMaxSalary() != null && dto.getMinSalary() > dto.getMaxSalary()) {
+            errors.add("Mức lương tối thiểu không được lớn hơn mức lương tối đa");
+        }
+
+        // Currency
+        if (dto.getCurrency() == null || dto.getCurrency().isBlank()) {
+            errors.add("Đơn vị tiền tệ không được để trống");
         }
 
         // location
-        if (!isEmpty(dto.getLocation())
-                && dto.getLocation().length() > 255) {
+        if (!isEmpty(dto.getLocation()) && dto.getLocation().length() > 255) {
             errors.add("Địa điểm tối đa 255 ký tự");
         }
 
         // experience
-        if (!isEmpty(dto.getExperience())
-                && dto.getExperience().length() > 100) {
+        if (!isEmpty(dto.getExperience()) && dto.getExperience().length() > 100) {
             errors.add("Yêu cầu kinh nghiệm tối đa 100 ký tự");
         }
 
@@ -76,16 +91,12 @@ public class JobValidator {
         }
 
         // So sánh thời gian
-        if (dto.getPostedAt() != null
-                && dto.getExpiredAt() != null
-                && dto.getPostedAt().isAfter(dto.getExpiredAt())) {
+        if (dto.getPostedAt() != null && dto.getExpiredAt() != null && dto.getPostedAt().isAfter(dto.getExpiredAt())) {
 
             errors.add("Ngày đăng phải trước ngày hết hạn");
         }
 
-        if (dto.getApplicationDeadline() != null
-                && dto.getExpiredAt() != null
-                && dto.getApplicationDeadline().isAfter(dto.getExpiredAt())) {
+        if (dto.getApplicationDeadline() != null && dto.getExpiredAt() != null && dto.getApplicationDeadline().isAfter(dto.getExpiredAt())) {
 
             errors.add("Hạn nộp hồ sơ phải trước hoặc bằng ngày hết hạn");
         }

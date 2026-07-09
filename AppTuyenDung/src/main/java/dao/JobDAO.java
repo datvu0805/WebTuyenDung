@@ -1,10 +1,9 @@
 package dao;
 
 import config.DatabaseConfig;
+import dto.JobSearchDTO;
 import mapper.JobMapper;
-import model.JobSkill;
 import model.Job;
-import model.Skill;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,31 +12,55 @@ import java.util.List;
 public class JobDAO extends DatabaseConfig implements TDAO<Job> {
     @Override
     public void add(Job jobs) {
-        String sql = "INSERT INTO jobs (employer_id, title, description, salary, location, experience, quantity, posted_at, expired_at, application_deadline, status, is_hidden_on_expiry, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id";
+
+        String sql = """
+                INSERT INTO jobs (
+                    employer_id,
+                    title,
+                    description,
+                    min_salary,
+                    max_salary,
+                    currency,
+                    location,
+                    experience,
+                    quantity,
+                    posted_at,
+                    expired_at,
+                    application_deadline,
+                    status,
+                    is_hidden_on_expiry,
+                    created_at,
+                    updated_at
+                )
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                RETURNING id
+                """;
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, jobs.getEmployerID().getId());
             ps.setString(2, jobs.getTitle());
             ps.setString(3, jobs.getDescription());
-            ps.setDouble(4, jobs.getSalary());
-            ps.setString(5, jobs.getLocation());
-            ps.setString(6, jobs.getExperience());
-            ps.setInt(7, jobs.getQuantity());
-            ps.setObject(8, jobs.getPostedAt());
-            ps.setObject(9, jobs.getExpiredAt());
-            ps.setObject(10, jobs.getApplicationDeadline());
-            ps.setInt(11, jobs.getStatus());
-            ps.setBoolean(12, jobs.getHiddenOnExpiry());
-            ps.setObject(13, jobs.getCreatedAt());
-            ps.setObject(14, jobs.getUpdatedAt());
+            ps.setDouble(4, jobs.getMinSalary());
+            ps.setDouble(5, jobs.getMaxSalary());
+            ps.setString(6, jobs.getCurrency());
+            ps.setString(7, jobs.getLocation());
+            ps.setString(8, jobs.getExperience());
+            ps.setInt(9, jobs.getQuantity());
+            ps.setObject(10, jobs.getPostedAt());
+            ps.setObject(11, jobs.getExpiredAt());
+            ps.setObject(12, jobs.getApplicationDeadline());
+            ps.setShort(13, jobs.getStatus().getValue());
+            ps.setBoolean(14, jobs.getHiddenOnExpiry());
+            ps.setObject(15, jobs.getCreatedAt());
+            ps.setObject(16, jobs.getUpdatedAt());
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    // đồng bộ hoá id
                     jobs.setId(rs.getInt("id"));
                 }
             }
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -45,26 +68,47 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
 
     @Override
     public void update(Job jobs) {
-        String sql = " UPDATE jobs SET employer_id = ?, title = ?, description = ?, salary = ?, location = ?, experience = ?, quantity = ?, posted_at = ?, expired_at = ?, application_deadline = ?, status = ?, is_hidden_on_expiry = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? ";
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = """
+                UPDATE jobs
+                SET employer_id = ?,
+                    title = ?,
+                    description = ?,
+                    min_salary = ?,
+                    max_salary = ?,
+                    currency = ?,
+                    location = ?,
+                    experience = ?,
+                    quantity = ?,
+                    posted_at = ?,
+                    expired_at = ?,
+                    application_deadline = ?,
+                    status = ?,
+                    is_hidden_on_expiry = ?,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+                """;
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, jobs.getEmployerID().getId());
             ps.setString(2, jobs.getTitle());
             ps.setString(3, jobs.getDescription());
-            ps.setDouble(4, jobs.getSalary());
-            ps.setString(5, jobs.getLocation());
-            ps.setString(6, jobs.getExperience());
-            ps.setInt(7, jobs.getQuantity());
-            ps.setObject(8, jobs.getPostedAt());
-            ps.setObject(9, jobs.getExpiredAt());
-            ps.setObject(10, jobs.getApplicationDeadline());
-            ps.setInt(11, jobs.getStatus());
-            ps.setBoolean(12, jobs.getHiddenOnExpiry());
-            ps.setInt(13, jobs.getId());
+            ps.setDouble(4, jobs.getMinSalary());
+            ps.setDouble(5, jobs.getMaxSalary());
+            ps.setString(6, jobs.getCurrency());
+            ps.setString(7, jobs.getLocation());
+            ps.setString(8, jobs.getExperience());
+            ps.setInt(9, jobs.getQuantity());
+            ps.setObject(10, jobs.getPostedAt());
+            ps.setObject(11, jobs.getExpiredAt());
+            ps.setObject(12, jobs.getApplicationDeadline());
+            ps.setShort(13, jobs.getStatus().getValue());
+            ps.setBoolean(14, jobs.getHiddenOnExpiry());
+            ps.setInt(15, jobs.getId());
 
             ps.executeUpdate();
+
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -73,8 +117,7 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
     @Override
     public void delete(int id) {
         String sql = " DELETE FROM jobs WHERE id=?";
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             ps.executeUpdate();
         } catch (Exception e) {
@@ -88,8 +131,7 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
 
         String sql = "SELECT * FROM jobs WHERE id = ?";
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
 
@@ -114,9 +156,7 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
 
         List<Job> list = new ArrayList<>();
 
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 list.add(JobMapper.map(rs));
@@ -124,6 +164,67 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
 
         } catch (Exception e) {
             throw new RuntimeException(e);
+        }
+
+        return list;
+    }
+
+    public List<Job> search(JobSearchDTO search) {
+
+        StringBuilder sql = new StringBuilder("SELECT * FROM jobs WHERE 1=1");
+
+        List<Object> params = new ArrayList<>();
+
+        if (search.getTitle() != null && !search.getTitle().isBlank()) {
+
+            sql.append(" AND title ILIKE ?");
+
+            params.add("%" + search.getTitle() + "%");
+        }
+
+        if (search.getLocation() != null && !search.getLocation().isBlank()) {
+
+            sql.append(" AND location=?");
+
+            params.add(search.getLocation());
+        }
+
+        if (search.getMinSalary() != null) {
+
+            sql.append(" AND min_salary>=?");
+
+            params.add(search.getMinSalary());
+        }
+
+        if (search.getMaxSalary() != null) {
+
+            sql.append(" AND max_salary<=?");
+
+            params.add(search.getMaxSalary());
+        }
+
+        List<Job> list = new ArrayList<>();
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+
+                ps.setObject(i + 1, params.get(i));
+
+            }
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                list.add(JobMapper.map(rs));
+
+            }
+
+        } catch (Exception e) {
+
+            throw new RuntimeException(e);
+
         }
 
         return list;

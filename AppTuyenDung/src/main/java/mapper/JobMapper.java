@@ -1,5 +1,6 @@
 package mapper;
 
+import constant.JobStatus;
 import dto.JobDTO;
 import model.Employers;
 import model.Job;
@@ -21,7 +22,9 @@ public class JobMapper {
         job.setEmployerID(new Employers(rs.getInt("employer_id")));
         job.setTitle(rs.getString("title"));
         job.setDescription(rs.getString("description"));
-        job.setSalary(rs.getDouble("salary"));
+        job.setMinSalary(rs.getDouble("min_salary"));
+        job.setMaxSalary(rs.getDouble("max_salary"));
+        job.setCurrency(rs.getString("currency"));
         job.setLocation(rs.getString("location"));
         job.setExperience(rs.getString("experience"));
         job.setQuantity(rs.getInt("quantity"));
@@ -30,7 +33,7 @@ public class JobMapper {
         job.setExpiredAt(rs.getObject("expired_at", LocalDateTime.class));
         job.setApplicationDeadline(rs.getObject("application_deadline", LocalDateTime.class));
 
-        job.setStatus(rs.getShort("status"));
+        job.setStatus(JobStatus.fromValue(rs.getShort("status")));
         job.setHiddenOnExpiry(rs.getBoolean("is_hidden_on_expiry"));
 
         job.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
@@ -46,9 +49,18 @@ public class JobMapper {
 
         Job job = new Job();
 
+        job.setId(dto.getId());
+
+        if (dto.getEmployerId() != null) {
+            Employers employer = new Employers(dto.getEmployerId());
+            job.setEmployerID(employer);
+        }
+
         job.setTitle(dto.getTitle());
         job.setDescription(dto.getDescription());
-        job.setSalary(dto.getSalary());
+        job.setMinSalary(dto.getMinSalary());
+        job.setMaxSalary(dto.getMaxSalary());
+        job.setCurrency(dto.getCurrency());
         job.setLocation(dto.getLocation());
         job.setExperience(dto.getExperience());
         job.setQuantity(dto.getQuantity());
@@ -57,7 +69,7 @@ public class JobMapper {
         job.setExpiredAt(dto.getExpiredAt());
         job.setApplicationDeadline(dto.getApplicationDeadline());
 
-        job.setStatus(dto.getStatus());
+        job.setStatus(JobStatus.fromValue(dto.getStatus()));
         job.setHiddenOnExpiry(dto.getHiddenOnExpiry());
 
         return job;
@@ -69,11 +81,20 @@ public class JobMapper {
         if (job == null) {
             return null;
         }
+
         JobDTO dto = new JobDTO();
+
+        dto.setId(job.getId());
+
+        if (job.getEmployerID() != null) {
+            dto.setEmployerId(job.getEmployerID().getId());
+        }
 
         dto.setTitle(job.getTitle());
         dto.setDescription(job.getDescription());
-        dto.setSalary(job.getSalary());
+        dto.setMinSalary(job.getMinSalary());
+        dto.setMaxSalary(job.getMaxSalary());
+        dto.setCurrency(job.getCurrency());
         dto.setLocation(job.getLocation());
         dto.setExperience(job.getExperience());
         dto.setQuantity(job.getQuantity());
@@ -82,7 +103,7 @@ public class JobMapper {
         dto.setExpiredAt(job.getExpiredAt());
         dto.setApplicationDeadline(job.getApplicationDeadline());
 
-        dto.setStatus(job.getStatus());
+        dto.setStatus(job.getStatus().getValue());
         dto.setHiddenOnExpiry(job.getHiddenOnExpiry());
 
         return dto;

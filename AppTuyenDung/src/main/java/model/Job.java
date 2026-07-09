@@ -1,26 +1,32 @@
 package model;
 
+import constant.JobStatus;
+
 import java.time.LocalDateTime;
 
 public class Job extends BaseEntity{
     private Employers employerID;
     private String title;
     private String description;
-    private Double salary;
+    private Double minSalary;
+    private Double maxSalary;
+    private String currency;
     private String location;
     private String experience;
     private int quantity;
     private LocalDateTime postedAt;
     private LocalDateTime expiredAt;
     private LocalDateTime applicationDeadline;
-    private Short status;
+    private JobStatus status;
     private Boolean isHiddenOnExpiry;
 
-    public Job(Employers employerID, String title, String description, Double salary, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status, Boolean isHiddenOnExpiry) {
+    public Job(Employers employerID, String title, String description, Double minSalary, Double maxSalary, String currency, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, JobStatus status, Boolean isHiddenOnExpiry) {
         this.employerID = employerID;
         this.title = title;
         this.description = description;
-        this.salary = salary;
+        this.minSalary = minSalary;
+        this.maxSalary = maxSalary;
+        this.currency = currency;
         this.location = location;
         this.experience = experience;
         this.quantity = quantity;
@@ -31,12 +37,14 @@ public class Job extends BaseEntity{
         this.isHiddenOnExpiry = isHiddenOnExpiry;
     }
 
-    public Job(int id, Employers employerID, String title, String description, Double salary, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, Short status, Boolean isHiddenOnExpiry) {
+    public Job(int id, Employers employerID, String title, String description, Double minSalary, Double maxSalary, String currency, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, JobStatus status, Boolean isHiddenOnExpiry) {
         super(id);
         this.employerID = employerID;
         this.title = title;
         this.description = description;
-        this.salary = salary;
+        this.minSalary = minSalary;
+        this.maxSalary = maxSalary;
+        this.currency = currency;
         this.location = location;
         this.experience = experience;
         this.quantity = quantity;
@@ -86,12 +94,28 @@ public class Job extends BaseEntity{
         this.description = description;
     }
 
-    public Double getSalary() {
-        return salary;
+    public Double getMinSalary() {
+        return minSalary;
     }
 
-    public void setSalary(Double salary) {
-        this.salary = salary;
+    public void setMinSalary(Double minSalary) {
+        this.minSalary = minSalary;
+    }
+
+    public Double getMaxSalary() {
+        return maxSalary;
+    }
+
+    public void setMaxSalary(Double maxSalary) {
+        this.maxSalary = maxSalary;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public String getLocation() {
@@ -142,11 +166,11 @@ public class Job extends BaseEntity{
         this.applicationDeadline = applicationDeadline;
     }
 
-    public Short getStatus() {
+    public JobStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Short status) {
+    public void setStatus(JobStatus status) {
         this.status = status;
     }
 

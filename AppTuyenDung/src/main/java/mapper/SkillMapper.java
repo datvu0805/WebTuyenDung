@@ -12,7 +12,10 @@ public class SkillMapper {
         }
 
         Skill skill = new Skill();
-        skill.setId(dto.getId());
+        if (dto.getId() != null) {
+            skill.setId(dto.getId());
+        }
+
         skill.setSkillName(dto.getSkillName());
 
         return skill;
@@ -24,9 +27,6 @@ public class SkillMapper {
             return null;
         }
 
-        return new SkillDTO(
-                skill.getId(),
-                skill.getSkillName()
-        );
+        return new SkillDTO(skill.getId(), skill.getSkillName());
     }
 }

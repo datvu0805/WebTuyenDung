@@ -1,10 +1,13 @@
 package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dto.ApiResponse;
 import dto.JobDTO;
+import dto.JobSearchDTO;
 import mapper.JobRequestMapper;
+import mapper.JobSearchRequestMapper;
 import service.JobService;
 
 import javax.servlet.ServletException;
@@ -14,11 +17,11 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(urlPatterns = {"/jobs/*"})
+@WebServlet(urlPatterns = {"/job/*"})
 public class JobSevrlet extends BaseServlet {
     private final JobService jobService = new JobService();
     // chuyển đổi để json đọc được data từ kiểu localdatetime
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
 
     @Override
@@ -31,51 +34,86 @@ public class JobSevrlet extends BaseServlet {
 
             String pathInfo = req.getPathInfo();
 
-            // GET /jobs
-            if (pathInfo == null || pathInfo.equals("/")) {
+
+            // GET /jobs/search
+            if ("/search".equals(pathInfo)) {
+
+                JobSearchDTO searchDTO = JobSearchRequestMapper.toDTO(req);
+
+                List<JobDTO> jobs = jobService.search(searchDTO);
+
+                ApiResponse<List<JobDTO>> response = new ApiResponse<>(true, "Tìm kiếm thành công", jobs);
+
+                resp.setStatus(HttpServletResponse.SC_OK);
+
+                resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+                return;
+            }
+
+
+            // GET /jobs hoặc GET /jobs/
+            if (pathInfo == null || "/".equals(pathInfo)) {
 
                 List<JobDTO> jobs = jobService.getAllJobs();
 
                 ApiResponse<List<JobDTO>> response = new ApiResponse<>(true, "Lấy danh sách công việc thành công!", jobs);
 
                 resp.setStatus(HttpServletResponse.SC_OK);
+
                 resp.getWriter().print(objectMapper.writeValueAsString(response));
 
-            } else {
-
-                // GET /jobs/5
-                int id = Integer.parseInt(pathInfo.substring(1));
-
-                JobDTO jobDTO = jobService.getJobById(id);
-
-                if (jobDTO == null) {
-
-                    ApiResponse<JobDTO> response = new ApiResponse<>(false, "Không tìm thấy công việc", null);
-
-                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    resp.getWriter().print(objectMapper.writeValueAsString(response));
-                    return;
-                }
-
-                ApiResponse<JobDTO> response = new ApiResponse<>(true, "Lấy công việc thành công!", jobDTO);
-
-                resp.setStatus(HttpServletResponse.SC_OK);
-                resp.getWriter().print(objectMapper.writeValueAsString(response));
+                return;
             }
 
-        } catch (NumberFormatException e) {
 
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            // GET /jobs/{id}
+            int id = Integer.parseInt(pathInfo.substring(1));
 
-            ApiResponse<Object> response = new ApiResponse<>(false, "ID không hợp lệ", null);
+
+            JobDTO jobDTO = jobService.getJobById(id);
+
+
+            if (jobDTO == null) {
+
+                ApiResponse<JobDTO> response = new ApiResponse<>(false, "Không tìm thấy công việc", null);
+
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
+                resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+                return;
+            }
+
+
+            ApiResponse<JobDTO> response = new ApiResponse<>(true, "Lấy công việc thành công!", jobDTO);
+
+
+            resp.setStatus(HttpServletResponse.SC_OK);
 
             resp.getWriter().print(objectMapper.writeValueAsString(response));
 
+
+        } catch (NumberFormatException e) {
+
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+
+            ApiResponse<Object> response = new ApiResponse<>(false, "ID không hợp lệ", null);
+
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+
         } catch (Exception e) {
+
 
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
+
             ApiResponse<Object> response = new ApiResponse<>(false, e.getMessage(), null);
+
 
             resp.getWriter().print(objectMapper.writeValueAsString(response));
         }

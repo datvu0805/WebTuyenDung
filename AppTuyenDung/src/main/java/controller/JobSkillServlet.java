@@ -2,9 +2,8 @@ package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dto.ApiResponse;
-import model.JobSkills;
-import model.Jobs;
-import model.Skills;
+import dto.JobSkillDTO;
+import mapper.JobSkillRequestMapper;
 import service.JobSkillService;
 
 import javax.servlet.ServletException;
@@ -14,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet("/job-skills/*")
+@WebServlet(urlPatterns = {"/job-skills/*"})
 public class JobSkillServlet extends BaseServlet {
 
     private final JobSkillService jobSkillService = new JobSkillService();
@@ -29,26 +28,28 @@ public class JobSkillServlet extends BaseServlet {
 
         try {
 
-            int jobId = Integer.parseInt(req.getParameter("jobId"));
-            int skillId = Integer.parseInt(req.getParameter("skillId"));
+            JobSkillDTO dto = JobSkillRequestMapper.toDTO(req);
 
-            JobSkills jobSkill = new JobSkills();
-            jobSkill.setJobID(new Jobs(jobId));
-            jobSkill.setSkillID(new Skills(skillId));
+            jobSkillService.add(dto);
 
-            jobSkillService.add(jobSkill);
+            ApiResponse<JobSkillDTO> response = new ApiResponse<>(true, "Thêm kỹ năng cho công việc thành công!", dto);
 
             resp.setStatus(HttpServletResponse.SC_OK);
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
 
-            ApiResponse<JobSkills> response = new ApiResponse<>(true, "Thêm skill cho job thành công!", jobSkill);
+        } catch (IllegalArgumentException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            ApiResponse<Object> response = new ApiResponse<>(false, e.getMessage(), null);
 
             resp.getWriter().print(objectMapper.writeValueAsString(response));
 
         } catch (Exception e) {
 
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
-            ApiResponse<JobSkills> response = new ApiResponse<>(false, e.getMessage(), null);
+            ApiResponse<Object> response = new ApiResponse<>(false, "Có lỗi hệ thống: " + e.getMessage(), null);
 
             resp.getWriter().print(objectMapper.writeValueAsString(response));
         }
@@ -63,24 +64,28 @@ public class JobSkillServlet extends BaseServlet {
 
         try {
 
-            int jobId = Integer.parseInt(req.getParameter("jobId"));
-            int skillId = Integer.parseInt(req.getParameter("skillId"));
+            JobSkillDTO dto = JobSkillRequestMapper.toDTO(req);
 
-            JobSkills jobSkill = new JobSkills();
-            jobSkill.setJobID(new Jobs(jobId));
-            jobSkill.setSkillID(new Skills(skillId));
+            jobSkillService.delete(dto);
 
-            jobSkillService.delete(jobSkill);
+            ApiResponse<JobSkillDTO> response = new ApiResponse<>(true, "Xóa kỹ năng khỏi công việc thành công!", dto);
 
-            ApiResponse<JobSkills> response = new ApiResponse<>(true, "Xóa skill khỏi job thành công!", jobSkill);
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+        } catch (IllegalArgumentException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            ApiResponse<Object> response = new ApiResponse<>(false, e.getMessage(), null);
 
             resp.getWriter().print(objectMapper.writeValueAsString(response));
 
         } catch (Exception e) {
 
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
-            ApiResponse<JobSkills> response = new ApiResponse<>(false, e.getMessage(), null);
+            ApiResponse<Object> response = new ApiResponse<>(false, "Có lỗi hệ thống: " + e.getMessage(), null);
 
             resp.getWriter().print(objectMapper.writeValueAsString(response));
         }
@@ -97,34 +102,44 @@ public class JobSkillServlet extends BaseServlet {
             String jobId = req.getParameter("jobId");
             String skillId = req.getParameter("skillId");
 
-            if (jobId != null) {
+            if (jobId != null && !jobId.isBlank()) {
 
-                List<JobSkills> list = jobSkillService.getByJobId(Integer.parseInt(jobId));
+                List<JobSkillDTO> list = jobSkillService.getByJobId(Integer.parseInt(jobId));
 
-                ApiResponse<List<JobSkills>> response = new ApiResponse<>(true, "Danh sách skill của job", list);
+                ApiResponse<List<JobSkillDTO>> response = new ApiResponse<>(true, "Lấy danh sách kỹ năng của công việc thành công!", list);
 
+                resp.setStatus(HttpServletResponse.SC_OK);
                 resp.getWriter().print(objectMapper.writeValueAsString(response));
 
-            } else if (skillId != null) {
+            } else if (skillId != null && !skillId.isBlank()) {
 
-                List<JobSkills> list = jobSkillService.getBySkillId(Integer.parseInt(skillId));
+                List<JobSkillDTO> list = jobSkillService.getBySkillId(Integer.parseInt(skillId));
 
-                ApiResponse<List<JobSkills>> response = new ApiResponse<>(true, "Danh sách job theo skill", list);
+                ApiResponse<List<JobSkillDTO>> response = new ApiResponse<>(true, "Lấy danh sách công việc theo kỹ năng thành công!", list);
 
+                resp.setStatus(HttpServletResponse.SC_OK);
                 resp.getWriter().print(objectMapper.writeValueAsString(response));
 
             } else {
 
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 
-                ApiResponse<Object> response = new ApiResponse<>(false, "Thiếu jobId hoặc skillId", null);
+                ApiResponse<Object> response = new ApiResponse<>(false, "Vui lòng truyền jobId hoặc skillId", null);
 
                 resp.getWriter().print(objectMapper.writeValueAsString(response));
             }
 
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
 
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            ApiResponse<Object> response = new ApiResponse<>(false, "ID không hợp lệ", null);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+        } catch (Exception e) {
+
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
             ApiResponse<Object> response = new ApiResponse<>(false, e.getMessage(), null);
 

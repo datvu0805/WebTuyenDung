@@ -2,18 +2,17 @@ package dao;
 
 import config.DatabaseConfig;
 import mapper.JobMapper;
-import model.JobSkills;
-import model.Jobs;
-import model.Skills;
+import model.JobSkill;
+import model.Job;
+import model.Skill;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
+public class JobDAO extends DatabaseConfig implements TDAO<Job> {
     @Override
-    public void add(Jobs jobs) {
+    public void add(Job jobs) {
         String sql = "INSERT INTO jobs (employer_id, title, description, salary, location, experience, quantity, posted_at, expired_at, application_deadline, status, is_hidden_on_expiry, created_at, updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id";
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -45,7 +44,7 @@ public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
     }
 
     @Override
-    public void update(Jobs jobs) {
+    public void update(Job jobs) {
         String sql = " UPDATE jobs SET employer_id = ?, title = ?, description = ?, salary = ?, location = ?, experience = ?, quantity = ?, posted_at = ?, expired_at = ?, application_deadline = ?, status = ?, is_hidden_on_expiry = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? ";
 
         try (Connection conn = getConnection();
@@ -85,7 +84,7 @@ public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
     }
 
     @Override
-    public Jobs getById(int id) {
+    public Job getById(int id) {
 
         String sql = "SELECT * FROM jobs WHERE id = ?";
 
@@ -109,11 +108,11 @@ public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
     }
 
     @Override
-    public List<Jobs> getAll() {
+    public List<Job> getAll() {
 
         String sql = "SELECT * FROM jobs";
 
-        List<Jobs> list = new ArrayList<>();
+        List<Job> list = new ArrayList<>();
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -127,66 +126,6 @@ public class JobsDAO extends DatabaseConfig implements TDAO<Jobs> {
             throw new RuntimeException(e);
         }
 
-        return list;
-    }
-
-    public void addSkill(Jobs jobsID, Skills skillsID) {
-        String sql = "INSERT INTO jobs_skills (jobs_id, skills_id) VALUES (?, ?)";
-
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, jobsID.getId());
-            ps.setInt(2, skillsID.getId());
-
-            ps.executeUpdate();
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void deleteSkill(Jobs jobsID, Skills skillsID) {
-        String sql = "DELETE FROM jobs_skills WHERE jobs_id = ? AND skills_id = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, jobsID.getId());
-            ps.setInt(2, skillsID.getId());
-
-            ps.executeUpdate();
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<JobSkills> getSkillsByJob(int jobId) {
-        String sql = "SELECT * FROM job_skills WHERE job_id = ?";
-
-        List<JobSkills> list = new ArrayList<>();
-
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, jobId);
-
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-
-                JobSkills jobSkill = new JobSkills();
-
-                jobSkill.setJobID(new Jobs(rs.getInt("job_id")));
-                jobSkill.setSkillID(new Skills(rs.getInt("skill_id")));
-
-                list.add(jobSkill);
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
         return list;
     }
 }

@@ -51,7 +51,6 @@ public class UploadCVServlet extends HttpServlet {
             }
 
         } catch (Exception e) {
-
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             ApiResponse<Void> apiResponse = new ApiResponse<>(false, e.getMessage());
             response.getWriter().print(this.objectMapper.writeValueAsString(apiResponse));

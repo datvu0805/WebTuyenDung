@@ -1,5 +1,7 @@
 package dto;
 
+import model.Users;
+
 // yêu cầu mua hàng
 public class PurchaseRequestDTO {
     private Integer userID;

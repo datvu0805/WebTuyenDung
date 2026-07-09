@@ -18,6 +18,8 @@ import EmployerDashboardPage from './pages/EmployerDashboardPage';
 import ApplicationManagePage from './pages/ApplicationManagePage';
 import SkillManagePage from './pages/SkillManagePage';
 import UploadCVPage from './pages/UploadCVPage';
+import CandidateProfilePage from './pages/CandidateProfilePage';
+import CandidateListPage from './pages/CandidateListPage';
 
 dayjs.extend(relativeTime);
 dayjs.locale('vi');
@@ -51,6 +53,9 @@ export default function App() {
             <Route path="/cv/upload" element={
               <PrivateRoute roles={['CANDIDATE']}><UploadCVPage /></PrivateRoute>
             } />
+            <Route path="/candidate/profile" element={
+              <PrivateRoute roles={['CANDIDATE']}><CandidateProfilePage /></PrivateRoute>
+            } />
 
             <Route path="/employer/dashboard" element={
               <PrivateRoute roles={['EMPLOYER']}><EmployerDashboardPage /></PrivateRoute>
@@ -60,6 +65,9 @@ export default function App() {
             } />
             <Route path="/employer/skills" element={
               <PrivateRoute roles={['EMPLOYER']}><SkillManagePage /></PrivateRoute>
+            } />
+            <Route path="/employer/candidates" element={
+              <PrivateRoute roles={['EMPLOYER']}><CandidateListPage /></PrivateRoute>
             } />
 
             <Route path="/" element={<Navigate to="/login" replace />} />

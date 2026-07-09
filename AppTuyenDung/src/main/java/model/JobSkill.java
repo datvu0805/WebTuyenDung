@@ -3,38 +3,38 @@ package model;
 
 
 // Bảng kỹ năng yêu cầu của công việc
-public class JobSkills extends BaseEntity{
-    private Jobs jobID;
-    private Skills skillID;
+public class JobSkill extends BaseEntity{
+    private Job jobID;
+    private Skill skillID;
 
-    public JobSkills(Jobs jobID, Skills skillID) {
+    public JobSkill(Job jobID, Skill skillID) {
         this.jobID = jobID;
         this.skillID = skillID;
     }
 
-    public JobSkills(int id, Jobs jobID, Skills skillID) {
+    public JobSkill(int id, Job jobID, Skill skillID) {
         super(id);
         this.jobID = jobID;
         this.skillID = skillID;
     }
 
-    public JobSkills() {
+    public JobSkill() {
 
     }
 
-    public Jobs getJobID() {
+    public Job getJobID() {
         return jobID;
     }
 
-    public void setJobID(Jobs jobID) {
+    public void setJobID(Job jobID) {
         this.jobID = jobID;
     }
 
-    public Skills getSkillID() {
+    public Skill getSkillID() {
         return skillID;
     }
 
-    public void setSkillID(Skills skillID) {
+    public void setSkillID(Skill skillID) {
         this.skillID = skillID;
     }
 

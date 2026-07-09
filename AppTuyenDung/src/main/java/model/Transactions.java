@@ -3,7 +3,7 @@ package model;
 
 // lịch sử giao dịch
 public class Transactions extends BaseEntity{
-    private Users userID;
+    private int userID;
     private String transactionType;
     private Double amount;
     private int status;
@@ -12,7 +12,7 @@ public class Transactions extends BaseEntity{
     public Transactions() {
     }
 
-    public Transactions(Users userID, String transactionType, Double amount, int status, String conntent) {
+    public Transactions(int userID, String transactionType, Double amount, int status, String conntent) {
         this.userID = userID;
         this.transactionType = transactionType;
         this.amount = amount;
@@ -20,7 +20,7 @@ public class Transactions extends BaseEntity{
         this.content = conntent;
     }
 
-    public Transactions(int id, Users userID, String transactionType, Double amount, int status, String conntent) {
+    public Transactions(int id, int userID, String transactionType, Double amount, int status, String conntent) {
         super(id);
         this.userID = userID;
         this.transactionType = transactionType;
@@ -29,7 +29,7 @@ public class Transactions extends BaseEntity{
         this.content = conntent;
     }
 
-    public Users getUserID() {
+    public int getUserID() {
         return userID;
     }
 

@@ -15,7 +15,7 @@ public class TransactionDAO extends DatabaseConfig implements IDAO<Transactions>
         String sql = "INSERT INTO transactions(user_id, transaction_type, amount, status, content, created_at, update_at)" +
                 "VALUES(?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)";
         try (PreparedStatement ps = conn.prepareStatement(sql)){
-           ps.setInt(1, transactions.getUserID().getId());
+           ps.setInt(1, transactions.getUserID());
            ps.setString(2, transactions.getTransactionType());
            ps.setDouble(3, transactions.getAmount());
            ps.setInt(4, transactions.getStatus());

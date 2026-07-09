@@ -1,12 +1,11 @@
 package model;
 
-import java.io.PrintWriter;
 import java.time.LocalDateTime;
 
 // bảng đơn ứng tuyển
 public class Application extends BaseEntity{
     private Candidates candidateID;
-    private Jobs jodID;
+    private Job jodID;
     private CV cvID;
     private LocalDateTime appliedAt;
     private String coverLetter;
@@ -16,7 +15,7 @@ public class Application extends BaseEntity{
     public Application() {
     }
 
-    public Application(Candidates candidateID, Jobs jodID, CV cvID, LocalDateTime appliedAt, String coverLetter, String description, int status) {
+    public Application(Candidates candidateID, Job jodID, CV cvID, LocalDateTime appliedAt, String coverLetter, String description, int status) {
         this.candidateID = candidateID;
         this.jodID = jodID;
         this.cvID = cvID;
@@ -26,7 +25,7 @@ public class Application extends BaseEntity{
         this.status = status;
     }
 
-    public Application(int id, Candidates candidateID, Jobs jodID, CV cvID, LocalDateTime appliedAt, String coverLetter, String description, int status) {
+    public Application(int id, Candidates candidateID, Job jodID, CV cvID, LocalDateTime appliedAt, String coverLetter, String description, int status) {
         super(id);
         this.candidateID = candidateID;
         this.jodID = jodID;
@@ -45,11 +44,11 @@ public class Application extends BaseEntity{
         this.candidateID = candidateID;
     }
 
-    public Jobs getJodID() {
+    public Job getJodID() {
         return jodID;
     }
 
-    public void setJodID(Jobs jodID) {
+    public void setJodID(Job jodID) {
         this.jodID = jodID;
     }
 

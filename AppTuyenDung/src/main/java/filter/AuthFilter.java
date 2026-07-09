@@ -52,6 +52,9 @@ public class AuthFilter implements Filter {
 
         // Chỉ CANDIDATE mới upload CV
         ROLE_REQUIRED.put("POST:/UploadCV", setOf("CANDIDATE"));
+
+        // Upload avatar — cả CANDIDATE lẫn EMPLOYER đều được
+        // (không cần entry trong ROLE_REQUIRED — mọi user đã đăng nhập đều qua được)
     }
 
     private static Set<String> setOf(String... roles) {

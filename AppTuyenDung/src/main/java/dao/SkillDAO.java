@@ -1,17 +1,17 @@
 package dao;
 
 import config.DatabaseConfig;
-import model.Skills;
+import model.Skill;
 
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SkillDAO extends DatabaseConfig implements TDAO<Skills> {
+public class SkillDAO extends DatabaseConfig implements TDAO<Skill> {
 
     @Override
-    public void add(Skills entity) {
+    public void add(Skill entity) {
         String sql = "INSERT INTO skills (skill_name, created_at, updated_at) VALUES (?, ?, ?) RETURNING id";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -27,7 +27,7 @@ public class SkillDAO extends DatabaseConfig implements TDAO<Skills> {
     }
 
     @Override
-    public void update(Skills entity) {
+    public void update(Skill entity) {
         String sql = "UPDATE skills SET skill_name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -52,7 +52,7 @@ public class SkillDAO extends DatabaseConfig implements TDAO<Skills> {
     }
 
     @Override
-    public Skills getById(int id) {
+    public Skill getById(int id) {
         String sql = "SELECT * FROM skills WHERE id = ?";
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -67,9 +67,9 @@ public class SkillDAO extends DatabaseConfig implements TDAO<Skills> {
     }
 
     @Override
-    public List<Skills> getAll() {
+    public List<Skill> getAll() {
         String sql = "SELECT * FROM skills ORDER BY skill_name";
-        List<Skills> list = new ArrayList<>();
+        List<Skill> list = new ArrayList<>();
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -80,8 +80,8 @@ public class SkillDAO extends DatabaseConfig implements TDAO<Skills> {
         return list;
     }
 
-    private Skills mapRow(ResultSet rs) throws SQLException {
-        Skills s = new Skills();
+    private Skill mapRow(ResultSet rs) throws SQLException {
+        Skill s = new Skill();
         s.setId(rs.getInt("id"));
         s.setSkillName(rs.getString("skill_name"));
         return s;

@@ -4,16 +4,16 @@ import constant.ScoreType;
 
 
 // Bảng chứng chỉ
-public class Certificates extends BaseEntity{
+public class Certificate extends BaseEntity{
     private String certificatesName;
     private ScoreType scoreType;
 
-    public Certificates(String certificatesName, ScoreType scoreType) {
+    public Certificate(String certificatesName, ScoreType scoreType) {
         this.certificatesName = certificatesName;
         this.scoreType = scoreType;
     }
 
-    public Certificates(int id, String certificatesName, ScoreType scoreType) {
+    public Certificate(int id, String certificatesName, ScoreType scoreType) {
         super(id);
         this.certificatesName = certificatesName;
         this.scoreType = scoreType;

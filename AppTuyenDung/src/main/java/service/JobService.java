@@ -1,24 +1,24 @@
 package service;
 
-import dao.JobsDAO;
+import dao.JobDAO;
 import dto.JobDTO;
 import mapper.JobMapper;
-import model.Jobs;
+import model.Job;
 import validator.JobValidator;
 
-import model.JobSkills;
-import model.Skills;
+import model.JobSkill;
+import model.Skill;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class JobService {
 
-    private final JobsDAO jobsDAO;
+    private final JobDAO JobDAO;
     private final JobValidator validator;
 
     public JobService() {
-        this.jobsDAO = new JobsDAO();
+        this.JobDAO = new JobDAO();
         this.validator = new JobValidator();
     }
 
@@ -31,9 +31,9 @@ public class JobService {
             throw new IllegalArgumentException(String.join("\n", errors));
         }
 
-        Jobs job = JobMapper.toEntity(dto);
+        Job job = JobMapper.toEntity(dto);
 
-        jobsDAO.add(job);
+        JobDAO.add(job);
     }
 
 
@@ -49,10 +49,10 @@ public class JobService {
             throw new IllegalArgumentException(String.join("\n", errors));
         }
 
-        Jobs job = JobMapper.toEntity(dto);
+        Job job = JobMapper.toEntity(dto);
         job.setId(id);
 
-        jobsDAO.update(job);
+        JobDAO.update(job);
     }
 
 
@@ -62,65 +62,29 @@ public class JobService {
             throw new IllegalArgumentException("ID công việc không hợp lệ");
         }
 
-        jobsDAO.delete(id);
+        JobDAO.delete(id);
     }
 
 
-    public Jobs getJobById(int id) {
+    public JobDTO getJobById(int id) {
 
         if (id <= 0) {
-            throw new IllegalArgumentException("ID công việc không hợp lệ");
+            throw new IllegalArgumentException("ID không hợp lệ");
         }
 
-        return jobsDAO.getById(id);
+        Job job = JobDAO.getById(id);
+
+        return JobMapper.toDTO(job);
     }
 
 
     public List<JobDTO> getAllJobs() {
         List<JobDTO> jobDTOList = new ArrayList<>();
         JobDTO jobDTO1 = new JobDTO();
-        List<Jobs> jobList = jobsDAO.getAll();
+        List<Job> jobList = JobDAO.getAll();
          jobList.stream().forEach(x -> {
-            jobDTOList.add(new JobDTO(x.getTitle(), x.getDescription(), x.getSalary(), x.getLocation(), x.getExperience(), x.getQuantity(),x.getPostedAt(),x.getExpiredAt(),x.getApplicationDeadline(),x.getStatus(),x.getHiddenOnExpiry()));
+            jobDTOList.add(new JobDTO(x.getId(),x.getTitle(), x.getDescription(), x.getSalary(), x.getLocation(), x.getExperience(), x.getQuantity(),x.getPostedAt(),x.getExpiredAt(),x.getApplicationDeadline(),x.getStatus(),x.getHiddenOnExpiry()));
         });
          return jobDTOList;
-    }
-
-
-    public void addSkillToJob(int jobId, int skillId) {
-
-        if (jobId <= 0) {
-            throw new IllegalArgumentException("ID công việc không hợp lệ");
-        }
-
-        if (skillId <= 0) {
-            throw new IllegalArgumentException("ID kỹ năng không hợp lệ");
-        }
-
-        jobsDAO.addSkill(new Jobs(jobId), new Skills(skillId));
-    }
-
-
-    public void removeSkillFromJob(int jobId, int skillId) {
-
-        if (jobId <= 0) {
-            throw new IllegalArgumentException("ID công việc không hợp lệ");
-        }
-
-        if (skillId <= 0) {
-            throw new IllegalArgumentException("ID kỹ năng không hợp lệ");
-        }
-
-        jobsDAO.deleteSkill(new Jobs(jobId), new Skills(skillId));
-    }
-
-
-    public List<JobSkills> getSkillsByJob(int jobId) {
-
-        if (jobId <= 0) {
-            throw new IllegalArgumentException("ID công việc không hợp lệ");
-        }
-
-        return jobsDAO.getSkillsByJob(jobId);
     }
 }

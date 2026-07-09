@@ -84,6 +84,27 @@ public class CompanyDAO extends DatabaseConfig {
         }
     }
 
+    public Company findByName(String name) {
+        String sql = "SELECT * FROM companies WHERE company_name = ?";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            ps.setString(1, name);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapCompany(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
     public Company findById(int id) {
         String sql = "SELECT * FROM companies WHERE id = ?";
 

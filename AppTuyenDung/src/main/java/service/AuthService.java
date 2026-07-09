@@ -1,9 +1,12 @@
 package service;
 
 import dao.*;
+import dto.CandidateProfileDTO;
+import dto.EmployerProfileDTO;
 import dto.RegisterCandidateDTO;
 import dto.RegisterEmployerDTO;
 import model.Company;
+import model.Employers;
 import model.Role;
 import model.Users;
 import utils.PasswordUtil;
@@ -11,6 +14,7 @@ import validator.UserValidator;
 
 import javax.servlet.http.Part;
 import java.sql.SQLException;
+import java.time.LocalDate;
 
 public class AuthService {
     private final UserDAO userDAO = new UserDAO();
@@ -49,6 +53,7 @@ public class AuthService {
         if(userDAO.findByEmail(user.getEmail()) != null) {
             return "Email đã tồn tại";
         }
+
         Role role = roleDAO.findByName("CANDIDATE");
         user.setRole(role);
 
@@ -159,7 +164,79 @@ public class AuthService {
         return user;
     }
 
+    public String updateCandidateProfile(int id, CandidateProfileDTO dto) throws SQLException, ClassNotFoundException {
+
+        if(!validator.isValidEmail(dto.getEmail())) {
+            return "Email không hợp lệ";
+        }
+        if(!validator.isValidPassword(dto.getPassword())){
+            return "Mật khẩu phải từ 6 đến 30 ký tự";
+        }
+        if (!validator.isValidPhoneNumber(dto.getPhoneNumber())) {
+            return "Số điện thoai không hợp lệ";
+        }
+
+        Users user = userDAO.getByID(id);
+
+        if (user == null) {
+            return "Không tìm thấy người dùng";
+        }
+
+        user.setFullName(dto.getFullName());
+        user.setEmail(dto.getEmail());
+        user.setPassword(PasswordUtil.hashPassword(dto.getPassword()));
+        user.setPhoneNumber(dto.getPhoneNumber());
+        user.setAddress(dto.getAddress());
+        user.setAvatarUrl(dto.getAvatarUrl());
+        user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth()));
+
+        boolean update = userDAO.update(id, user);
 
 
+        if (!update) {
+            return "update thất bại";
+        }
+        return null;
+    }
+
+    public String updateEmployerProfile(int id, EmployerProfileDTO dto) throws SQLException, ClassNotFoundException {
+
+            if(!validator.isValidEmail(dto.getEmail())) {
+                return "Email không hợp lệ";
+            }
+            if(!validator.isValidPassword(dto.getPassword())){
+                return "Mật khẩu phải từ 6 đến 30 ký tự";
+            }
+            if (!validator.isValidPhoneNumber(dto.getPhoneNumber())) {
+                return "Số điện thoai không hợp lệ";
+            }
+
+
+        Users user = new Users();
+
+        user.setFullName(dto.getFullName());
+        user.setEmail(dto.getEmail());
+        user.setPassword(dto.getPassword());
+        user.setPhoneNumber(dto.getPhoneNumber());
+        user.setAddress(dto.getAddress());
+        user.setAvatarUrl(dto.getAvatarUrl());
+        user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth()));
+
+        Employers employer = new Employers();
+        Company company = companyDAO.findByName(dto.getCompanyName());
+        if (company != null) {
+            employer.setCompany(company);
+        }else {
+            return "Công ty không tồn tại";
+        }
+
+        boolean update = userDAO.update(id , user);
+
+        if (!update) {
+            return "Update thất bại";
+        }
+
+        return null;
+    }
 
 }

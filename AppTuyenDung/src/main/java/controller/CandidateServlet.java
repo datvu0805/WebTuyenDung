@@ -2,19 +2,23 @@ package controller;
 
 import com.google.gson.Gson;
 import dao.CandicateDAO;
+import dao.UserDAO;
 import dto.ApiResponse;
 import dto.CandidateDTO;
 import model.Candidates;
+import model.Users;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
+import java.time.LocalDate;
 
 @WebServlet("/candidate/profile")
 public class CandidateServlet extends BaseServlet {
 
     private final Gson gson = new Gson();
     private final CandicateDAO candicateDAO = new CandicateDAO();
+    private final UserDAO userDAO = new UserDAO();
 
     @Override
     protected void doGet(HttpServletRequest req,
@@ -61,5 +65,37 @@ public class CandidateServlet extends BaseServlet {
                 );
 
         resp.getWriter().write(gson.toJson(result));
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json;charset=UTF-8");
+
+        HttpSession session = req.getSession(false);
+        Integer userId = (Integer) session.getAttribute("userId");
+
+        Users user = userDAO.getByID(userId);
+        if (user == null) {
+            resp.getWriter().write(gson.toJson(new ApiResponse<>(false, "Không tìm thấy user", null)));
+            return;
+        }
+
+        String fullName = req.getParameter("fullName");
+        String email = req.getParameter("email");
+        String phoneNumber = req.getParameter("phoneNumber");
+        String address = req.getParameter("address");
+        String dateOfBirth = req.getParameter("dateOfBirth");
+
+        if (fullName != null && !fullName.isBlank()) user.setFullName(fullName);
+        if (email != null && !email.isBlank()) user.setEmail(email);
+        if (phoneNumber != null) user.setPhoneNumber(phoneNumber);
+        if (address != null) user.setAddress(address);
+        if (dateOfBirth != null && !dateOfBirth.isBlank()) {
+            user.setDateOfBirth(LocalDate.parse(dateOfBirth));
+        }
+
+        userDAO.update(user);
+
+        resp.getWriter().write(gson.toJson(new ApiResponse<>(true, "Cập nhật thông tin thành công", null)));
     }
 }

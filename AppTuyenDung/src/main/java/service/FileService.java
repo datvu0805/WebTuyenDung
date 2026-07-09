@@ -107,7 +107,7 @@ public class FileService {
                         .method(Http.Method.GET)
                         .bucket(BUCKET_NAME)
                         .object(objectName)
-                        .expiry(100, TimeUnit.DAYS)
+                        .expiry(7, TimeUnit.DAYS)
                         .build()
         );
     }

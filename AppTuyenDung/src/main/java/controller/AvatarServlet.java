@@ -41,7 +41,7 @@ public class AvatarServlet extends BaseServlet {
 
             Users user = userDAO.getByID(userId);
             user.setAvatarUrl(avatarUrl);
-            userDAO.update(user);
+            userDAO.update(user.getId(), user);
 
             resp.getWriter().write(gson.toJson(new ApiResponse<>(true, "Cập nhật ảnh đại diện thành công", avatarUrl)));
 

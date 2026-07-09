@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import {
   Table, Button, Modal, Form, Input, Select, InputNumber,
-  DatePicker, Switch, Space, Tag, message, Popconfirm, Typography, Statistic, Row, Col
+  DatePicker, Switch, Space, Tag, message, Popconfirm, Typography, Row, Col, Tooltip
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, FileTextOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons';
-import { jobApi } from '../api/services';
+import { PlusOutlined, EditOutlined, DeleteOutlined, FileTextOutlined, CheckCircleOutlined, ClockCircleOutlined, TagsOutlined, CloseOutlined } from '@ant-design/icons';
+import { jobApi, jobSkillApi, skillApi } from '../api/services';
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/AppLayout';
 import dayjs from 'dayjs';
@@ -23,6 +23,14 @@ export default function EmployerDashboardPage() {
   const [saving, setSaving] = useState(false);
   const { user } = useAuth();
   const [form] = Form.useForm();
+
+  // Job skills modal state
+  const [skillModalOpen, setSkillModalOpen] = useState(false);
+  const [skillModalJob, setSkillModalJob] = useState(null);
+  const [jobSkills, setJobSkills] = useState([]);
+  const [allSkills, setAllSkills] = useState([]);
+  const [skillsLoading, setSkillsLoading] = useState(false);
+  const [addingSkillId, setAddingSkillId] = useState(null);
 
   const loadJobs = () => {
     setLoading(true);
@@ -83,6 +91,49 @@ export default function EmployerDashboardPage() {
     }
   };
 
+  const openSkillModal = async (job) => {
+    setSkillModalJob(job);
+    setSkillModalOpen(true);
+    setSkillsLoading(true);
+    try {
+      const [jobSkillsRes, allSkillsRes] = await Promise.all([
+        jobSkillApi.getByJob(job.id),
+        skillApi.getAll(),
+      ]);
+      if (jobSkillsRes.data.success) setJobSkills(jobSkillsRes.data.data || []);
+      if (allSkillsRes.data.success) setAllSkills(allSkillsRes.data.data || []);
+    } catch {
+      message.error('Không thể tải kỹ năng');
+    } finally {
+      setSkillsLoading(false);
+    }
+  };
+
+  const handleAddSkill = async (skillId) => {
+    if (!skillId) return;
+    try {
+      const res = await jobSkillApi.add(skillModalJob.id, skillId);
+      if (res.data.success) {
+        const refreshed = await jobSkillApi.getByJob(skillModalJob.id);
+        if (refreshed.data.success) setJobSkills(refreshed.data.data || []);
+        setAddingSkillId(null);
+      } else {
+        message.error(res.data.message);
+      }
+    } catch {
+      message.error('Thêm kỹ năng thất bại');
+    }
+  };
+
+  const handleRemoveSkill = async (skillId) => {
+    try {
+      await jobSkillApi.remove(skillModalJob.id, skillId);
+      setJobSkills(prev => prev.filter(s => s.skillId !== skillId && s.id !== skillId));
+    } catch {
+      message.error('Xóa kỹ năng thất bại');
+    }
+  };
+
   const activeCount = jobs.filter(j => j.status === 0).length;
 
   const columns = [
@@ -105,9 +156,12 @@ export default function EmployerDashboardPage() {
       render: (v) => v ? dayjs(v).format('DD/MM/YYYY') : '—'
     },
     {
-      title: 'Thao tác', key: 'actions', fixed: 'right', width: 100,
+      title: 'Thao tác', key: 'actions', fixed: 'right', width: 130,
       render: (_, record) => (
         <Space size={4}>
+          <Tooltip title="Kỹ năng">
+            <Button icon={<TagsOutlined />} size="small" onClick={() => openSkillModal(record)} style={{ borderRadius: 6 }} />
+          </Tooltip>
           <Button icon={<EditOutlined />} size="small" onClick={() => openEdit(record)} style={{ borderRadius: 6 }} />
           <Popconfirm title="Xóa tin này?" onConfirm={() => onDelete(record.id)} okText="Xóa" cancelText="Hủy">
             <Button icon={<DeleteOutlined />} size="small" danger style={{ borderRadius: 6 }} />
@@ -233,6 +287,61 @@ export default function EmployerDashboardPage() {
             </Button>
           </div>
         </Form>
+      </Modal>
+
+      {/* Modal quản lý kỹ năng cho job */}
+      <Modal
+        title={<span style={{ fontWeight: 700 }}>Kỹ năng yêu cầu — {skillModalJob?.title}</span>}
+        open={skillModalOpen}
+        onCancel={() => { setSkillModalOpen(false); setAddingSkillId(null); }}
+        footer={<Button onClick={() => { setSkillModalOpen(false); setAddingSkillId(null); }}>Đóng</Button>}
+        width={480}
+      >
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ fontWeight: 600, marginBottom: 8, color: '#555' }}>Thêm kỹ năng</div>
+          <Space.Compact style={{ width: '100%' }}>
+            <Select
+              placeholder="Chọn kỹ năng..."
+              style={{ flex: 1 }}
+              value={addingSkillId}
+              onChange={setAddingSkillId}
+              showSearch
+              filterOption={(input, opt) => (opt?.children ?? '').toLowerCase().includes(input.toLowerCase())}
+            >
+              {allSkills
+                .filter(s => !jobSkills.some(js => js.skillId === s.id))
+                .map(s => <Option key={s.id} value={s.id}>{s.skillName}</Option>)}
+            </Select>
+            <Button type="primary" style={{ background: GREEN, borderColor: GREEN }}
+              onClick={() => handleAddSkill(addingSkillId)} disabled={!addingSkillId}>
+              Thêm
+            </Button>
+          </Space.Compact>
+        </div>
+
+        <div style={{ fontWeight: 600, marginBottom: 8, color: '#555' }}>Kỹ năng hiện tại</div>
+        {skillsLoading ? (
+          <div style={{ color: '#aaa', textAlign: 'center', padding: '16px 0' }}>Đang tải...</div>
+        ) : jobSkills.length === 0 ? (
+          <div style={{ color: '#aaa', textAlign: 'center', padding: '16px 0' }}>Chưa có kỹ năng nào</div>
+        ) : (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+            {jobSkills.map(s => {
+              const skill = allSkills.find(sk => sk.id === s.skillId);
+              return (
+                <Tag
+                  key={s.skillId}
+                  closable
+                  onClose={() => handleRemoveSkill(s.skillId)}
+                  closeIcon={<CloseOutlined />}
+                  style={{ borderRadius: 20, padding: '4px 10px', fontSize: 13, background: '#f0fdf4', borderColor: '#bbf7d0', color: '#166534' }}
+                >
+                  {skill?.skillName ?? `Skill #${s.skillId}`}
+                </Tag>
+              );
+            })}
+          </div>
+        )}
       </Modal>
     </AppLayout>
   );

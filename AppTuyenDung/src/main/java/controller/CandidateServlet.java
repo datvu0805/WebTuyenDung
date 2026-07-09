@@ -7,6 +7,7 @@ import dto.ApiResponse;
 import dto.CandidateDTO;
 import model.Candidates;
 import model.Users;
+import service.FileService;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
@@ -19,6 +20,7 @@ public class CandidateServlet extends BaseServlet {
     private final Gson gson = new Gson();
     private final CandicateDAO candicateDAO = new CandicateDAO();
     private final UserDAO userDAO = new UserDAO();
+    private final FileService fileService = new FileService();
 
     @Override
     protected void doGet(HttpServletRequest req,
@@ -46,10 +48,16 @@ public class CandidateServlet extends BaseServlet {
         dto.setUserId(candidate.getUser().getId());
         dto.setUsername(candidate.getUser().getUsername());
         dto.setFullName(candidate.getUser().getFullName());
-        dto.setAvatarUrl(candidate.getUser().getAvatarUrl());
         dto.setEmail(candidate.getUser().getEmail());
         dto.setPhoneNumber(candidate.getUser().getPhoneNumber());
         dto.setAddress(candidate.getUser().getAddress());
+
+        // Generate presigned URL nếu avatarUrl là object path
+        String avatarUrl = candidate.getUser().getAvatarUrl();
+        if (avatarUrl != null && !avatarUrl.isBlank() && !avatarUrl.startsWith("http")) {
+            try { avatarUrl = fileService.getPresignedUrl(avatarUrl); } catch (Exception ignored) {}
+        }
+        dto.setAvatarUrl(avatarUrl);
 
         if (candidate.getUser().getDateOfBirth() != null) {
             dto.setDateOfBirth(candidate.getUser().getDateOfBirth().toString());
@@ -94,7 +102,7 @@ public class CandidateServlet extends BaseServlet {
             user.setDateOfBirth(LocalDate.parse(dateOfBirth));
         }
 
-        userDAO.update(user);
+        userDAO.update(userId, user);
 
         resp.getWriter().write(gson.toJson(new ApiResponse<>(true, "Cập nhật thông tin thành công", null)));
     }

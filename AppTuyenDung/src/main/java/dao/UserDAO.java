@@ -237,60 +237,43 @@ public class UserDAO extends DatabaseConfig {
         return -1;
     }
 
-    public void update(Users user) {
+    public boolean update(int id, Users user) {
         String sql = """
-            UPDATE users
-            SET username = ?,
-                password = ?,
-                full_name = ?,
-                avatar_url = ?,
-                email = ?,
-                date_of_birth = ?,
-                phone_number = ?,
-                address = ?,
-                role_id = ?,
-                updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        """;
+        UPDATE users
+        SET password = ?,
+            full_name = ?,
+            avatar_url = ?,
+            email = ?,
+            date_of_birth = ?,
+            phone_number = ?,
+            address = ?,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    """;
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, user.getUsername());
-            ps.setString(2, user.getPassword());
-            ps.setString(3, user.getFullName());
-            ps.setString(4, user.getAvatarUrl());
-            ps.setString(5, user.getEmail());
+            ps.setString(1, user.getPassword());
+            ps.setString(2, user.getFullName());
+            ps.setString(3, user.getAvatarUrl());
+            ps.setString(4, user.getEmail());
 
             if (user.getDateOfBirth() == null) {
-                ps.setNull(6, Types.DATE);
+                ps.setNull(5, Types.DATE);
             } else {
-                ps.setDate(6, Date.valueOf(user.getDateOfBirth()));
+                ps.setDate(5, Date.valueOf(user.getDateOfBirth()));
             }
 
-            ps.setString(7, user.getPhoneNumber());
-            ps.setString(8, user.getAddress());
-            ps.setInt(9, user.getRole().getId());
-            ps.setInt(10, user.getId());
+            ps.setString(6, user.getPhoneNumber());
+            ps.setString(7, user.getAddress());
+            ps.setInt(8, id);
 
-            ps.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void delete(int id) {
-        String sql = "DELETE FROM users WHERE id = ?";
-
-        try (Connection conn = getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
+            return false;
         }
     }
 }

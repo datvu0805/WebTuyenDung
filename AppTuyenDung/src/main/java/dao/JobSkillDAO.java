@@ -61,8 +61,8 @@ public class JobSkillDAO extends DatabaseConfig {
 
                     JobSkill jobSkill = new JobSkill();
 
-                    jobSkill.setJobID(new Job(rs.getInt("jobs_id")));
-                    jobSkill.setSkillID(new Skill(rs.getInt("skills_id")));
+                    jobSkill.setJobID(new Job(rs.getInt("job_id")));
+                    jobSkill.setSkillID(new Skill(rs.getInt("skill_id")));
 
                     list.add(jobSkill);
                 }
@@ -91,8 +91,8 @@ public class JobSkillDAO extends DatabaseConfig {
 
                     JobSkill jobSkill = new JobSkill();
 
-                    jobSkill.setJobID(new Job(rs.getInt("jobs_id")));
-                    jobSkill.setSkillID(new Skill(rs.getInt("skills_id")));
+                    jobSkill.setJobID(new Job(rs.getInt("job_id")));
+                    jobSkill.setSkillID(new Skill(rs.getInt("skill_id")));
 
                     list.add(jobSkill);
                 }

@@ -8,6 +8,13 @@ public class Certificate extends BaseEntity{
     private String certificatesName;
     private ScoreType scoreType;
 
+    public Certificate() {
+    }
+
+    public Certificate(int id) {
+        super(id);
+    }
+
     public Certificate(String certificatesName, ScoreType scoreType) {
         this.certificatesName = certificatesName;
         this.scoreType = scoreType;

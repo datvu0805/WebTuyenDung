@@ -3,6 +3,7 @@ package service;
 import dao.JobDAO;
 import dto.JobDTO;
 import dto.JobSearchDTO;
+import dto.PageResponse;
 import mapper.JobMapper;
 import model.Job;
 import validator.JobValidator;
@@ -94,11 +95,23 @@ public class JobService {
 //                .map(JobMapper::toDTO)
 //                .toList();
 //    }
-    public List<JobDTO> search(JobSearchDTO searchDTO) {
+    public PageResponse<JobDTO> search(JobSearchDTO searchDTO) {
 
-        return JobDAO.search(searchDTO)
+        List<JobDTO> jobs = JobDAO.search(searchDTO)
                 .stream()
                 .map(JobMapper::toDTO)
                 .toList();
+
+        int totalItems = JobDAO.count(searchDTO);
+
+        int totalPages = (int) Math.ceil((double) totalItems / searchDTO.getSize());
+
+        return new PageResponse<>(
+                jobs,
+                searchDTO.getPage(),
+                searchDTO.getSize(),
+                totalPages,
+                totalItems
+        );
     }
 }

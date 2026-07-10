@@ -15,7 +15,7 @@ public class JobSkillDAO extends DatabaseConfig {
 
     public void add(JobSkill jobSkill) {
 
-        String sql = "INSERT INTO jobs_skills (jobs_id, skills_id) VALUES (?, ?)";
+        String sql = "INSERT INTO job_skills (job_id, skill_id) VALUES (?, ?)";
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -31,7 +31,7 @@ public class JobSkillDAO extends DatabaseConfig {
 
     public void delete(JobSkill jobSkill) {
 
-        String sql = "DELETE FROM jobs_skills WHERE jobs_id = ? AND skills_id = ?";
+        String sql = "DELETE FROM job_skills WHERE job_id = ? AND skill_id = ?";
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -47,7 +47,7 @@ public class JobSkillDAO extends DatabaseConfig {
 // tìm kiếm trong job này đang có yêu cầu kỹ năng nào
     public List<JobSkill> getByJobId(int jobId) {
 
-        String sql = "SELECT * FROM jobs_skills WHERE jobs_id = ?";
+        String sql = "SELECT * FROM job_skills WHERE job_id = ?";
 
         List<JobSkill> list = new ArrayList<>();
 
@@ -77,7 +77,7 @@ public class JobSkillDAO extends DatabaseConfig {
 // ngược lại tìm xem skill thì có nhưng job nào đang cần  tới nó
     public List<JobSkill> getBySkillId(int skillId) {
 
-        String sql = "SELECT * FROM jobs_skills WHERE skills_id = ?";
+        String sql = "SELECT * FROM job_skills WHERE skill_id = ?";
 
         List<JobSkill> list = new ArrayList<>();
 
@@ -107,7 +107,7 @@ public class JobSkillDAO extends DatabaseConfig {
 //kiểm tra xem trong data thì job đó đã có skill đó chưa khác với validator
     public boolean exists(int jobId, int skillId) {
 
-        String sql = " SELECT 1 FROM jobs_skills WHERE jobs_id = ? AND skills_id = ? ";
+        String sql = " SELECT 1 FROM job_skills WHERE job_id = ? AND skill_id = ? ";
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dto.ApiResponse;
 import dto.JobDTO;
 import dto.JobSearchDTO;
+import dto.PageResponse;
 import mapper.JobRequestMapper;
 import mapper.JobSearchRequestMapper;
 import service.JobService;
@@ -14,10 +15,11 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
-@WebServlet(urlPatterns = {"/job/*"})
+@WebServlet(urlPatterns = {"/jobs/*"})
 public class JobSevrlet extends BaseServlet {
     private final JobService jobService = new JobService();
     // chuyển đổi để json đọc được data từ kiểu localdatetime
@@ -40,9 +42,10 @@ public class JobSevrlet extends BaseServlet {
 
                 JobSearchDTO searchDTO = JobSearchRequestMapper.toDTO(req);
 
-                List<JobDTO> jobs = jobService.search(searchDTO);
+                PageResponse<JobDTO> jobs = jobService.search(searchDTO);
 
-                ApiResponse<List<JobDTO>> response = new ApiResponse<>(true, "Tìm kiếm thành công", jobs);
+                ApiResponse<PageResponse<JobDTO>> response =
+                        new ApiResponse<>(true, "Tìm kiếm thành công", jobs);
 
                 resp.setStatus(HttpServletResponse.SC_OK);
 
@@ -131,6 +134,12 @@ public class JobSevrlet extends BaseServlet {
         try {
             // Chuyển request -> DTO
             JobDTO dto = JobRequestMapper.toDTO(req);
+
+//            HttpSession session = req.getSession(false);
+//
+//            Integer employerId = (Integer) session.getAttribute("employerId");
+//
+//            dto.setEmployerId(employerId);
 
             // Gọi service thêm dữ liệu
             jobService.addJob(dto);

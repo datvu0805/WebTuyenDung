@@ -39,6 +39,23 @@ public class JobSearchRequestMapper {
             dto.setStatus(Short.parseShort(status));
 
         }
+        // Page
+        String page = req.getParameter("page");
+
+        if (page != null && !page.isBlank()) {
+            dto.setPage(Integer.parseInt(page));
+        } else {
+            dto.setPage(1);
+        }
+
+// Size
+        String size = req.getParameter("size");
+
+        if (size != null && !size.isBlank()) {
+            dto.setSize(Integer.parseInt(size));
+        } else {
+            dto.setSize(20);
+        }
 
         return dto;
 

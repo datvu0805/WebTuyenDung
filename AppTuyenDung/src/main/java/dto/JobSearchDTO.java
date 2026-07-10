@@ -8,6 +8,8 @@ public class JobSearchDTO {
     private Double maxSalary;
     private String experience;
     private Short status;
+    private int page = 1;
+    private int size = 20;
 
     public String getTitle() {
         return title;
@@ -60,12 +62,30 @@ public class JobSearchDTO {
         this.status = status;
     }
 
-    public JobSearchDTO(String title, String location, Double minSalary, Double maxSalary, String experience, Short status) {
+    public int getPage() {
+        return page;
+    }
+
+    public void setPage(int page) {
+        this.page = page;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public JobSearchDTO(String title, String location, Double minSalary, Double maxSalary, String experience, Short status, int page, int size) {
         this.title = title;
         this.location = location;
         this.minSalary = minSalary;
         this.maxSalary = maxSalary;
         this.experience = experience;
         this.status = status;
+        this.page = page;
+        this.size = size;
     }
 }

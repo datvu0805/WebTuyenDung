@@ -196,12 +196,14 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
             params.add(search.getMinSalary());
         }
 
-        if (search.getMaxSalary() != null) {
+        sql.append(" ORDER BY posted_at DESC");
+        sql.append(" LIMIT ? OFFSET ?");
 
-            sql.append(" AND max_salary<=?");
+        params.add(search.getSize());
 
-            params.add(search.getMaxSalary());
-        }
+        int offset = (search.getPage() - 1) * search.getSize();
+
+        params.add(offset);
 
         List<Job> list = new ArrayList<>();
 
@@ -228,5 +230,50 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
         }
 
         return list;
+    }
+    public int count(JobSearchDTO search) {
+
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) FROM jobs WHERE 1=1");
+
+        List<Object> params = new ArrayList<>();
+
+        if (search.getTitle() != null && !search.getTitle().isBlank()) {
+            sql.append(" AND title ILIKE ?");
+            params.add("%" + search.getTitle() + "%");
+        }
+
+        if (search.getLocation() != null && !search.getLocation().isBlank()) {
+            sql.append(" AND location = ?");
+            params.add(search.getLocation());
+        }
+
+        if (search.getMinSalary() != null) {
+            sql.append(" AND min_salary >= ?");
+            params.add(search.getMinSalary());
+        }
+
+        if (search.getMaxSalary() != null) {
+            sql.append(" AND max_salary <= ?");
+            params.add(search.getMaxSalary());
+        }
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return 0;
     }
 }

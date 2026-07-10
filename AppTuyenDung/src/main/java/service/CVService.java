@@ -2,9 +2,9 @@ package service;
 
 import config.MinIOConfig;
 import dao.CVDAO;
+import dao.CandicateDAO;
 import dto.UploadCVDTO;
 import io.minio.*;
-
 import model.CV;
 import model.Candidates;
 import validator.CVValidator;
@@ -12,14 +12,17 @@ import validator.CVValidator;
 import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class CVService {
     private final String BUCKET_NAME = "other-project";
     private final CVDAO cvdao = new CVDAO();
+    private final CandicateDAO candicateDAO = new CandicateDAO();
 
     public CV handleUploadCV(UploadCVDTO dto) throws Exception {
-        // 1. Kiểm tra dữ liệu đầu vào từ Validator
         String valResult = CVValidator.validate(dto);
         if (valResult != null) {
             throw new IllegalArgumentException(valResult);
@@ -31,18 +34,15 @@ public class CVService {
         LocalDateTime now = LocalDateTime.now();
         String timestamp = now.format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
 
-        // 2. Kết nối MinIO và tự động tạo bucket nếu chưa có
         MinioClient minioClient = MinIOConfig.getClient();
         boolean found = minioClient.bucketExists(BucketExistsArgs.builder().bucket(BUCKET_NAME).build());
         if (!found) {
             minioClient.makeBucket(MakeBucketArgs.builder().bucket(BUCKET_NAME).build());
         }
 
-        // Đổi khoảng trắng trong tên file thành dấu gạch dưới để URL không bị lỗi ký tự %20
         String originalCvName = dto.getFileCV().getSubmittedFileName().replaceAll("\\s+", "_");
         String cvObjectName = "candidates/" + candidateID + "/cvs/cv_" + timestamp + "_" + originalCvName;
 
-        // Đẩy file CV chính lên MinIO
         try (InputStream inputStream = dto.getFileCV().getInputStream()) {
             minioClient.putObject(
                     PutObjectArgs.builder().bucket(BUCKET_NAME)
@@ -51,67 +51,120 @@ public class CVService {
             );
         }
 
-//        // Đẩy file Ảnh đại diện lên MinIO nếu có
-//        String avatarObjectName = null;
-//        if (dto.getFileAvatar() != null && dto.getFileAvatar().getSize() > 0) {
-//            String originalAvatarName = dto.getFileAvatar().getSubmittedFileName().replaceAll("\\s+", "_");
-//            avatarObjectName = "candidates/" + candidateID + "/avatars/avatar_" + timestamp + "_" + originalAvatarName;
-//
-//            try (InputStream avatarStream = dto.getFileAvatar().getInputStream()) {
-//                minioClient.putObject(
-//                        PutObjectArgs.builder().bucket(BUCKET_NAME)
-//                                .object(avatarObjectName).stream(avatarStream, dto.getFileAvatar().getSize(), (long) -1)
-//                                .contentType(dto.getFileAvatar().getContentType()).build()
-//                );
-//             }
-//        }
-
-        // 3. Khởi tạo thực thể Entity để chuẩn bị lưu xuống DB
         CV cv = new CV();
         Candidates candidates = new Candidates();
         candidates.setId(candidateID);
         cv.setCandidateId(candidates);
-
         cv.setCvTitle(dto.getCvTitle());
 
-        //Chỉ lưu tên Object thô gọn gàng vào Database
+        // GỢI Ý CHỮA CHÁY: Lưu object name thô vào DB trước rồi mới đổi link trả về client
         cv.setFileUrl(cvObjectName);
-//        cv.setAvatarURl(avatarObjectName);
-
         cv.setDescription(dto.getDescription() != null ? dto.getDescription() : "");
         cv.setVersion(version);
         cv.setCreatedAt(now);
         cv.setUpdatedAt(now);
 
-        // 4. BIẾN ĐỔI THÀNH LINK ĐỘNG (PRESIGNED URL) TRƯỚC KHI TRẢ VỀ POSTMAN
-        // Bước này giúp đối tượng trả về Servlet chứa link full đầy đủ chìa khóa
-        cv.setFileUrl(genarateMinioURL(cvObjectName));
-//        cv.setAvatarURl(genarateMinioURL(avatarObjectName));
-        // Gọi DAO lưu xuống PostgreSQL
         cvdao.add(cv);
 
+        // Ký link sau khi đã lưu DB thành công
+        cv.setFileUrl(genarateMinioURL(cvObjectName));
 
         return cv;
     }
 
+    // Lấy dữ liệu quản lý hồ sơ
+    public Map<String, Object> getPureDashboarData(int candidateID){
+        Candidates candidates = candicateDAO.getByID(candidateID);
+        if(candidates == null) return null;
+
+        if(candidates.getUser() != null && candidates.getUser().getAvatarUrl() != null){
+            String rawAvatar = candidates.getUser().getAvatarUrl();
+            if (!rawAvatar.trim().isEmpty()){
+                candidates.getUser().setAvatarUrl(genarateMinioURL(rawAvatar));
+            }
+        }
+
+        List<CV> cvList = cvdao.getCVByCandidateID(candidateID);
+
+        if(cvList != null){
+            for (CV cv : cvList){
+                if (cv.getFileUrl() != null){
+                    cv.setFileUrl(genarateMinioURL(cv.getFileUrl()));
+                }
+                cv.setCreatedAt(null);
+                cv.setUpdatedAt(null);
+            }
+        }
+
+        Map<String, Object> reponesData = new HashMap<>();
+        reponesData.put("candidateInfo", candidates);
+        reponesData.put("cvList", cvList);
+
+        return reponesData;
+    }
+
+    /**
+     * XÓA CV TRONG QUẢN LÝ CV (Bản vá lỗi nuốt ngoại lệ và bao sân lỗi link tuyệt đối)
+     */
+    public boolean hanleDeleteCV(int cvId, int candidateID){
+        try {
+            CV cv = cvdao.getById(cvId);
+
+            // Nếu không tìm thấy CV dưới DB xóa luôn phòng trường hợp getById lỗi
+            if (cv == null){
+                System.out.println(" Không tìm thấy object qua getById, ép xóa thẳng dưới DB.");
+                cvdao.deleteID(cvId, candidateID);
+                return true;
+            }
+
+            // Xóa file cv trên MinIO
+            if (cv.getFileUrl() != null && !cv.getFileUrl().trim().isEmpty()){
+                // Nếu đường dẫn lưu nhầm link tuyệt đối có HTTP, bỏ qua không xóa MinIO để tránh nổ lỗi crash code
+                if (!cv.getFileUrl().startsWith("http://") && !cv.getFileUrl().startsWith("https://")) {
+                    try {
+                        MinioClient minioClient = MinIOConfig.getClient();
+                        minioClient.removeObject(
+                                RemoveObjectArgs.builder().bucket(BUCKET_NAME).object(cv.getFileUrl()).build()
+                        );
+                        System.out.println(">> Đã xóa file trên MinIO thành công.");
+                    } catch (Exception minioE) {
+                        System.out.println(">> Lỗi gỡ file MinIO (Bỏ qua để tiếp tục xóa DB): " + minioE.getMessage());
+                    }
+                }
+            }
+
+            // Thực thi xóa dòng dữ liệu trong PostgreSQL bằng hàm chạy tốt của bạn
+            cvdao.delete(cvId);
+            System.out.println(">> Đã xóa bản ghi dưới DB thành công.");
+            return true;
+
+        } catch (Exception e) {
+            System.err.println(">> Crash tại Service xử lý xóa: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     public String genarateMinioURL(String objectName) {
         if (objectName == null || objectName.trim().isEmpty()) {
             return null;
         }
+        // Nếu bản thân nó đã là một URL ký sẵn rồi thì không ký đè nữa
+        if (objectName.startsWith("http://") || objectName.startsWith("https://")) {
+            return objectName;
+        }
         try {
             MinioClient minioClient = MinIOConfig.getClient();
             return minioClient.getPresignedObjectUrl(
                     GetPresignedObjectUrlArgs.builder()
-                            .method(Http.Method.GET) // Dùng phương thức GET để đọc file
+                            .method(Http.Method.GET)
                             .bucket(BUCKET_NAME)
                             .object(objectName)
                             .expiry(1, TimeUnit.DAYS)
                             .build()
             );
         } catch (Exception e) {
-            System.err.println(">> [MINIO ERROR] Không thể ký URL cho object: " + objectName);
-            e.printStackTrace();
+            System.err.println(">> [MINIO ERROR] Không thể ký URL: " + objectName);
             return null;
         }
     }

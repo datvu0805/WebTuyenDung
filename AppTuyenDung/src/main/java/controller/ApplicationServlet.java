@@ -2,6 +2,7 @@ package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import dao.ApplicationDAO;
 import dto.ApiResponse;
 import dto.ApplicationDTO;
 import exception.BusinessException;
@@ -20,13 +21,19 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @WebServlet("/api/aplication")
 @MultipartConfig
 public class ApplicationServlet extends HttpServlet {
     private final ApplicationService applicationService = new ApplicationService();
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private final ApplicationDAO applicationDAO = new ApplicationDAO();
+    // DÒNG MỚI ĐÃ SỬA:
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     private void sendJsonResponse(HttpServletResponse response, int statusCode, ApiResponse<?> apiResponse)
         throws IOException{
@@ -68,10 +75,43 @@ public class ApplicationServlet extends HttpServlet {
                 // nhà tuyển dụng cập nhật th buộc pahir kiểm tra id đơn ứng tuyển
                 ApplicationValidator.validateUpdateStatus(idRaw, statusRaw);
 
-                applicationService.updateStatus(Integer.parseInt(idRaw), Integer.parseInt(statusRaw));
-                sendJsonResponse(resp, HttpServletResponse.SC_OK, new ApiResponse<>(true, "Cập nhật trạng thái thành công!"));
+                int appID = Integer.parseInt(idRaw);
+                int status = Integer.parseInt(statusRaw);
+                // 0: chờ duyêt, 1:Phỏng vấn, 2: Đat, 3: Loại
 
+                // cập nhật trạng thái trên DB
+                applicationService.updateStatus(appID, status);
+
+                ApplicationDTO dto = new ApplicationDTO();
+                try {
+                    Application updateApp = applicationDAO.getByID(appID);
+
+                    if (updateApp != null) {
+                        dto.setApplicationID(updateApp);
+                        dto.setStatus(updateApp.getStatus());
+                        dto.setApplieAt(updateApp.getAppliedAt());
+
+                        // thông tin của ứng viên
+                        int candidateID = updateApp.getCandidateID().getId();
+                        Candidates candidates = new Candidates();
+                        candidates.setId(candidateID);
+                        dto.setCandidateName(candidates);
+
+
+                        int cvId = updateApp.getCvID().getId();
+                        int jobID = updateApp.getJodID().getId();
+                        dto.setJobTitle("ID Công việc: " +jobID);
+                        dto.setCvTitle("CV Id: " + cvId);
+                    }
+                }catch (Exception e){
+                    dto.setStatus(status);
+                    dto.setApplieAt(LocalDateTime.now());
+                }
+                        sendJsonResponse(resp, HttpServletResponse.SC_OK, new ApiResponse<>(true, "Cập nhật trạng thái thành công!"));
             }
+
+
+
             else if ("submit".equals(action)){
                 String candidateIDRaw = req.getParameter("candidateID");
                 String jobIDRaw = req.getParameter("jobID");
@@ -87,6 +127,7 @@ public class ApplicationServlet extends HttpServlet {
                 candidates.setId(Integer.parseInt(candidateIDRaw));
                 app.setCandidateID(candidates);
 
+
                 Job jobs = new Job();
                 jobs.setId(Integer.parseInt(jobIDRaw));
                 app.setJodID(jobs);
@@ -97,10 +138,30 @@ public class ApplicationServlet extends HttpServlet {
 
                 app.setCoverLetter(coverLetter);
                 app.setDescription(description);
+                app.setStatus(0); // 0: chờ duyêt, 1:Phỏng vấn, 2: Đat, 3: Loại
 
                 // ktra giới hạn nộp đơn tối đa 3 lần
                 applicationService.submitApplication(app);
-                sendJsonResponse(resp, HttpServletResponse.SC_CREATED, new ApiResponse<>(true, "Nộp đơn ứng tuyển thành công!"));
+                //xóa sạch bộ đệm để maats số 1
+                resp.resetBuffer();
+
+                ApplicationDTO dto = new ApplicationDTO();
+                Application cleanApp = new Application();
+                cleanApp.setId(app.getId());
+                cleanApp.setCoverLetter(coverLetter);
+                cleanApp.setDescription(description);
+                dto.setApplicationID(cleanApp);
+
+                Candidates  candidateRes = new Candidates();
+                candidateRes.setId(Integer.parseInt(candidateIDRaw));
+                dto.setCandidateName(candidateRes);
+
+                dto.setApplieAt(LocalDateTime.now());
+                dto.setStatus(0);
+
+                dto.setJobTitle("ID Jobs: " + jobIDRaw);
+                dto.setCvTitle("iD CV : " + cvIDRaw);
+                sendJsonResponse(resp, HttpServletResponse.SC_CREATED, new ApiResponse<>(true, "Nộp đơn ứng tuyển thành công!", dto));
 
             }
         }catch (BusinessException e){

@@ -4,7 +4,9 @@ import config.DatabaseConfig;
 import dto.ApplicationDTO;
 import exception.BusinessException;
 import model.Application;
+import model.CV;
 import model.Candidates;
+import model.Job;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -30,7 +32,12 @@ public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> 
             ps.setObject(9, app.getUpdatedAt());
 
             ps.executeUpdate();
-
+            // lấy id tự tăng của postgres trả lại cho app
+            try (ResultSet rs = ps.getGeneratedKeys()){
+                if (rs.next()){
+                    app.setId(rs.getInt(1));
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException(e.getMessage());
         }
@@ -73,7 +80,20 @@ public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> 
                     Application app = new Application();
                     app.setId(rs.getInt("id"));
                     app.setStatus(rs.getInt("status"));
-                    return app;
+                    app.setAppliedAt((LocalDateTime) rs.getObject("applied_at"));
+
+                    Candidates c = new Candidates();
+                    c.setId(rs.getInt("candidate_id"));
+                    app.setCandidateID(c);
+
+                    Job j = new Job();
+                    j.setId(rs.getInt("job_id"));
+                    app.setJodID(j);
+
+                    CV cv = new CV();
+                    cv.setId(rs.getInt("cv_id"));
+                    app.setCvID(cv);
+                        return app;
                 }
             }
         } catch (SQLException e) {

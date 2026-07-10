@@ -17,8 +17,8 @@ import java.io.IOException;
 @WebServlet("/UploadCV")
 @MultipartConfig(
         fileSizeThreshold = 0,
-        maxFileSize = 1024 * 1024 * 2,
-        maxRequestSize = 1024 * 1024 * 3
+        maxFileSize = 1024 * 1024 * 10,
+        maxRequestSize = 1024 * 1024 * 11
 )
 public class UploadCVServlet extends HttpServlet {
     private final CVService cvService = new CVService();

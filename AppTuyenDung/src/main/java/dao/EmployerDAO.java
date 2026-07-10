@@ -100,30 +100,32 @@ public class EmployerDAO extends DatabaseConfig {
         """;
     }
 
-    public void update(Employers employer) {
+    public boolean update(Connection conn,Employers employer) {
+
         String sql = """
-            UPDATE employers
-            SET user_id = ?,
-                company_id = ?,
-                updated_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-        """;
+        UPDATE employers
+        SET user_id = ?,
+            company_id = ?,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    """;
 
         try (
-                Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)
         ) {
+
             ps.setInt(1, employer.getUser().getId());
             ps.setInt(2, employer.getCompany().getId());
             ps.setInt(3, employer.getId());
 
-            ps.executeUpdate();
+            return ps.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
 
+        return false;
+    }
     public void delete(int id) {
         String sql = "DELETE FROM employers WHERE id = ?";
 
@@ -229,5 +231,22 @@ public class EmployerDAO extends DatabaseConfig {
         }
 
         return employers;
+    }
+
+    public boolean updateCompany(Connection conn, int employerId, int companyId) throws SQLException {
+
+        String sql = """
+        UPDATE employers
+        SET company_id = ?,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ?
+    """;
+
+        PreparedStatement ps = conn.prepareStatement(sql);
+
+        ps.setInt(1, companyId);
+        ps.setInt(2, employerId);
+
+        return ps.executeUpdate() > 0;
     }
 }

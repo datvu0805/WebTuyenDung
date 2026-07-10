@@ -237,7 +237,7 @@ public class UserDAO extends DatabaseConfig {
         return -1;
     }
 
-    public boolean update(int id, Users user) {
+    public boolean update(Connection conn ,  int id, Users user) {
         String sql = """
         UPDATE users
         SET password = ?,
@@ -251,7 +251,7 @@ public class UserDAO extends DatabaseConfig {
         WHERE id = ?
     """;
 
-        try (Connection conn = getConnection();
+        try (
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, user.getPassword());
@@ -277,6 +277,15 @@ public class UserDAO extends DatabaseConfig {
         }
     }
 
+    public boolean update(int userId, Users user) {
+        try (Connection conn = getConnection()) {
+            return update(conn, userId, user);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     public Users getUserByIDForUpdate(Connection conn, int userId) throws SQLException{
         String sql = "SELECT u.*, r.id AS role_id, r.role_name" +
                             "FROM users u" +
@@ -292,4 +301,36 @@ public class UserDAO extends DatabaseConfig {
         }
         return null;
     }
+
+    public Users findByEmailExceptId(String email, int userId) {
+
+        String sql = """
+        SELECT *
+        FROM users
+        WHERE email = ?
+        AND id <> ?
+    """;
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+
+            ps.setString(1, email);
+            ps.setInt(2, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapUser(rs);
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+
 }

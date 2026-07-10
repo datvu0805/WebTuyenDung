@@ -13,6 +13,7 @@ import utils.PasswordUtil;
 import validator.UserValidator;
 
 import javax.servlet.http.Part;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 
@@ -181,7 +182,10 @@ public class AuthService {
         if (user == null) {
             return "Không tìm thấy người dùng";
         }
-
+        if (userDAO.findByEmail(user.getEmail()) != null) {
+            return "Email đã tồn tại";
+        }
+        Connection conn = userDAO.getConnection();
         user.setFullName(dto.getFullName());
         user.setEmail(dto.getEmail());
         user.setPassword(PasswordUtil.hashPassword(dto.getPassword()));
@@ -190,7 +194,7 @@ public class AuthService {
         user.setAvatarUrl(dto.getAvatarUrl());
         user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth()));
 
-        boolean update = userDAO.update(id, user);
+        boolean update = userDAO.update(conn, id, user);
 
 
         if (!update) {
@@ -199,44 +203,61 @@ public class AuthService {
         return null;
     }
 
-    public String updateEmployerProfile(int id, EmployerProfileDTO dto) throws SQLException, ClassNotFoundException {
+    public String updateEmployerProfile(int userId, EmployerProfileDTO dto)
+            throws SQLException {
 
-            if(!validator.isValidEmail(dto.getEmail())) {
-                return "Email không hợp lệ";
+        Connection conn = null;
+
+        try {
+            conn = userDAO.getConnection();
+            conn.setAutoCommit(false); // 🔥 bắt đầu transaction
+
+            // ===== update user =====
+            Users user = new Users();
+            user.setPassword(PasswordUtil.hashPassword(dto.getPassword()));
+            user.setFullName(dto.getFullName());
+            user.setEmail(dto.getEmail());
+            user.setPhoneNumber(dto.getPhoneNumber());
+            user.setAddress(dto.getAddress());
+            user.setAvatarUrl(dto.getAvatarUrl());
+
+            if (userDAO.findByEmail(user.getEmail()) != null) {
+                return "Email đã tồn tại";
             }
-            if(!validator.isValidPassword(dto.getPassword())){
-                return "Mật khẩu phải từ 6 đến 30 ký tự";
+
+            boolean updateUser = userDAO.update(conn, userId, user);
+
+            if (!updateUser) {
+                conn.rollback();
+                return "Update user thất bại";
             }
-            if (!validator.isValidPhoneNumber(dto.getPhoneNumber())) {
-                return "Số điện thoai không hợp lệ";
+
+            // ===== employer =====
+            Employers employer = employerDAO.findByUserId(userId);
+
+            // ===== company =====
+            boolean updateEmployer = employerDAO.updateCompany(
+                    conn,
+                    employer.getId(),
+                    dto.getCompanyId()
+            );
+
+            if (!updateEmployer) {
+                conn.rollback();
+                return "Update employer thất bại";
             }
 
+            conn.commit(); // 🔥 thành công hết
 
-        Users user = new Users();
+            return null;
 
-        user.setFullName(dto.getFullName());
-        user.setEmail(dto.getEmail());
-        user.setPassword(dto.getPassword());
-        user.setPhoneNumber(dto.getPhoneNumber());
-        user.setAddress(dto.getAddress());
-        user.setAvatarUrl(dto.getAvatarUrl());
-        user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth()));
-
-        Employers employer = new Employers();
-        Company company = companyDAO.findByName(dto.getCompanyName());
-        if (company != null) {
-            employer.setCompany(company);
-        }else {
-            return "Công ty không tồn tại";
+        } catch (Exception e) {
+            if (conn != null) conn.rollback(); // 🔥 lỗi → rollback
+            e.printStackTrace();
+            return "Lỗi hệ thống";
+        } finally {
+            if (conn != null) conn.close();
         }
-
-        boolean update = userDAO.update(id , user);
-
-        if (!update) {
-            return "Update thất bại";
-        }
-
-        return null;
+    }
     }
 
-}

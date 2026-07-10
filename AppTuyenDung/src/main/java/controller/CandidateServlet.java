@@ -12,6 +12,8 @@ import service.FileService;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
 
 @WebServlet("/candidate/profile")
@@ -101,8 +103,14 @@ public class CandidateServlet extends BaseServlet {
         if (dateOfBirth != null && !dateOfBirth.isBlank()) {
             user.setDateOfBirth(LocalDate.parse(dateOfBirth));
         }
+        Connection conn = null;
+        try {
+            conn = userDAO.getConnection();
+            userDAO.update(conn,userId, user);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
-        userDAO.update(userId, user);
 
         resp.getWriter().write(gson.toJson(new ApiResponse<>(true, "Cập nhật thông tin thành công", null)));
     }

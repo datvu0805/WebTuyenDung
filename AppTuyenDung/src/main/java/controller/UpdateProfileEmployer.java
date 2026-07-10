@@ -24,7 +24,7 @@ public class UpdateProfileEmployer extends  BaseServlet{
         request.setCharacterEncoding("utf-8");
 
         HttpSession session = request.getSession(false);
-        int employerId = (Integer)session.getAttribute("employerId");
+        int employerId = (Integer)session.getAttribute("userId");
 
         ApiResponse<?> result ;
 

@@ -45,7 +45,7 @@ public class CompanyDAO extends DatabaseConfig {
         return -1;
     }
 
-    public void update(Company company) {
+    public boolean update(Connection conn,Company company) {
         String sql = """
             UPDATE companies
             SET company_name = ?,
@@ -55,7 +55,6 @@ public class CompanyDAO extends DatabaseConfig {
         """;
 
         try (
-                Connection conn = getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)
         ) {
             ps.setString(1, company.getCompanyName());
@@ -67,6 +66,8 @@ public class CompanyDAO extends DatabaseConfig {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return false;
     }
 
     public void delete(int id) {

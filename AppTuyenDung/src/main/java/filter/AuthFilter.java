@@ -53,8 +53,17 @@ public class AuthFilter implements Filter {
         // Chỉ CANDIDATE mới upload CV
         ROLE_REQUIRED.put("POST:/UploadCV", setOf("CANDIDATE"));
 
+
         // Upload avatar — cả CANDIDATE lẫn EMPLOYER đều được
         // (không cần entry trong ROLE_REQUIRED — mọi user đã đăng nhập đều qua được)
+
+        //chỉ admin mới đc làm
+        ROLE_REQUIRED.put("POST:/admin/company/create", setOf("ADMIN"));
+        ROLE_REQUIRED.put("PUT:/admin/company/update", setOf("ADMIN"));
+        ROLE_REQUIRED.put("DELETE:/admin/company/delete", setOf("ADMIN"));
+        ROLE_REQUIRED.put("GET:/admin/company/list", setOf("ADMIN"));
+
+
     }
 
     private static Set<String> setOf(String... roles) {
@@ -102,12 +111,12 @@ public class AuthFilter implements Filter {
             return;
         }
 
-        // Kiểm tra RBAC
+        // Kiểm tra RBAC , admin có quyền dùng tất cả api của role khác
         String roleKey = method + ":" + path;
         Set<String> allowedRoles = ROLE_REQUIRED.get(roleKey);
         if (allowedRoles != null) {
             String userRole = (String) session.getAttribute("role");
-            if (userRole == null || !allowedRoles.contains(userRole)) {
+            if (userRole == null ||  (!allowedRoles.contains(userRole) && !"ADMIN".equals(userRole))) {
                 sendJson(resp, HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền thực hiện hành động này");
                 return;
             }

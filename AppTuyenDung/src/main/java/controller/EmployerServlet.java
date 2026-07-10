@@ -5,6 +5,7 @@ import dao.EmployerDAO;
 import dao.UserDAO;
 import dto.ApiResponse;
 import dto.CandidateDTO;
+import dto.EmployerProfileDTO;
 import model.Employers;
 import model.Users;
 import service.FileService;
@@ -35,14 +36,15 @@ public class EmployerServlet extends BaseServlet {
             return;
         }
 
-        CandidateDTO dto = new CandidateDTO();
+        EmployerProfileDTO dto = new EmployerProfileDTO();
         dto.setUserId(employer.getUser().getId());
         dto.setUsername(employer.getUser().getUsername());
         dto.setFullName(employer.getUser().getFullName());
         dto.setEmail(employer.getUser().getEmail());
         dto.setPhoneNumber(employer.getUser().getPhoneNumber());
         dto.setAddress(employer.getUser().getAddress());
-
+        dto.setEmployerId(employer.getUser().getId());
+        dto.setCompanyId(employer.getCompany().getId());
         // Generate presigned URL nếu avatarUrl là object path
         String avatarUrl = employer.getUser().getAvatarUrl();
         if (avatarUrl != null && !avatarUrl.isBlank() && !avatarUrl.startsWith("http")) {
@@ -52,7 +54,6 @@ public class EmployerServlet extends BaseServlet {
         if (employer.getUser().getDateOfBirth() != null) {
             dto.setDateOfBirth(employer.getUser().getDateOfBirth().toString());
         }
-        dto.setRole(employer.getUser().getRole().getRoleName());
 
         resp.getWriter().write(gson.toJson(new ApiResponse<>(true, "Lấy thông tin employer thành công", dto)));
     }

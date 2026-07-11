@@ -40,7 +40,7 @@ public class AuthFilter implements Filter {
 
     static {
         // Chỉ EMPLOYER mới được tạo/sửa/xóa job
-        ROLE_REQUIRED.put("POST:/jobs", setOf("EMPLOYER"));
+        ROLE_REQUIRED.put("POST:/jobs", setOf("EMPLOYER","ADMIN"));
         ROLE_REQUIRED.put("PUT:/jobs", setOf("EMPLOYER"));
         ROLE_REQUIRED.put("DELETE:/jobs", setOf("EMPLOYER"));
         ROLE_REQUIRED.put("POST:/job-skills", setOf("EMPLOYER"));

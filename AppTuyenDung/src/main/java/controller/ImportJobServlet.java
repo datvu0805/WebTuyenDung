@@ -22,6 +22,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @WebServlet("/jobs/import")
 @MultipartConfig(maxFileSize = 5 * 1024 * 1024)
@@ -32,8 +34,10 @@ public class ImportJobServlet extends BaseServlet {
             .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
-    private static final DateTimeFormatter DT_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter DT_FMT  = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter DT_FMT2 = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    // Regex parse "Tên bất kỳ (ID:123)" → group 1 = "123"
+    private static final Pattern ID_PATTERN = Pattern.compile("\\(ID:(\\d+)\\)\\s*$");
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
@@ -98,16 +102,18 @@ public class ImportJobServlet extends BaseServlet {
                     short statusVal = statusStr.isBlank() ? 1 : Short.parseShort(statusStr);
                     job.setStatus(JobStatus.fromValue(statusVal));
 
-                    // companyId (cột 13)
-                    String companyIdStr = getString(r, 13);
-                    if (!companyIdStr.isBlank()) {
-                        try { job.setCompanyId(Integer.parseInt(companyIdStr)); } catch (NumberFormatException ignored) {}
+                    // Công ty (cột 13) — "Tên công ty (ID:x)" hoặc số nguyên thuần
+                    String companyVal = getString(r, 13);
+                    if (!companyVal.isBlank()) {
+                        Integer cid = parseIdFromCell(companyVal);
+                        if (cid != null) job.setCompanyId(cid);
                     }
 
-                    // jobPositionId (cột 15)
-                    String posIdStr = getString(r, 15);
-                    if (!posIdStr.isBlank()) {
-                        try { job.setJobPositionId(Integer.parseInt(posIdStr)); } catch (NumberFormatException ignored) {}
+                    // Chức danh (cột 14) — "Tên chức danh (ID:x)" hoặc số nguyên thuần
+                    String posVal = getString(r, 14);
+                    if (!posVal.isBlank()) {
+                        Integer pid = parseIdFromCell(posVal);
+                        if (pid != null) job.setJobPositionId(pid);
                     }
 
                     job.setHiddenOnExpiry(false);
@@ -167,9 +173,21 @@ public class ImportJobServlet extends BaseServlet {
         }
     }
 
+    /** Parse ID từ chuỗi "Tên bất kỳ (ID:123)" hoặc số thuần "123" */
+    private Integer parseIdFromCell(String val) {
+        if (val == null || val.isBlank()) return null;
+        Matcher m = ID_PATTERN.matcher(val.trim());
+        if (m.find()) {
+            try { return Integer.parseInt(m.group(1)); } catch (NumberFormatException ignored) {}
+        }
+        // fallback: cả chuỗi là số nguyên
+        try { return Integer.parseInt(val.trim()); } catch (NumberFormatException ignored) {}
+        return null;
+    }
+
     private boolean isRowEmpty(Row row) {
         if (row == null) return true;
-        for (int i = 0; i <= 15; i++) {
+        for (int i = 0; i <= 14; i++) {
             Cell c = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
             if (c != null && c.getCellType() != CellType.BLANK) return false;
         }

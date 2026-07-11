@@ -1,20 +1,19 @@
 import ExcelJS from 'exceljs';
 
-// Màu sắc header
-const COLOR_COMPANY = '006B3F';   // xanh đậm
-const COLOR_POSITION = '1D4ED8';  // xanh dương
-const COLOR_JOB = '7E22CE';       // tím
+const COLOR_COMPANY  = '006B3F';
+const COLOR_POSITION = '1D4ED8';
+const COLOR_JOB      = '7E22CE';
 
 function applyHeaderStyle(row, color) {
   row.eachCell((cell) => {
-    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + color } };
-    cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
+    cell.fill   = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + color } };
+    cell.font   = { bold: true, color: { argb: 'FFFFFFFF' }, size: 11 };
     cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
     cell.border = {
-      top: { style: 'medium', color: { argb: 'FF000000' } },
-      left: { style: 'medium', color: { argb: 'FF000000' } },
+      top:    { style: 'medium', color: { argb: 'FF000000' } },
+      left:   { style: 'medium', color: { argb: 'FF000000' } },
       bottom: { style: 'medium', color: { argb: 'FF000000' } },
-      right: { style: 'medium', color: { argb: 'FF000000' } },
+      right:  { style: 'medium', color: { argb: 'FF000000' } },
     };
   });
   row.height = 30;
@@ -23,10 +22,10 @@ function applyHeaderStyle(row, color) {
 function applyDataRowStyle(row) {
   row.eachCell({ includeEmpty: true }, (cell) => {
     cell.border = {
-      top: { style: 'thin', color: { argb: 'FFAAAAAA' } },
-      left: { style: 'thin', color: { argb: 'FFAAAAAA' } },
+      top:    { style: 'thin', color: { argb: 'FFAAAAAA' } },
+      left:   { style: 'thin', color: { argb: 'FFAAAAAA' } },
       bottom: { style: 'thin', color: { argb: 'FFAAAAAA' } },
-      right: { style: 'thin', color: { argb: 'FFAAAAAA' } },
+      right:  { style: 'thin', color: { argb: 'FFAAAAAA' } },
     };
     cell.alignment = { vertical: 'middle', wrapText: true };
   });
@@ -39,142 +38,118 @@ async function downloadWorkbook(workbook, filename) {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
   });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
+  const a   = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
   URL.revokeObjectURL(url);
 }
 
-// ── Template CÔNG TY ──────────────────────────────────────
+// ── Template CÔNG TY ──────────────────────────────────────────────────────────
 export async function downloadCompanyTemplate() {
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet('Danh sách công ty');
 
-  ws.columns = [
-    { header: 'Tên công ty (bắt buộc)', key: 'companyName', width: 35 },
-    { header: 'Mô tả', key: 'description', width: 50 },
-  ];
-
+  ws.getRow(1).values = ['Tên công ty (bắt buộc)', 'Mô tả'];
+  ws.getColumn(1).width = 35;
+  ws.getColumn(2).width = 50;
   applyHeaderStyle(ws.getRow(1), COLOR_COMPANY);
 
-  const samples = [
+  [
     ['ABC Technology', 'Công ty phần mềm hàng đầu Việt Nam'],
     ['XYZ Corp', 'Công ty thiết kế và truyền thông'],
-  ];
-  samples.forEach((s) => {
-    const row = ws.addRow(s);
-    applyDataRowStyle(row);
-  });
+  ].forEach((s) => applyDataRowStyle(ws.addRow(s)));
 
   await downloadWorkbook(wb, 'mau_cong_ty.xlsx');
 }
 
-// ── Template CHỨC DANH ────────────────────────────────────
+// ── Template CHỨC DANH ────────────────────────────────────────────────────────
 export async function downloadPositionTemplate() {
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet('Danh sách chức danh');
 
-  ws.columns = [
-    { header: 'Tên chức danh (bắt buộc)', key: 'name', width: 35 },
-    { header: 'Mô tả', key: 'description', width: 50 },
-  ];
-
+  ws.getRow(1).values = ['Tên chức danh (bắt buộc)', 'Mô tả'];
+  ws.getColumn(1).width = 35;
+  ws.getColumn(2).width = 50;
   applyHeaderStyle(ws.getRow(1), COLOR_POSITION);
 
-  const samples = [
+  [
     ['Lập trình viên Backend', 'Phát triển API, xử lý logic nghiệp vụ'],
-    ['Frontend Developer', 'Xây dựng giao diện người dùng'],
-    ['Fullstack Developer', 'Phát triển cả frontend lẫn backend'],
-  ];
-  samples.forEach((s) => {
-    const row = ws.addRow(s);
-    applyDataRowStyle(row);
-  });
+    ['Frontend Developer',     'Xây dựng giao diện người dùng'],
+    ['Fullstack Developer',    'Phát triển cả frontend lẫn backend'],
+  ].forEach((s) => applyDataRowStyle(ws.addRow(s)));
 
   await downloadWorkbook(wb, 'mau_chuc_danh.xlsx');
 }
 
-// ── Template CÔNG VIỆC ────────────────────────────────────
+// ── Template CÔNG VIỆC ────────────────────────────────────────────────────────
+// Cột công ty & chức danh có dropdown dạng "Tên (ID:x)" lấy từ sheet ẩn.
+// Backend parse regex để lấy ID.
+//
+// Layout (14 cột):
+//  A  Tiêu đề công việc
+//  B  Mô tả
+//  C  Địa điểm
+//  D  Kinh nghiệm
+//  E  Lương tối thiểu
+//  F  Lương tối đa
+//  G  Tiền tệ          ← dropdown VND/USD/EUR
+//  H  Số lượng
+//  I  Ngày đăng
+//  J  Ngày hết hạn
+//  K  Hạn nộp HS
+//  L  Trạng thái       ← dropdown 0/1/2
+//  M  Công ty          ← dropdown "Tên (ID:x)" từ sheet ẩn _companies
+//  N  Chức danh        ← dropdown "Tên (ID:x)" từ sheet ẩn _positions
+
 export async function downloadJobTemplate({ companies = [], jobPositions = [] } = {}) {
   const wb = new ExcelJS.Workbook();
+
+  // ── Sheet ẩn: _companies (cột A = "Tên (ID:x)")
+  const wsC = wb.addWorksheet('_companies');
+  wsC.state = 'veryHidden';
+  companies.forEach((c, i) => {
+    wsC.getCell(`A${i + 1}`).value = `${c.companyName || c.name} (ID:${c.id})`;
+  });
+
+  // ── Sheet ẩn: _positions (cột A = "Tên (ID:x)")
+  const wsP = wb.addWorksheet('_positions');
+  wsP.state = 'veryHidden';
+  jobPositions.forEach((p, i) => {
+    wsP.getCell(`A${i + 1}`).value = `${p.name} (ID:${p.id})`;
+  });
+
+  // ── Sheet chính
   const ws = wb.addWorksheet('Danh sách công việc');
 
-  // Sheet ẩn chứa danh sách dropdown
-  const wsCompany = wb.addWorksheet('_companies');
-  wsCompany.state = 'veryHidden';
-  companies.forEach((c, i) => {
-    wsCompany.getCell(`A${i + 1}`).value = c.id;
-    wsCompany.getCell(`B${i + 1}`).value = c.companyName || c.name;
-    wsCompany.getCell(`C${i + 1}`).value = `${c.companyName || c.name} (ID:${c.id})`;
-  });
-
-  const wsPos = wb.addWorksheet('_positions');
-  wsPos.state = 'veryHidden';
-  jobPositions.forEach((p, i) => {
-    wsPos.getCell(`A${i + 1}`).value = p.id;
-    wsPos.getCell(`B${i + 1}`).value = p.name;
-    wsPos.getCell(`C${i + 1}`).value = `${p.name} (ID:${p.id})`;
-  });
-
-  // Tên cột — 15 cột
-  ws.columns = [
-    { header: 'Tiêu đề công việc (bắt buộc)', key: 'title', width: 40 },
-    { header: 'Mô tả công việc', key: 'description', width: 40 },
-    { header: 'Địa điểm', key: 'location', width: 20 },
-    { header: 'Kinh nghiệm', key: 'experience', width: 18 },
-    { header: 'Lương tối thiểu', key: 'minSalary', width: 18 },
-    { header: 'Lương tối đa', key: 'maxSalary', width: 18 },
-    { header: 'Tiền tệ (VND/USD)', key: 'currency', width: 16 },
-    { header: 'Số lượng', key: 'quantity', width: 12 },
-    { header: 'Ngày đăng (yyyy-MM-dd)', key: 'postedAt', width: 22 },
-    { header: 'Ngày hết hạn (yyyy-MM-dd)', key: 'expiredAt', width: 24 },
-    { header: 'Hạn nộp HS (yyyy-MM-dd)', key: 'applicationDeadline', width: 24 },
-    { header: 'Trạng thái (0=Tuyển/1=Tạm dừng/2=Đóng)', key: 'status', width: 36 },
-    { header: 'Company ID', key: 'companyId', width: 14 },
-    { header: 'Tên công ty (tham khảo)', key: 'companyName', width: 30 },
-    { header: 'Chức danh ID', key: 'jobPositionId', width: 14 },
-    { header: 'Tên chức danh (tham khảo)', key: 'jobPositionName', width: 30 },
-  ];
-
-  ws.columns = ws.columns || [];
-
-  // Tái thiết lập columns rõ ràng
-  ws.getRow(1).values = [
+  const headers = [
     'Tiêu đề công việc (bắt buộc)',
     'Mô tả công việc',
     'Địa điểm',
     'Kinh nghiệm',
     'Lương tối thiểu',
     'Lương tối đa',
-    'Tiền tệ (VND/USD)',
+    'Tiền tệ',
     'Số lượng',
     'Ngày đăng (yyyy-MM-dd)',
     'Ngày hết hạn (yyyy-MM-dd)',
     'Hạn nộp HS (yyyy-MM-dd)',
-    'Trạng thái (0=Tuyển/1=Tạm dừng/2=Đóng)',
-    'Company ID',
-    'Tên công ty (tham khảo)',
-    'Chức danh ID',
-    'Tên chức danh (tham khảo)',
+    'Trạng thái',
+    'Công ty',
+    'Chức danh',
   ];
+  const colWidths = [42, 40, 20, 18, 18, 18, 12, 10, 22, 24, 24, 22, 35, 35];
 
-  // Thiết lập độ rộng cột
-  const colWidths = [40, 40, 20, 18, 18, 18, 16, 12, 22, 24, 24, 38, 14, 30, 14, 30];
+  ws.getRow(1).values = headers;
   colWidths.forEach((w, i) => { ws.getColumn(i + 1).width = w; });
-
   applyHeaderStyle(ws.getRow(1), COLOR_JOB);
 
-  // Dữ liệu mẫu
-  const now = new Date();
-  const fmt = (d) => d.toISOString().split('T')[0];
-  const expire = new Date(now); expire.setMonth(expire.getMonth() + 2);
+  // ── Dữ liệu mẫu dòng 2
+  const now     = new Date();
+  const fmt     = (d) => d.toISOString().split('T')[0];
+  const expire  = new Date(now); expire.setMonth(expire.getMonth() + 2);
   const deadline = new Date(expire); deadline.setDate(deadline.getDate() - 1);
 
-  const sampleCompanyId = companies.length > 0 ? companies[0].id : '';
-  const sampleCompanyName = companies.length > 0 ? (companies[0].companyName || companies[0].name) : 'Nhập ID công ty từ cột bên';
-  const samplePosId = jobPositions.length > 0 ? jobPositions[0].id : '';
-  const samplePosName = jobPositions.length > 0 ? jobPositions[0].name : 'Nhập ID chức danh từ cột bên';
+  const sampleCompany  = companies.length  > 0 ? `${companies[0].companyName || companies[0].name} (ID:${companies[0].id})`  : '';
+  const samplePosition = jobPositions.length > 0 ? `${jobPositions[0].name} (ID:${jobPositions[0].id})` : '';
 
   const sampleRow = ws.addRow([
     'Java Backend Developer',
@@ -189,59 +164,62 @@ export async function downloadJobTemplate({ companies = [], jobPositions = [] } 
     fmt(expire),
     fmt(deadline),
     0,
-    sampleCompanyId,
-    sampleCompanyName,
-    samplePosId,
-    samplePosName,
+    sampleCompany,
+    samplePosition,
   ]);
   applyDataRowStyle(sampleRow);
 
-  // Dropdown validation cho trạng thái (cột 12 = L)
-  for (let r = 2; r <= 100; r++) {
+  // ── Dropdown validation cho từng dòng dữ liệu (2 → 200)
+  const companyCount  = companies.length;
+  const positionCount = jobPositions.length;
+
+  for (let r = 2; r <= 200; r++) {
+    // Trạng thái (cột L = 12)
     ws.getCell(`L${r}`).dataValidation = {
       type: 'list',
       allowBlank: true,
       formulae: ['"0,1,2"'],
+      showInputMessage: true,
+      promptTitle: 'Trạng thái',
+      prompt: '0 = Đang tuyển  |  1 = Tạm dừng  |  2 = Đã đóng',
       showErrorMessage: true,
-      errorTitle: 'Trạng thái không hợp lệ',
-      error: 'Chỉ nhập 0 (Đang tuyển), 1 (Tạm dừng), hoặc 2 (Đã đóng)',
+      errorTitle: 'Không hợp lệ',
+      error: 'Chỉ nhập 0, 1 hoặc 2',
     };
-  }
 
-  // Dropdown validation cho tiền tệ (cột 7 = G)
-  for (let r = 2; r <= 100; r++) {
+    // Tiền tệ (cột G = 7)
     ws.getCell(`G${r}`).dataValidation = {
       type: 'list',
       allowBlank: false,
       formulae: ['"VND,USD,EUR"'],
+      showInputMessage: true,
+      promptTitle: 'Tiền tệ',
+      prompt: 'Chọn đơn vị tiền tệ',
     };
-  }
 
-  // Sheet danh sách company và position để tham khảo (visible)
-  if (companies.length > 0) {
-    const wsRef = wb.addWorksheet('Danh sách công ty');
-    wsRef.getRow(1).values = ['ID', 'Tên công ty', 'Mô tả'];
-    applyHeaderStyle(wsRef.getRow(1), COLOR_COMPANY);
-    wsRef.getColumn(1).width = 10;
-    wsRef.getColumn(2).width = 35;
-    wsRef.getColumn(3).width = 40;
-    companies.forEach((c) => {
-      const row = wsRef.addRow([c.id, c.companyName || c.name, c.description || '']);
-      applyDataRowStyle(row);
-    });
-  }
+    // Công ty (cột M = 13) — dropdown từ sheet ẩn _companies
+    if (companyCount > 0) {
+      ws.getCell(`M${r}`).dataValidation = {
+        type: 'list',
+        allowBlank: true,
+        formulae: [`_companies!$A$1:$A$${companyCount}`],
+        showErrorMessage: true,
+        errorTitle: 'Công ty không hợp lệ',
+        error: 'Vui lòng chọn từ danh sách',
+      };
+    }
 
-  if (jobPositions.length > 0) {
-    const wsPosRef = wb.addWorksheet('Danh sách chức danh');
-    wsPosRef.getRow(1).values = ['ID', 'Tên chức danh', 'Mô tả'];
-    applyHeaderStyle(wsPosRef.getRow(1), COLOR_POSITION);
-    wsPosRef.getColumn(1).width = 10;
-    wsPosRef.getColumn(2).width = 35;
-    wsPosRef.getColumn(3).width = 40;
-    jobPositions.forEach((p) => {
-      const row = wsPosRef.addRow([p.id, p.name, p.description || '']);
-      applyDataRowStyle(row);
-    });
+    // Chức danh (cột N = 14) — dropdown từ sheet ẩn _positions
+    if (positionCount > 0) {
+      ws.getCell(`N${r}`).dataValidation = {
+        type: 'list',
+        allowBlank: true,
+        formulae: [`_positions!$A$1:$A$${positionCount}`],
+        showErrorMessage: true,
+        errorTitle: 'Chức danh không hợp lệ',
+        error: 'Vui lòng chọn từ danh sách',
+      };
+    }
   }
 
   await downloadWorkbook(wb, 'mau_cong_viec.xlsx');

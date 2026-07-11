@@ -6,13 +6,12 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
-    // Proxy để tránh CORS khi dev (tuỳ chọn - backend đã có CORS)
-    // proxy: {
-    //   '/AppTuyenDung': {
-    //     target: 'http://localhost:8080',
-    //     changeOrigin: true,
-    //   },
-    // },
+    proxy: {
+      '/AppTuyenDung': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
   },
 })
 

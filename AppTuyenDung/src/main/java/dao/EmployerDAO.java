@@ -96,7 +96,7 @@ public class EmployerDAO extends DatabaseConfig {
             FROM employers e
             JOIN users u ON e.user_id = u.id
             JOIN roles r ON u.role_id = r.id
-            JOIN companies c ON e.company_id = c.id
+            LEFT JOIN companies c ON e.company_id = c.id
         """;
     }
 

@@ -16,6 +16,7 @@ import javax.servlet.http.Part;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class AuthService {
     private final UserDAO userDAO = new UserDAO();
@@ -165,16 +166,15 @@ public class AuthService {
         return user;
     }
 
-    public String updateCandidateProfile(int id, CandidateProfileDTO dto) throws SQLException, ClassNotFoundException {
+    public String updateCandidateProfile(int id, CandidateProfileDTO dto)
+            throws SQLException, ClassNotFoundException {
 
-        if(!validator.isValidEmail(dto.getEmail())) {
+        if (!validator.isValidEmail(dto.getEmail())) {
             return "Email không hợp lệ";
         }
-        if(!validator.isValidPassword(dto.getPassword())){
-            return "Mật khẩu phải từ 6 đến 30 ký tự";
-        }
+
         if (!validator.isValidPhoneNumber(dto.getPhoneNumber())) {
-            return "Số điện thoai không hợp lệ";
+            return "Số điện thoại không hợp lệ";
         }
 
         Users user = userDAO.getByID(id);
@@ -182,24 +182,33 @@ public class AuthService {
         if (user == null) {
             return "Không tìm thấy người dùng";
         }
-        if (userDAO.findByEmail(user.getEmail()) != null) {
+        // ✅ check email đúng
+        Users existingUser = userDAO.findByEmail(dto.getEmail());
+        if (existingUser != null && existingUser.getId() != id) {
             return "Email đã tồn tại";
         }
-        Connection conn = userDAO.getConnection();
+
         user.setFullName(dto.getFullName());
         user.setEmail(dto.getEmail());
-        user.setPassword(PasswordUtil.hashPassword(dto.getPassword()));
         user.setPhoneNumber(dto.getPhoneNumber());
         user.setAddress(dto.getAddress());
         user.setAvatarUrl(dto.getAvatarUrl());
-        user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth()));
 
-        boolean update = userDAO.update(conn, id, user);
+        if (dto.getDateOfBirth() != null && !dto.getDateOfBirth().isBlank()) {
 
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-        if (!update) {
-            return "update thất bại";
+            user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth(), formatter));
         }
+
+        try (Connection conn = userDAO.getConnection()) {
+            boolean update = userDAO.update(conn, id, user);
+
+            if (!update) {
+                return "update thất bại";
+            }
+        }
+
         return null;
     }
 
@@ -210,17 +219,17 @@ public class AuthService {
 
         try {
             conn = userDAO.getConnection();
-            conn.setAutoCommit(false); // 🔥 bắt đầu transaction
+            conn.setAutoCommit(false); //  bắt đầu transaction
 
             // ===== update user =====
             Users user = new Users();
-            user.setPassword(PasswordUtil.hashPassword(dto.getPassword()));
             user.setFullName(dto.getFullName());
             user.setEmail(dto.getEmail());
             user.setPhoneNumber(dto.getPhoneNumber());
             user.setAddress(dto.getAddress());
             user.setAvatarUrl(dto.getAvatarUrl());
 
+            user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth()));
             if (userDAO.findByEmail(user.getEmail()) != null) {
                 return "Email đã tồn tại";
             }
@@ -235,24 +244,13 @@ public class AuthService {
             // ===== employer =====
             Employers employer = employerDAO.findByUserId(userId);
 
-            // ===== company =====
-            boolean updateEmployer = employerDAO.updateCompany(
-                    conn,
-                    employer.getId(),
-                    dto.getCompanyId()
-            );
 
-            if (!updateEmployer) {
-                conn.rollback();
-                return "Update employer thất bại";
-            }
-
-            conn.commit(); // 🔥 thành công hết
+            conn.commit(); //  thành công hết
 
             return null;
 
         } catch (Exception e) {
-            if (conn != null) conn.rollback(); // 🔥 lỗi → rollback
+            if (conn != null) conn.rollback(); //  lỗi → rollback
             e.printStackTrace();
             return "Lỗi hệ thống";
         } finally {

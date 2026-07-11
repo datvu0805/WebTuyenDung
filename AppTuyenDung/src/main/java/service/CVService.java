@@ -91,8 +91,6 @@ public class CVService {
                 if (cv.getFileUrl() != null){
                     cv.setFileUrl(genarateMinioURL(cv.getFileUrl()));
                 }
-                cv.setCreatedAt(null);
-                cv.setUpdatedAt(null);
             }
         }
 

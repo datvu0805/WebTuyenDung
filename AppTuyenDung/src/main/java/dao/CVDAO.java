@@ -69,7 +69,6 @@ public class CVDAO   implements IDAO<CV>{
                     CV cv = new CV();
                     cv.setId(rs.getInt("id"));
 
-                    // Bây giờ gọi rs.getInt("candidate_id") sẽ không còn bị báo lỗi thiếu cột nữa
                     Candidates candidates = new Candidates();
                     candidates.setId(rs.getInt("candidate_id"));
                     cv.setCandidateId(candidates);
@@ -79,7 +78,6 @@ public class CVDAO   implements IDAO<CV>{
                     cv.setDescription(rs.getString("description"));
                     cv.setVersion(rs.getString("version"));
 
-                    // Đọc an toàn kiểu dữ liệu thời gian
                     cv.setCreatedAt(rs.getObject("created_at", java.time.LocalDateTime.class));
                     cv.setUpdatedAt(rs.getObject("updated_at", java.time.LocalDateTime.class));
 

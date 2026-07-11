@@ -50,7 +50,7 @@ export const cvApi = {
 export const candidateApi = {
   getProfile: () => api.get('/candidate/profile'),
   getAll: () => api.get('/candidate/list'),
-  updateProfile: (data) => api.put('/candidate/profile', new URLSearchParams(data)),
+  updateProfile: (data) => api.put('/candidate/profile', data, { headers: { 'Content-Type': 'application/json' } }),
   uploadAvatar: (file) => {
     const form = new FormData();
     form.append('avatar', file);

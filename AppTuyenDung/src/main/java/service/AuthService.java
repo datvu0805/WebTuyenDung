@@ -230,7 +230,8 @@ public class AuthService {
             user.setAvatarUrl(dto.getAvatarUrl());
 
             user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth()));
-            if (userDAO.findByEmail(user.getEmail()) != null) {
+            Users existingEmail = userDAO.findByEmailExceptId(user.getEmail(), userId);
+            if (existingEmail != null) {
                 return "Email đã tồn tại";
             }
 

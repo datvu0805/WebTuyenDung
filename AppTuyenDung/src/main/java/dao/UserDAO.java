@@ -240,7 +240,7 @@ public class UserDAO extends DatabaseConfig {
     public boolean update(Connection conn ,  int id, Users user) {
         String sql = """
         UPDATE users
-        SET password = ?,
+        SET
             full_name = ?,
             avatar_url = ?,
             email = ?,
@@ -254,20 +254,20 @@ public class UserDAO extends DatabaseConfig {
         try (
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, user.getPassword());
-            ps.setString(2, user.getFullName());
-            ps.setString(3, user.getAvatarUrl());
-            ps.setString(4, user.getEmail());
+
+            ps.setString(1, user.getFullName());
+            ps.setString(2, user.getAvatarUrl());
+            ps.setString(3, user.getEmail());
 
             if (user.getDateOfBirth() == null) {
-                ps.setNull(5, Types.DATE);
+                ps.setNull(4, Types.DATE);
             } else {
-                ps.setDate(5, Date.valueOf(user.getDateOfBirth()));
+                ps.setDate(4, Date.valueOf(user.getDateOfBirth()));
             }
 
-            ps.setString(6, user.getPhoneNumber());
-            ps.setString(7, user.getAddress());
-            ps.setInt(8, id);
+            ps.setString(5, user.getPhoneNumber());
+            ps.setString(6, user.getAddress());
+            ps.setInt(7, id);
 
             return ps.executeUpdate() > 0;
 

@@ -5,6 +5,7 @@ import dao.CandicateDAO;
 import dao.UserDAO;
 import dto.ApiResponse;
 import dto.CandidateDTO;
+import dto.CandidateProfileDTO;
 import model.Candidates;
 import model.Users;
 import service.FileService;
@@ -79,6 +80,7 @@ public class CandidateServlet extends BaseServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
         resp.setContentType("application/json;charset=UTF-8");
 
         HttpSession session = req.getSession(false);
@@ -86,32 +88,36 @@ public class CandidateServlet extends BaseServlet {
 
         Users user = userDAO.getByID(userId);
         if (user == null) {
-            resp.getWriter().write(gson.toJson(new ApiResponse<>(false, "Không tìm thấy user", null)));
+            resp.getWriter().write(gson.toJson(
+                    new ApiResponse<>(false, "Không tìm thấy user", null)
+            ));
             return;
         }
 
-        String fullName = req.getParameter("fullName");
-        String email = req.getParameter("email");
-        String phoneNumber = req.getParameter("phoneNumber");
-        String address = req.getParameter("address");
-        String dateOfBirth = req.getParameter("dateOfBirth");
+        // ✔ chỉ dùng JSON
+        CandidateProfileDTO dto = gson.fromJson(req.getReader(), CandidateProfileDTO.class);
 
-        if (fullName != null && !fullName.isBlank()) user.setFullName(fullName);
-        if (email != null && !email.isBlank()) user.setEmail(email);
-        if (phoneNumber != null) user.setPhoneNumber(phoneNumber);
-        if (address != null) user.setAddress(address);
-        if (dateOfBirth != null && !dateOfBirth.isBlank()) {
-            user.setDateOfBirth(LocalDate.parse(dateOfBirth));
-        }
-        Connection conn = null;
-        try {
-            conn = userDAO.getConnection();
-            userDAO.update(conn,userId, user);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        if (dto.getFullName() != null) user.setFullName(dto.getFullName());
+        if (dto.getEmail() != null) user.setEmail(dto.getEmail());
+        if (dto.getPhoneNumber() != null) user.setPhoneNumber(dto.getPhoneNumber());
+        if (dto.getAddress() != null) user.setAddress(dto.getAddress());
+
+        if (dto.getDateOfBirth() != null && !dto.getDateOfBirth().isBlank()) {
+            user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth()));
         }
 
+        try (Connection conn = userDAO.getConnection()) {
+            userDAO.update(conn, userId, user);
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.getWriter().write(gson.toJson(
+                    new ApiResponse<>(false, "Lỗi update", null)
+            ));
+            return;
+        }
 
-        resp.getWriter().write(gson.toJson(new ApiResponse<>(true, "Cập nhật thông tin thành công", null)));
+        resp.getWriter().write(gson.toJson(
+                new ApiResponse<>(true, "Cập nhật thành công", null)
+        ));
     }
 }

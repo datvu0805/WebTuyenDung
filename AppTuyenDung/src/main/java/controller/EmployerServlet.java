@@ -43,7 +43,7 @@ public class EmployerServlet extends BaseServlet {
         dto.setEmail(employer.getUser().getEmail());
         dto.setPhoneNumber(employer.getUser().getPhoneNumber());
         dto.setAddress(employer.getUser().getAddress());
-        dto.setEmployerId(employer.getUser().getId());
+        dto.setEmployerId(employer.getId());
         dto.setCompanyId(employer.getCompany().getId());
         // Generate presigned URL nếu avatarUrl là object path
         String avatarUrl = employer.getUser().getAvatarUrl();

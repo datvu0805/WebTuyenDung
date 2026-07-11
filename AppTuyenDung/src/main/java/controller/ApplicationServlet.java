@@ -30,20 +30,23 @@ import java.util.List;
 public class ApplicationServlet extends HttpServlet {
     private final ApplicationService applicationService = new ApplicationService();
     private final ApplicationDAO applicationDAO = new ApplicationDAO();
-    // DÒNG MỚI ĐÃ SỬA:
+
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
             .disable(com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
     private void sendJsonResponse(HttpServletResponse response, int statusCode, ApiResponse<?> apiResponse)
         throws IOException{
+        if(!response.isCommitted()){
+            response.resetBuffer();
+        }
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         response.setStatus(statusCode);
-        try (PrintWriter out = response.getWriter()){
-            out.print(this.objectMapper.writeValueAsString(apiResponse));
-            out.flush();
-        }
+        PrintWriter out = response.getWriter();
+        out.print(this.objectMapper.writeValueAsString(apiResponse));
+        out.flush();
+
     }
 
     @Override
@@ -138,29 +141,15 @@ public class ApplicationServlet extends HttpServlet {
 
                 app.setCoverLetter(coverLetter);
                 app.setDescription(description);
-                app.setStatus(0); // 0: chờ duyêt, 1:Phỏng vấn, 2: Đat, 3: Loại
 
-                // ktra giới hạn nộp đơn tối đa 3 lần
                 applicationService.submitApplication(app);
-                //xóa sạch bộ đệm để maats số 1
-                resp.resetBuffer();
+                if(!resp.isCommitted()){
+                    resp.resetBuffer();
+                }
 
-                ApplicationDTO dto = new ApplicationDTO();
-                Application cleanApp = new Application();
-                cleanApp.setId(app.getId());
-                cleanApp.setCoverLetter(coverLetter);
-                cleanApp.setDescription(description);
-                dto.setApplicationID(cleanApp);
+                ApplicationDTO dto = applicationDAO.getApplicationDtoById(app.getId());
 
-                Candidates  candidateRes = new Candidates();
-                candidateRes.setId(Integer.parseInt(candidateIDRaw));
-                dto.setCandidateName(candidateRes);
 
-                dto.setApplieAt(LocalDateTime.now());
-                dto.setStatus(0);
-
-                dto.setJobTitle("ID Jobs: " + jobIDRaw);
-                dto.setCvTitle("iD CV : " + cvIDRaw);
                 sendJsonResponse(resp, HttpServletResponse.SC_CREATED, new ApiResponse<>(true, "Nộp đơn ứng tuyển thành công!", dto));
 
             }

@@ -125,7 +125,7 @@ public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> 
         List<ApplicationDTO> list = new ArrayList<>();
         String sql = "SELECT a.id AS app_id, a.cover_letter, a.description, " +
                 "c.id AS candidate_id, " +
-                "j.title AS job_title, cv.title AS cv_title, cv.file_url, a.status, a.applied_at " +
+                "j.title AS job_title, cv.cv_title AS cv_title, cv.file_url, a.status, a.applied_at " +
                 "FROM applications a " +
                 "JOIN candidates c ON a.candidate_id = c.id " +
                 "JOIN jobs j ON a.job_id = j.id " +
@@ -169,5 +169,47 @@ public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> 
         return List.of();
     }
 
+    public ApplicationDTO getApplicationDtoById(int appId) {
+        String sql = "SELECT a.id AS app_id, a.cover_letter, a.description, " +
+                "c.id AS candidate_id, " +
+                "j.title AS job_title, cv.cv_title AS cv_title, cv.file_url, a.status, a.applied_at " +
+                "FROM applications a " +
+                "JOIN candidates c ON a.candidate_id = c.id " +
+                "JOIN jobs j ON a.job_id = j.id " +
+                "JOIN cvs cv ON a.cv_id = cv.id " +
+                "WHERE a.id = ?"; // Bắn lệnh JOIN để lôi thông tin thật từ các bảng lên theo đúng ID vừa tạo
+
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, appId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    ApplicationDTO dto = new ApplicationDTO();
+
+                    Application app = new Application();
+                    app.setId(rs.getInt("app_id"));
+                    app.setCoverLetter(rs.getString("cover_letter"));
+                    app.setDescription(rs.getString("description"));
+                    dto.setApplicationID(app);
+
+                    Candidates candidate = new Candidates();
+                    candidate.setId(rs.getInt("candidate_id"));
+                    dto.setCandidateName(candidate);
+
+                    // Đổ trực tiếp dữ liệu text xịn từ các bảng khác sang DTO
+                    dto.setJobTitle(rs.getString("job_title"));
+                    dto.setCvTitle(rs.getString("cv_title"));
+                    dto.setFileUrl(rs.getString("file_url"));
+                    dto.setApplieAt(rs.getObject("applied_at", LocalDateTime.class));
+                    dto.setStatus(rs.getInt("status"));
+
+                    return dto;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Lỗi SQL khi lấy DTO theo ID: " + e.getMessage(), e);
+        }
+        return null;
+    }
 
 }

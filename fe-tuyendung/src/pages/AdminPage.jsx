@@ -1,13 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Table, Button, Modal, Form, Input, Space, message, Popconfirm, Typography
+  Table, Button, Modal, Form, Input, Space, message, Popconfirm, Typography, Upload, Tooltip
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, BankOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, BankOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
 import { adminCompanyApi } from '../api/services';
 import AppLayout from '../components/AppLayout';
 
 const { Title, Text } = Typography;
 const GREEN = '#00b14f';
+
+// File mẫu công ty dạng CSV (tải về dưới dạng xlsx template)
+function downloadCompanyTemplate() {
+  const header = ['companyName', 'description'];
+  const sample = [['ABC Technology', 'Công ty phần mềm'], ['XYZ Corp', 'Công ty thiết kế']];
+  const rows = [header, ...sample].map(r => r.join('\t')).join('\n');
+  const blob = new Blob(['\uFEFF' + rows], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'mau_cong_ty.xls'; a.click();
+  URL.revokeObjectURL(url);
+}
 
 export default function AdminPage() {
   const [companies, setCompanies] = useState([]);
@@ -16,6 +28,21 @@ export default function AdminPage() {
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
   const [form] = Form.useForm();
+
+  const [importing, setImporting] = useState(false);
+
+  const handleImport = async ({ file }) => {
+    setImporting(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await adminCompanyApi.import(form);
+      if (res.data.success) { message.success(res.data.message); load(); }
+      else message.error(res.data.message);
+    } catch { message.error('Import thất bại'); }
+    finally { setImporting(false); }
+    return false;
+  };
 
   const load = () => {
     setLoading(true);
@@ -97,12 +124,20 @@ export default function AdminPage() {
 
       <div style={{ maxWidth: 1000, margin: '-32px auto 0', padding: '0 16px 32px' }}>
         <div style={{ background: '#fff', borderRadius: 14, padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
             <Title level={5} style={{ margin: 0 }}>Danh sách công ty ({companies.length})</Title>
-            <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}
-              style={{ background: GREEN, borderColor: GREEN, borderRadius: 8, fontWeight: 600 }}>
-              Thêm công ty
-            </Button>
+            <Space wrap>
+              <Tooltip title="Tải file mẫu Excel">
+                <Button icon={<DownloadOutlined />} onClick={downloadCompanyTemplate}>File mẫu</Button>
+              </Tooltip>
+              <Upload showUploadList={false} accept=".xlsx,.xls" customRequest={handleImport} disabled={importing}>
+                <Button icon={<UploadOutlined />} loading={importing}>Import Excel</Button>
+              </Upload>
+              <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}
+                style={{ background: GREEN, borderColor: GREEN, borderRadius: 8, fontWeight: 600 }}>
+                Thêm công ty
+              </Button>
+            </Space>
           </div>
           <Table columns={columns} dataSource={companies} rowKey="id" loading={loading}
             pagination={{ pageSize: 15, showSizeChanger: false }} scroll={{ x: 600 }} />

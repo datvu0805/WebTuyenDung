@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import {
   Table, Button, Modal, Form, Input, Select, InputNumber,
-  DatePicker, Switch, Space, Tag, message, Popconfirm, Typography, Row, Col, Tooltip
+  DatePicker, Switch, Space, Tag, message, Popconfirm, Typography, Row, Col, Tooltip, Upload
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, FileTextOutlined, CheckCircleOutlined, ClockCircleOutlined, TagsOutlined, CloseOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, FileTextOutlined, CheckCircleOutlined, ClockCircleOutlined, TagsOutlined, CloseOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
 import { jobApi, jobSkillApi, skillApi } from '../api/services';
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/AppLayout';
@@ -32,6 +32,33 @@ export default function EmployerDashboardPage() {
   const [skillsLoading, setSkillsLoading] = useState(false);
   const [addingSkillId, setAddingSkillId] = useState(null);
 
+  const [importing, setImporting] = useState(false);
+
+  // Download file mẫu jobs
+  const downloadJobTemplate = () => {
+    const header = ['employerId', 'title', 'description', 'location', 'experience', 'minSalary', 'maxSalary', 'currency', 'quantity', 'postedAt', 'expiredAt', 'applicationDeadline', 'status'];
+    const sample = [['', 'Java Backend Developer', 'Mô tả công việc', 'Hà Nội', '2 năm', '15000000', '25000000', 'VND', '3', '2026-07-01 00:00:00', '2026-09-01 00:00:00', '2026-08-31 00:00:00', '1']];
+    const rows = [header, ...sample].map(r => r.join('\t')).join('\n');
+    const blob = new Blob(['\uFEFF' + rows], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'mau_cong_viec.xls'; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportJobs = async ({ file }) => {
+    setImporting(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await jobApi.import(form);
+      if (res.data.success) { message.success(res.data.message); loadJobs(); }
+      else message.error(res.data.message);
+    } catch { message.error('Import thất bại'); }
+    finally { setImporting(false); }
+    return false;
+  };
+
   const loadJobs = () => {
     setLoading(true);
     jobApi.getAll()
@@ -39,7 +66,7 @@ export default function EmployerDashboardPage() {
         if (res.data.success) {
           const all = res.data.data || [];
           // Lọc chỉ lấy job của employer đang đăng nhập
-          const mine = user?.userId ? all.filter(j => String(j.employerId) === String(user.userId)) : all;
+          const mine = user?.employerId ? all.filter(j => String(j.employerId) === String(user.employerId)) : all;
           setJobs(mine);
         }
       })
@@ -73,7 +100,7 @@ export default function EmployerDashboardPage() {
       expiredAt: values.expiredAt?.toISOString() || '',
       applicationDeadline: values.applicationDeadline?.toISOString() || '',
       hiddenOnExpiry: values.hiddenOnExpiry ? 'true' : 'false',
-      employerId: user?.userId || '',
+      employerId: user?.employerId || '',
     };
     try {
       const res = editingJob
@@ -219,10 +246,18 @@ export default function EmployerDashboardPage() {
         <div style={{ background: '#fff', borderRadius: 14, padding: '20px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
             <Title level={5} style={{ margin: 0 }}>Danh sách tin tuyển dụng</Title>
-            <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}
-              style={{ background: GREEN, borderColor: GREEN, borderRadius: 8, fontWeight: 600 }}>
-              Đăng tin mới
-            </Button>
+            <Space wrap>
+              <Tooltip title="Tải file mẫu Excel">
+                <Button icon={<DownloadOutlined />} onClick={downloadJobTemplate}>File mẫu</Button>
+              </Tooltip>
+              <Upload showUploadList={false} accept=".xlsx,.xls" customRequest={handleImportJobs} disabled={importing}>
+                <Button icon={<UploadOutlined />} loading={importing}>Import Excel</Button>
+              </Upload>
+              <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}
+                style={{ background: GREEN, borderColor: GREEN, borderRadius: 8, fontWeight: 600 }}>
+                Đăng tin mới
+              </Button>
+            </Space>
           </div>
           <Table columns={columns} dataSource={jobs} rowKey="id" loading={loading}
             scroll={{ x: 600 }} pagination={{ pageSize: 10, showSizeChanger: true }}

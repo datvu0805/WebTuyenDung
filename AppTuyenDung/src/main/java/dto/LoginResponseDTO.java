@@ -10,6 +10,15 @@ public class LoginResponseDTO {
     private String phoneNumber;
     private String address;
     private String role;
+    private Integer employerId;
+
+    public Integer getEmployerId() {
+        return employerId;
+    }
+
+    public void setEmployerId(Integer employerId) {
+        this.employerId = employerId;
+    }
 
     public int getUserId() {
         return userId;

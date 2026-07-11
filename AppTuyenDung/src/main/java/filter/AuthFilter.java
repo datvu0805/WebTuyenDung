@@ -61,7 +61,7 @@ public class AuthFilter implements Filter {
         ROLE_REQUIRED.put("POST:/admin/company/create", setOf("ADMIN"));
         ROLE_REQUIRED.put("PUT:/admin/company/update", setOf("ADMIN"));
         ROLE_REQUIRED.put("DELETE:/admin/company/delete", setOf("ADMIN"));
-        ROLE_REQUIRED.put("GET:/admin/company/list", setOf("ADMIN"));
+        ROLE_REQUIRED.put("GET:/admin/company/list", setOf("ADMIN", "EMPLOYER", "CANDIDATE"));
 
         // Job positions - chỉ ADMIN mới được thêm/sửa/xóa, mọi user đã đăng nhập đều xem được
         ROLE_REQUIRED.put("POST:/admin/job-positions", setOf("ADMIN"));

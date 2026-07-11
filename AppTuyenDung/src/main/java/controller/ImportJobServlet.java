@@ -98,6 +98,18 @@ public class ImportJobServlet extends BaseServlet {
                     short statusVal = statusStr.isBlank() ? 1 : Short.parseShort(statusStr);
                     job.setStatus(JobStatus.fromValue(statusVal));
 
+                    // companyId (cột 13)
+                    String companyIdStr = getString(r, 13);
+                    if (!companyIdStr.isBlank()) {
+                        try { job.setCompanyId(Integer.parseInt(companyIdStr)); } catch (NumberFormatException ignored) {}
+                    }
+
+                    // jobPositionId (cột 15)
+                    String posIdStr = getString(r, 15);
+                    if (!posIdStr.isBlank()) {
+                        try { job.setJobPositionId(Integer.parseInt(posIdStr)); } catch (NumberFormatException ignored) {}
+                    }
+
                     job.setHiddenOnExpiry(false);
 
                     if (job.getTitle() == null || job.getTitle().isBlank()) {
@@ -157,7 +169,7 @@ public class ImportJobServlet extends BaseServlet {
 
     private boolean isRowEmpty(Row row) {
         if (row == null) return true;
-        for (int i = 0; i <= 12; i++) {
+        for (int i = 0; i <= 15; i++) {
             Cell c = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
             if (c != null && c.getCellType() != CellType.BLANK) return false;
         }

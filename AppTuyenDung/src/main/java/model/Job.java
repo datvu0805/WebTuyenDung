@@ -19,6 +19,8 @@ public class Job extends BaseEntity{
     private LocalDateTime applicationDeadline;
     private JobStatus status;
     private Boolean isHiddenOnExpiry;
+    private Integer companyId;
+    private Integer jobPositionId;
 
     public Job(Employers employerID, String title, String description, Double minSalary, Double maxSalary, String currency, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, JobStatus status, Boolean isHiddenOnExpiry) {
         this.employerID = employerID;
@@ -172,6 +174,22 @@ public class Job extends BaseEntity{
 
     public void setStatus(JobStatus status) {
         this.status = status;
+    }
+
+    public Integer getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
+    }
+
+    public Integer getJobPositionId() {
+        return jobPositionId;
+    }
+
+    public void setJobPositionId(Integer jobPositionId) {
+        this.jobPositionId = jobPositionId;
     }
 
     @Override

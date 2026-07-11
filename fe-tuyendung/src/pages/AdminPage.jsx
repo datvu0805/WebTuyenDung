@@ -8,6 +8,7 @@ import {
 } from '@ant-design/icons';
 import { adminCompanyApi, jobPositionApi } from '../api/services';
 import AppLayout from '../components/AppLayout';
+import { downloadCompanyTemplate, downloadPositionTemplate } from '../utils/excelTemplates';
 
 const { Title, Text } = Typography;
 const GREEN = '#00b14f';
@@ -24,14 +25,6 @@ const positionHeaderStyle = {
   color: '#fff',
   fontWeight: 700,
 };
-
-function downloadTemplate(filename, header, sample) {
-  const rows = [header, ...sample].map(r => r.join('\t')).join('\n');
-  const blob = new Blob(['\uFEFF' + rows], { type: 'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
-  URL.revokeObjectURL(url);
-}
 
 // ===================== TAB COMPANY =====================
 function CompanyTab() {
@@ -115,7 +108,7 @@ function CompanyTab() {
         <Text strong style={{ fontSize: 15 }}>Danh sách công ty ({companies.length})</Text>
         <Space wrap>
           <Tooltip title="Tải file mẫu Excel">
-            <Button icon={<DownloadOutlined />} onClick={() => downloadTemplate('mau_cong_ty.xls', ['companyName', 'description'], [['ABC Technology', 'Công ty phần mềm'], ['XYZ Corp', 'Công ty thiết kế']])}>
+            <Button icon={<DownloadOutlined />} onClick={() => downloadCompanyTemplate().catch(() => message.error('Tạo file mẫu thất bại'))}>
               File mẫu
             </Button>
           </Tooltip>
@@ -236,7 +229,7 @@ function JobPositionTab() {
         <Text strong style={{ fontSize: 15 }}>Danh sách chức danh ({list.length})</Text>
         <Space wrap>
           <Tooltip title="Tải file mẫu Excel">
-            <Button icon={<DownloadOutlined />} onClick={() => downloadTemplate('mau_chuc_danh.xls', ['name', 'description'], [['Lập trình viên Backend', 'Phát triển hệ thống phía server'], ['Frontend Developer', 'Phát triển giao diện người dùng']])}>
+            <Button icon={<DownloadOutlined />} onClick={() => downloadPositionTemplate().catch(() => message.error('Tạo file mẫu thất bại'))}>
               File mẫu
             </Button>
           </Tooltip>

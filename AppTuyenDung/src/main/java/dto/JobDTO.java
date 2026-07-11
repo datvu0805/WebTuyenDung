@@ -27,6 +27,8 @@ public class JobDTO {
 
     private Short status;
     private Boolean hiddenOnExpiry;
+    private Integer companyId;
+    private Integer jobPositionId;
 
     public JobDTO() {
     }
@@ -167,5 +169,21 @@ public class JobDTO {
 
     public void setHiddenOnExpiry(Boolean hiddenOnExpiry) {
         this.hiddenOnExpiry = hiddenOnExpiry;
+    }
+
+    public Integer getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
+    }
+
+    public Integer getJobPositionId() {
+        return jobPositionId;
+    }
+
+    public void setJobPositionId(Integer jobPositionId) {
+        this.jobPositionId = jobPositionId;
     }
 }

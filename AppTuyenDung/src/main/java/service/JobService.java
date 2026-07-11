@@ -86,7 +86,10 @@ public class JobService {
         JobDTO jobDTO1 = new JobDTO();
         List<Job> jobList = JobDAO.getAll();
         jobList.stream().forEach(x -> {
-            jobDTOList.add(new JobDTO(x.getId(), x.getEmployerID().getId(), x.getTitle(), x.getDescription(), x.getMinSalary(), x.getMaxSalary(), x.getCurrency(), x.getLocation(), x.getExperience(), x.getQuantity(), x.getPostedAt(), x.getExpiredAt(), x.getApplicationDeadline(), x.getStatus().getValue(), x.getHiddenOnExpiry()));
+            JobDTO dto = new JobDTO(x.getId(), x.getEmployerID().getId(), x.getTitle(), x.getDescription(), x.getMinSalary(), x.getMaxSalary(), x.getCurrency(), x.getLocation(), x.getExperience(), x.getQuantity(), x.getPostedAt(), x.getExpiredAt(), x.getApplicationDeadline(), x.getStatus().getValue(), x.getHiddenOnExpiry());
+            dto.setCompanyId(x.getCompanyId());
+            dto.setJobPositionId(x.getJobPositionId());
+            jobDTOList.add(dto);
         });
         return jobDTOList;
     }

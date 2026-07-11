@@ -4,10 +4,11 @@ import {
   DatePicker, Switch, Space, Tag, message, Popconfirm, Typography, Row, Col, Tooltip, Upload
 } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, FileTextOutlined, CheckCircleOutlined, ClockCircleOutlined, TagsOutlined, CloseOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
-import { jobApi, jobSkillApi, skillApi, jobPositionApi, employerApi } from '../api/services';
+import { jobApi, jobSkillApi, skillApi, jobPositionApi, employerApi, adminCompanyApi } from '../api/services';
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/AppLayout';
 import dayjs from 'dayjs';
+import { downloadJobTemplate } from '../utils/excelTemplates';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -34,26 +35,18 @@ export default function EmployerDashboardPage() {
 
   const [importing, setImporting] = useState(false);
   const [jobPositions, setJobPositions] = useState([]);
+  const [companies, setCompanies] = useState([]);
   const [employerProfile, setEmployerProfile] = useState(null);
 
   useEffect(() => {
     jobPositionApi.getAll().then(r => { if (r.data.success) setJobPositions(r.data.data || []); }).catch(() => {});
     employerApi.getProfile().then(r => { if (r.data.success) setEmployerProfile(r.data.data); }).catch(() => {});
+    adminCompanyApi.getAll().then(r => { if (r.data.success) setCompanies(r.data.data || []); }).catch(() => {});
   }, []);
 
   // Download file mẫu jobs — ghi chú chức danh và thông tin từ API
-  const downloadJobTemplate = () => {
-    const positionNote = jobPositions.length > 0
-      ? jobPositions.slice(0, 5).map(p => p.name).join(' / ')
-      : 'Lập trình viên Backend / Frontend Developer';
-    const header = ['title', 'description', 'location', 'experience', 'minSalary', 'maxSalary', 'currency', 'quantity', 'postedAt', 'expiredAt', 'applicationDeadline', 'status'];
-    const sample = [[`Java Backend Developer (VD chức danh: ${positionNote})`, 'Mô tả công việc', 'Hà Nội', '2 năm', '15000000', '25000000', 'VND', '3', '2026-07-01 00:00:00', '2026-09-01 00:00:00', '2026-08-31 00:00:00', '1']];
-    const rows = [header, ...sample].map(r => r.join('\t')).join('\n');
-    const blob = new Blob(['\uFEFF' + rows], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'mau_cong_viec.xls'; a.click();
-    URL.revokeObjectURL(url);
+  const handleDownloadJobTemplate = () => {
+    downloadJobTemplate({ companies, jobPositions }).catch(() => message.error('Tạo file mẫu thất bại'));
   };
 
   const handleImportJobs = async ({ file }) => {
@@ -96,6 +89,8 @@ export default function EmployerDashboardPage() {
       postedAt: job.postedAt ? dayjs(job.postedAt) : null,
       expiredAt: job.expiredAt ? dayjs(job.expiredAt) : null,
       applicationDeadline: job.applicationDeadline ? dayjs(job.applicationDeadline) : null,
+      companyId: job.companyId || null,
+      jobPositionId: job.jobPositionId || null,
     });
     setModalOpen(true);
   };
@@ -111,7 +106,8 @@ export default function EmployerDashboardPage() {
       applicationDeadline: values.applicationDeadline?.toISOString() || '',
       hiddenOnExpiry: values.hiddenOnExpiry ? 'true' : 'false',
       employerId: user?.employerId || '',
-      companyId: employerProfile?.companyId || '',
+      companyId: values.companyId || employerProfile?.companyId || '',
+      jobPositionId: values.jobPositionId || '',
     };
     try {
       const res = editingJob
@@ -259,7 +255,7 @@ export default function EmployerDashboardPage() {
             <Title level={5} style={{ margin: 0 }}>Danh sách tin tuyển dụng</Title>
             <Space wrap>
               <Tooltip title="Tải file mẫu Excel">
-                <Button icon={<DownloadOutlined />} onClick={downloadJobTemplate}>File mẫu</Button>
+                <Button icon={<DownloadOutlined />} onClick={handleDownloadJobTemplate}>File mẫu</Button>
               </Tooltip>
               <Upload showUploadList={false} accept=".xlsx,.xls" customRequest={handleImportJobs} disabled={importing}>
                 <Button icon={<UploadOutlined />} loading={importing}>Import Excel</Button>
@@ -293,6 +289,30 @@ export default function EmployerDashboardPage() {
           <Form.Item name="description" label={<span style={{ fontWeight: 600 }}>Mô tả công việc</span>} rules={[{ required: true }]}>
             <Input.TextArea rows={4} placeholder="Mô tả chi tiết về công việc..." style={{ borderRadius: 8 }} />
           </Form.Item>
+          <Row gutter={12}>
+            <Col xs={24} sm={12}>
+              <Form.Item name="companyId" label={<span style={{ fontWeight: 600 }}>Công ty</span>}>
+                <Select
+                  showSearch placeholder="Chọn công ty..."
+                  filterOption={(input, opt) => (opt?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                  style={{ borderRadius: 8 }}
+                  allowClear
+                  options={companies.map(c => ({ value: c.id, label: c.companyName }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item name="jobPositionId" label={<span style={{ fontWeight: 600 }}>Chức danh</span>}>
+                <Select
+                  showSearch placeholder="Chọn chức danh..."
+                  filterOption={(input, opt) => (opt?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                  style={{ borderRadius: 8 }}
+                  allowClear
+                  options={jobPositions.map(p => ({ value: p.id, label: p.name }))}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
           <Row gutter={12}>
             <Col span={7}>
               <Form.Item name="minSalary" label={<span style={{ fontWeight: 600 }}>Lương tối thiểu</span>}>

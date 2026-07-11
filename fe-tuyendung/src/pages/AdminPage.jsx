@@ -11,14 +11,25 @@ import AppLayout from '../components/AppLayout';
 
 const { Title, Text } = Typography;
 const GREEN = '#00b14f';
+const BLUE = '#1677ff';
 
-function downloadCompanyTemplate() {
-  const header = ['companyName', 'description'];
-  const sample = [['ABC Technology', 'Công ty phần mềm'], ['XYZ Corp', 'Công ty thiết kế']];
+const tableHeaderStyle = {
+  background: GREEN,
+  color: '#fff',
+  fontWeight: 700,
+};
+
+const positionHeaderStyle = {
+  background: BLUE,
+  color: '#fff',
+  fontWeight: 700,
+};
+
+function downloadTemplate(filename, header, sample) {
   const rows = [header, ...sample].map(r => r.join('\t')).join('\n');
   const blob = new Blob(['\uFEFF' + rows], { type: 'text/plain;charset=utf-8' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'mau_cong_ty.xls'; a.click();
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
   URL.revokeObjectURL(url);
 }
 
@@ -43,12 +54,18 @@ function CompanyTab() {
   useEffect(() => { load(); }, []);
 
   const openCreate = () => { setEditing(null); form.resetFields(); setModalOpen(true); };
-  const openEdit = (item) => { setEditing(item); form.setFieldsValue({ companyName: item.companyName, description: item.description }); setModalOpen(true); };
+  const openEdit = (item) => {
+    setEditing(item);
+    form.setFieldsValue({ companyName: item.companyName, description: item.description });
+    setModalOpen(true);
+  };
 
   const onSave = async (values) => {
     setSaving(true);
     try {
-      const res = editing ? await adminCompanyApi.update({ ...values, id: editing.id }) : await adminCompanyApi.create(values);
+      const res = editing
+        ? await adminCompanyApi.update({ ...values, id: editing.id })
+        : await adminCompanyApi.create(values);
       if (res.data.success) { message.success(editing ? 'Cập nhật thành công' : 'Tạo công ty thành công'); setModalOpen(false); load(); }
       else message.error(res.data.message);
     } catch { message.error('Có lỗi xảy ra'); } finally { setSaving(false); }
@@ -67,18 +84,20 @@ function CompanyTab() {
     try {
       const fd = new FormData(); fd.append('file', file);
       const res = await adminCompanyApi.import(fd);
-      if (res.data.success) { message.success(res.data.message); load(); } else message.error(res.data.message);
+      if (res.data.success) { message.success(res.data.message); load(); }
+      else message.error(res.data.message);
     } catch { message.error('Import thất bại'); } finally { setImporting(false); }
     return false;
   };
 
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', width: 60 },
-    { title: 'Tên công ty', dataIndex: 'companyName', key: 'companyName', render: v => <Text strong>{v}</Text> },
-    { title: 'Mô tả', dataIndex: 'description', key: 'description', responsive: ['md'],
+    { title: 'ID', dataIndex: 'id', key: 'id', width: 60, onHeaderCell: () => ({ style: tableHeaderStyle }) },
+    { title: 'Tên công ty', dataIndex: 'companyName', key: 'companyName', onHeaderCell: () => ({ style: tableHeaderStyle }),
+      render: v => <Text strong>{v}</Text> },
+    { title: 'Mô tả', dataIndex: 'description', key: 'description', responsive: ['md'], onHeaderCell: () => ({ style: tableHeaderStyle }),
       render: v => v ? <Text ellipsis style={{ maxWidth: 300 }}>{v}</Text> : <Text type="secondary">—</Text> },
-    { title: 'Ngày tạo', dataIndex: 'createdAt', key: 'createdAt', responsive: ['lg'], width: 160 },
-    { title: 'Thao tác', key: 'actions', width: 100,
+    { title: 'Ngày tạo', dataIndex: 'createdAt', key: 'createdAt', responsive: ['lg'], width: 160, onHeaderCell: () => ({ style: tableHeaderStyle }) },
+    { title: 'Thao tác', key: 'actions', width: 100, onHeaderCell: () => ({ style: tableHeaderStyle }),
       render: (_, r) => (
         <Space size={4}>
           <Button icon={<EditOutlined />} size="small" onClick={() => openEdit(r)} style={{ borderRadius: 6 }} />
@@ -93,9 +112,13 @@ function CompanyTab() {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-        <Text strong>Danh sách công ty ({companies.length})</Text>
+        <Text strong style={{ fontSize: 15 }}>Danh sách công ty ({companies.length})</Text>
         <Space wrap>
-          <Tooltip title="Tải file mẫu Excel"><Button icon={<DownloadOutlined />} onClick={downloadCompanyTemplate}>File mẫu</Button></Tooltip>
+          <Tooltip title="Tải file mẫu Excel">
+            <Button icon={<DownloadOutlined />} onClick={() => downloadTemplate('mau_cong_ty.xls', ['companyName', 'description'], [['ABC Technology', 'Công ty phần mềm'], ['XYZ Corp', 'Công ty thiết kế']])}>
+              File mẫu
+            </Button>
+          </Tooltip>
           <Upload showUploadList={false} accept=".xlsx,.xls" customRequest={handleImport} disabled={importing}>
             <Button icon={<UploadOutlined />} loading={importing}>Import Excel</Button>
           </Upload>
@@ -106,7 +129,8 @@ function CompanyTab() {
         </Space>
       </div>
       <Table columns={columns} dataSource={companies} rowKey="id" loading={loading}
-        pagination={{ pageSize: 15, showSizeChanger: false }} scroll={{ x: 600 }} />
+        pagination={{ pageSize: 15, showSizeChanger: false }} scroll={{ x: 600 }}
+        bordered size="middle" />
 
       <Modal title={<span style={{ fontWeight: 700 }}>{editing ? 'Chỉnh sửa công ty' : 'Thêm công ty mới'}</span>}
         open={modalOpen} onCancel={() => setModalOpen(false)} footer={null} width={480}>
@@ -138,6 +162,7 @@ function JobPositionTab() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
   const [form] = Form.useForm();
 
   const load = () => {
@@ -151,7 +176,11 @@ function JobPositionTab() {
   useEffect(() => { load(); }, []);
 
   const openCreate = () => { setEditing(null); form.resetFields(); setModalOpen(true); };
-  const openEdit = (item) => { setEditing(item); form.setFieldsValue({ name: item.name, description: item.description }); setModalOpen(true); };
+  const openEdit = (item) => {
+    setEditing(item);
+    form.setFieldsValue({ name: item.name, description: item.description });
+    setModalOpen(true);
+  };
 
   const onSave = async (values) => {
     setSaving(true);
@@ -172,12 +201,24 @@ function JobPositionTab() {
     } catch { message.error('Xóa thất bại'); }
   };
 
+  const handleImport = async ({ file }) => {
+    setImporting(true);
+    try {
+      const fd = new FormData(); fd.append('file', file);
+      const res = await jobPositionApi.import(fd);
+      if (res.data.success) { message.success(res.data.message); load(); }
+      else message.error(res.data.message);
+    } catch { message.error('Import thất bại'); } finally { setImporting(false); }
+    return false;
+  };
+
   const columns = [
-    { title: 'ID', dataIndex: 'id', key: 'id', width: 60 },
-    { title: 'Chức danh', dataIndex: 'name', key: 'name', render: v => <Text strong>{v}</Text> },
-    { title: 'Mô tả', dataIndex: 'description', key: 'description', responsive: ['md'],
+    { title: 'ID', dataIndex: 'id', key: 'id', width: 60, onHeaderCell: () => ({ style: positionHeaderStyle }) },
+    { title: 'Chức danh', dataIndex: 'name', key: 'name', onHeaderCell: () => ({ style: positionHeaderStyle }),
+      render: v => <Text strong>{v}</Text> },
+    { title: 'Mô tả', dataIndex: 'description', key: 'description', responsive: ['md'], onHeaderCell: () => ({ style: positionHeaderStyle }),
       render: v => v ? <Text ellipsis style={{ maxWidth: 300 }}>{v}</Text> : <Text type="secondary">—</Text> },
-    { title: 'Thao tác', key: 'actions', width: 100,
+    { title: 'Thao tác', key: 'actions', width: 100, onHeaderCell: () => ({ style: positionHeaderStyle }),
       render: (_, r) => (
         <Space size={4}>
           <Button icon={<EditOutlined />} size="small" onClick={() => openEdit(r)} style={{ borderRadius: 6 }} />
@@ -192,14 +233,25 @@ function JobPositionTab() {
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
-        <Text strong>Danh sách chức danh ({list.length})</Text>
-        <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}
-          style={{ background: GREEN, borderColor: GREEN, borderRadius: 8, fontWeight: 600 }}>
-          Thêm chức danh
-        </Button>
+        <Text strong style={{ fontSize: 15 }}>Danh sách chức danh ({list.length})</Text>
+        <Space wrap>
+          <Tooltip title="Tải file mẫu Excel">
+            <Button icon={<DownloadOutlined />} onClick={() => downloadTemplate('mau_chuc_danh.xls', ['name', 'description'], [['Lập trình viên Backend', 'Phát triển hệ thống phía server'], ['Frontend Developer', 'Phát triển giao diện người dùng']])}>
+              File mẫu
+            </Button>
+          </Tooltip>
+          <Upload showUploadList={false} accept=".xlsx,.xls" customRequest={handleImport} disabled={importing}>
+            <Button icon={<UploadOutlined />} loading={importing}>Import Excel</Button>
+          </Upload>
+          <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}
+            style={{ background: BLUE, borderColor: BLUE, borderRadius: 8, fontWeight: 600 }}>
+            Thêm chức danh
+          </Button>
+        </Space>
       </div>
       <Table columns={columns} dataSource={list} rowKey="id" loading={loading}
-        pagination={{ pageSize: 15, showSizeChanger: false }} scroll={{ x: 500 }} />
+        pagination={{ pageSize: 15, showSizeChanger: false }} scroll={{ x: 500 }}
+        bordered size="middle" />
 
       <Modal title={<span style={{ fontWeight: 700 }}>{editing ? 'Chỉnh sửa chức danh' : 'Thêm chức danh mới'}</span>}
         open={modalOpen} onCancel={() => setModalOpen(false)} footer={null} width={480}>
@@ -214,7 +266,7 @@ function JobPositionTab() {
           <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
             <Button onClick={() => setModalOpen(false)} style={{ borderRadius: 8 }}>Hủy</Button>
             <Button type="primary" htmlType="submit" loading={saving}
-              style={{ borderRadius: 8, background: GREEN, borderColor: GREEN, fontWeight: 600 }}>
+              style={{ borderRadius: 8, background: BLUE, borderColor: BLUE, fontWeight: 600 }}>
               {editing ? 'Lưu thay đổi' : 'Thêm'}
             </Button>
           </div>

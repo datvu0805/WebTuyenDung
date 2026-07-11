@@ -4,7 +4,7 @@ import {
   DatePicker, Switch, Space, Tag, message, Popconfirm, Typography, Row, Col, Tooltip, Upload
 } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, FileTextOutlined, CheckCircleOutlined, ClockCircleOutlined, TagsOutlined, CloseOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
-import { jobApi, jobSkillApi, skillApi } from '../api/services';
+import { jobApi, jobSkillApi, skillApi, jobPositionApi, employerApi } from '../api/services';
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/AppLayout';
 import dayjs from 'dayjs';
@@ -33,11 +33,21 @@ export default function EmployerDashboardPage() {
   const [addingSkillId, setAddingSkillId] = useState(null);
 
   const [importing, setImporting] = useState(false);
+  const [jobPositions, setJobPositions] = useState([]);
+  const [employerProfile, setEmployerProfile] = useState(null);
 
-  // Download file mẫu jobs
+  useEffect(() => {
+    jobPositionApi.getAll().then(r => { if (r.data.success) setJobPositions(r.data.data || []); }).catch(() => {});
+    employerApi.getProfile().then(r => { if (r.data.success) setEmployerProfile(r.data.data); }).catch(() => {});
+  }, []);
+
+  // Download file mẫu jobs — ghi chú chức danh và thông tin từ API
   const downloadJobTemplate = () => {
-    const header = ['employerId', 'title', 'description', 'location', 'experience', 'minSalary', 'maxSalary', 'currency', 'quantity', 'postedAt', 'expiredAt', 'applicationDeadline', 'status'];
-    const sample = [['', 'Java Backend Developer', 'Mô tả công việc', 'Hà Nội', '2 năm', '15000000', '25000000', 'VND', '3', '2026-07-01 00:00:00', '2026-09-01 00:00:00', '2026-08-31 00:00:00', '1']];
+    const positionNote = jobPositions.length > 0
+      ? jobPositions.slice(0, 5).map(p => p.name).join(' / ')
+      : 'Lập trình viên Backend / Frontend Developer';
+    const header = ['title', 'description', 'location', 'experience', 'minSalary', 'maxSalary', 'currency', 'quantity', 'postedAt', 'expiredAt', 'applicationDeadline', 'status'];
+    const sample = [[`Java Backend Developer (VD chức danh: ${positionNote})`, 'Mô tả công việc', 'Hà Nội', '2 năm', '15000000', '25000000', 'VND', '3', '2026-07-01 00:00:00', '2026-09-01 00:00:00', '2026-08-31 00:00:00', '1']];
     const rows = [header, ...sample].map(r => r.join('\t')).join('\n');
     const blob = new Blob(['\uFEFF' + rows], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -101,6 +111,7 @@ export default function EmployerDashboardPage() {
       applicationDeadline: values.applicationDeadline?.toISOString() || '',
       hiddenOnExpiry: values.hiddenOnExpiry ? 'true' : 'false',
       employerId: user?.employerId || '',
+      companyId: employerProfile?.companyId || '',
     };
     try {
       const res = editingJob
@@ -269,7 +280,15 @@ export default function EmployerDashboardPage() {
         open={modalOpen} onCancel={() => setModalOpen(false)} footer={null} width={660}>
         <Form form={form} layout="vertical" onFinish={onSave} style={{ marginTop: 16 }}>
           <Form.Item name="title" label={<span style={{ fontWeight: 600 }}>Tiêu đề công việc</span>} rules={[{ required: true }]}>
-            <Input placeholder="Lập trình viên Java Senior" style={{ borderRadius: 8 }} />
+            <Select
+              showSearch placeholder="Chọn hoặc nhập tiêu đề..."
+              filterOption={(input, opt) => (opt?.children ?? '').toLowerCase().includes(input.toLowerCase())}
+              style={{ borderRadius: 8 }}
+              allowClear
+              notFoundContent="Không tìm thấy chức danh"
+            >
+              {jobPositions.map(p => <Option key={p.id} value={p.name}>{p.name}</Option>)}
+            </Select>
           </Form.Item>
           <Form.Item name="description" label={<span style={{ fontWeight: 600 }}>Mô tả công việc</span>} rules={[{ required: true }]}>
             <Input.TextArea rows={4} placeholder="Mô tả chi tiết về công việc..." style={{ borderRadius: 8 }} />

@@ -68,6 +68,7 @@ public class AuthFilter implements Filter {
         ROLE_REQUIRED.put("PUT:/admin/job-positions", setOf("ADMIN"));
         ROLE_REQUIRED.put("DELETE:/admin/job-positions", setOf("ADMIN"));
         ROLE_REQUIRED.put("GET:/admin/job-positions", setOf("ADMIN", "EMPLOYER", "CANDIDATE"));
+        ROLE_REQUIRED.put("POST:/admin/job-positions/import", setOf("ADMIN"));
 
 
     }

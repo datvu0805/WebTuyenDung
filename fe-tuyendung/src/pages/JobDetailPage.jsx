@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Card, Tag, Button, Spin, Typography, Space, Divider,
-  message, Modal, Form, Input, Descriptions
+  message, Modal, Form, Input, Select
 } from 'antd';
 import {
   EnvironmentOutlined, DollarOutlined, TeamOutlined,
@@ -9,12 +9,13 @@ import {
   CalendarOutlined, UserOutlined
 } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
-import { jobApi, applicationApi } from '../api/services';
+import { jobApi, applicationApi, cvApi } from '../api/services';
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/AppLayout';
 import dayjs from 'dayjs';
 
 const { Title, Text, Paragraph } = Typography;
+const { Option } = Select;
 const GREEN = '#00b14f';
 const STATUS_LABELS = ['Đang tuyển', 'Tạm dừng', 'Đã đóng'];
 const STATUS_COLORS = ['#e8f9f0', '#fff7e6', '#f5f5f5'];
@@ -26,6 +27,8 @@ export default function JobDetailPage() {
   const [loading, setLoading] = useState(true);
   const [applyOpen, setApplyOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [cvList, setCvList] = useState([]);
+  const [cvLoading, setCvLoading] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -36,6 +39,19 @@ export default function JobDetailPage() {
       .catch(() => message.error('Không tìm thấy tin tuyển dụng'))
       .finally(() => setLoading(false));
   }, [id]);
+
+  const openApplyModal = () => {
+    setApplyOpen(true);
+    if (user?.userId && cvList.length === 0) {
+      setCvLoading(true);
+      cvApi.getByCandidate(user.userId)
+        .then((res) => {
+          if (res.data.success) setCvList(res.data.data?.cvList || []);
+        })
+        .catch(() => {})
+        .finally(() => setCvLoading(false));
+    }
+  };
 
   const handleApply = async (values) => {
     setSubmitting(true);
@@ -83,12 +99,16 @@ export default function JobDetailPage() {
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 16px', marginTop: 4 }}>
                 <Text style={{ fontSize: 14, color: '#555' }}><EnvironmentOutlined style={{ marginRight: 4, color: '#aaa' }} />{job.location || 'Chưa cập nhật'}</Text>
-                <Text style={{ fontSize: 14, color: GREEN, fontWeight: 600 }}><DollarOutlined style={{ marginRight: 4 }} />{job.salary ? job.salary.toLocaleString('vi-VN') + ' VNĐ' : 'Thỏa thuận'}</Text>
+                <Text style={{ fontSize: 14, color: GREEN, fontWeight: 600 }}><DollarOutlined style={{ marginRight: 4 }} />
+                  {job.minSalary || job.maxSalary
+                    ? `${(job.minSalary || 0).toLocaleString('vi-VN')}${job.maxSalary ? ' – ' + job.maxSalary.toLocaleString('vi-VN') : ''} VNĐ`
+                    : 'Thỏa thuận'}
+                </Text>
                 <Text style={{ fontSize: 14, color: '#555' }}><TeamOutlined style={{ marginRight: 4, color: '#aaa' }} />{job.quantity} vị trí</Text>
               </div>
             </div>
             {user?.role === 'CANDIDATE' && job.status === 0 && (
-              <Button type="primary" icon={<SendOutlined />} size="large" onClick={() => setApplyOpen(true)}
+              <Button type="primary" icon={<SendOutlined />} size="large" onClick={openApplyModal}
                 style={{ background: GREEN, borderColor: GREEN, borderRadius: 8, fontWeight: 600, height: 44, flexShrink: 0 }}>
                 Ứng tuyển ngay
               </Button>
@@ -124,10 +144,14 @@ export default function JobDetailPage() {
 
       <Modal title="Nộp đơn ứng tuyển" open={applyOpen} onCancel={() => setApplyOpen(false)} footer={null} width={520}>
         <Form form={form} layout="vertical" onFinish={handleApply} style={{ marginTop: 16 }}>
-          <Form.Item name="cvID" label={<span style={{ fontWeight: 600 }}>ID CV của bạn</span>}
-            rules={[{ required: true, message: 'Vui lòng nhập ID CV' }]}
-            extra="Bạn có thể xem ID CV tại trang hồ sơ">
-            <Input type="number" placeholder="Nhập ID CV" style={{ borderRadius: 8 }} />
+          <Form.Item name="cvID" label={<span style={{ fontWeight: 600 }}>Chọn CV</span>}
+            rules={[{ required: true, message: 'Vui lòng chọn CV' }]}>
+            <Select placeholder="Chọn CV của bạn" loading={cvLoading} style={{ borderRadius: 8 }}
+              notFoundContent={cvLoading ? 'Đang tải...' : 'Bạn chưa có CV. Vui lòng tải CV lên trước.'}>
+              {cvList.map((cv) => (
+                <Option key={cv.id} value={cv.id}>{cv.cvTitle || cv.cv_title} {cv.version ? `(v${cv.version})` : ''}</Option>
+              ))}
+            </Select>
           </Form.Item>
           <Form.Item name="coverLetter" label={<span style={{ fontWeight: 600 }}>Thư xin việc</span>}
             rules={[{ required: true, message: 'Bắt buộc' }]}>

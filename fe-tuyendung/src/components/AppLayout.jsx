@@ -33,6 +33,7 @@ export default function AppLayout({ children }) {
   const profileApi = user?.role === 'EMPLOYER' ? employerApi : candidateApi;
 
   const openProfile = () => {
+    if (user?.role === 'ADMIN') return;
     setProfileOpen(true);
     setProfileLoading(true);
     profileApi.getProfile()
@@ -98,6 +99,9 @@ export default function AppLayout({ children }) {
     }
   };
 
+  const adminNav = [
+    { key: '/admin', icon: <BankOutlined />, label: 'Quản trị hệ thống' },
+  ];
   const candidateNav = [
     { key: '/jobs', icon: <UnorderedListOutlined />, label: 'Việc làm' },
     { key: '/cv/upload', icon: <FileTextOutlined />, label: 'Hồ sơ CV' },
@@ -107,16 +111,11 @@ export default function AppLayout({ children }) {
     { key: '/employer/applications', icon: <UnorderedListOutlined />, label: 'Đơn ứng tuyển' },
     { key: '/employer/skills', icon: <BulbOutlined />, label: 'Kỹ năng' },
   ];
-  const navItems = user?.role === 'EMPLOYER' ? employerNav : candidateNav;
-  const homeRoute = user?.role === 'EMPLOYER' ? '/employer/dashboard' : '/jobs';
+  const navItems = user?.role === 'ADMIN' ? adminNav : user?.role === 'EMPLOYER' ? employerNav : candidateNav;
+  const homeRoute = user?.role === 'ADMIN' ? '/admin' : user?.role === 'EMPLOYER' ? '/employer/dashboard' : '/jobs';
 
   const userMenuItems = [
-    {
-      key: 'profile',
-      icon: <UserOutlined />,
-      label: 'Thông tin cá nhân',
-    },
-    { type: 'divider' },
+    ...(user?.role !== 'ADMIN' ? [{ key: 'profile', icon: <UserOutlined />, label: 'Thông tin cá nhân' }, { type: 'divider' }] : []),
     { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất' },
   ];
 

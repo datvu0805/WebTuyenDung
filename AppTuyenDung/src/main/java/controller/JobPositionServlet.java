@@ -1,5 +1,8 @@
 package controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dao.JobPositionDAO;
@@ -14,6 +17,9 @@ import java.io.IOException;
 public class JobPositionServlet extends BaseServlet {
 
     private final JobPositionDAO dao = new JobPositionDAO();
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     private final Gson gson = new Gson();
 
     @Override
@@ -22,16 +28,19 @@ public class JobPositionServlet extends BaseServlet {
         String pathInfo = req.getPathInfo();
         try {
             if (pathInfo == null || "/".equals(pathInfo)) {
-                resp.getWriter().write(gson.toJson(new ApiResponse<>(true, "OK", dao.getAll())));
+                resp.getWriter().write(objectMapper.writeValueAsString(new ApiResponse<>(true, "OK", dao.getAll())));
             } else {
                 int id = Integer.parseInt(pathInfo.substring(1));
                 JobPosition p = dao.getById(id);
-                if (p == null) resp.getWriter().write(gson.toJson(new ApiResponse<>(false, "Không tìm thấy", null)));
-                else resp.getWriter().write(gson.toJson(new ApiResponse<>(true, "OK", p)));
+                if (p == null) {
+                    resp.getWriter().write(objectMapper.writeValueAsString(new ApiResponse<>(false, "Không tìm thấy", null)));
+                } else {
+                    resp.getWriter().write(objectMapper.writeValueAsString(new ApiResponse<>(true, "OK", p)));
+                }
             }
         } catch (Exception e) {
             resp.setStatus(500);
-            resp.getWriter().write(gson.toJson(new ApiResponse<>(false, e.getMessage(), null)));
+            resp.getWriter().write(objectMapper.writeValueAsString(new ApiResponse<>(false, e.getMessage(), null)));
         }
     }
 
@@ -45,14 +54,15 @@ public class JobPositionServlet extends BaseServlet {
             String description = body.has("description") && !body.get("description").isJsonNull()
                     ? body.get("description").getAsString() : null;
             if (name == null || name.isBlank()) {
-                resp.getWriter().write(gson.toJson(new ApiResponse<>(false, "Tên chức danh không được trống", null)));
+                resp.getWriter().write(objectMapper.writeValueAsString(
+                        new ApiResponse<>(false, "Tên chức danh không được trống", null)));
                 return;
             }
             JobPosition created = dao.add(new JobPosition(name.trim(), description));
-            resp.getWriter().write(gson.toJson(new ApiResponse<>(true, "Thêm thành công", created)));
+            resp.getWriter().write(objectMapper.writeValueAsString(new ApiResponse<>(true, "Thêm thành công", created)));
         } catch (Exception e) {
             resp.setStatus(500);
-            resp.getWriter().write(gson.toJson(new ApiResponse<>(false, e.getMessage(), null)));
+            resp.getWriter().write(objectMapper.writeValueAsString(new ApiResponse<>(false, e.getMessage(), null)));
         }
     }
 
@@ -67,16 +77,18 @@ public class JobPositionServlet extends BaseServlet {
             String description = body.has("description") && !body.get("description").isJsonNull()
                     ? body.get("description").getAsString() : null;
             if (name == null || name.isBlank()) {
-                resp.getWriter().write(gson.toJson(new ApiResponse<>(false, "Tên chức danh không được trống", null)));
+                resp.getWriter().write(objectMapper.writeValueAsString(
+                        new ApiResponse<>(false, "Tên chức danh không được trống", null)));
                 return;
             }
             JobPosition p = new JobPosition(name.trim(), description);
             p.setId(id);
             boolean ok = dao.update(p);
-            resp.getWriter().write(gson.toJson(new ApiResponse<>(ok, ok ? "Cập nhật thành công" : "Không tìm thấy", null)));
+            resp.getWriter().write(objectMapper.writeValueAsString(
+                    new ApiResponse<>(ok, ok ? "Cập nhật thành công" : "Không tìm thấy", null)));
         } catch (Exception e) {
             resp.setStatus(500);
-            resp.getWriter().write(gson.toJson(new ApiResponse<>(false, e.getMessage(), null)));
+            resp.getWriter().write(objectMapper.writeValueAsString(new ApiResponse<>(false, e.getMessage(), null)));
         }
     }
 
@@ -86,14 +98,15 @@ public class JobPositionServlet extends BaseServlet {
         try {
             String idParam = req.getParameter("id");
             if (idParam == null) {
-                resp.getWriter().write(gson.toJson(new ApiResponse<>(false, "Thiếu id", null)));
+                resp.getWriter().write(objectMapper.writeValueAsString(new ApiResponse<>(false, "Thiếu id", null)));
                 return;
             }
             boolean ok = dao.delete(Integer.parseInt(idParam));
-            resp.getWriter().write(gson.toJson(new ApiResponse<>(ok, ok ? "Xóa thành công" : "Không tìm thấy", null)));
+            resp.getWriter().write(objectMapper.writeValueAsString(
+                    new ApiResponse<>(ok, ok ? "Xóa thành công" : "Không tìm thấy", null)));
         } catch (Exception e) {
             resp.setStatus(500);
-            resp.getWriter().write(gson.toJson(new ApiResponse<>(false, e.getMessage(), null)));
+            resp.getWriter().write(objectMapper.writeValueAsString(new ApiResponse<>(false, e.getMessage(), null)));
         }
     }
 }

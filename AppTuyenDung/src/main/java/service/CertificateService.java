@@ -18,9 +18,15 @@ public class CertificateService {
 
         CertificateValidator.validate(dto);
 
-        Certificate certificate = new Certificate(dto.getCertificateName(), ScoreType.valueOf(dto.getScoreType().toUpperCase()));
+        Certificate certificate = new Certificate(
+                dto.getCertificateName(),
+                ScoreType.valueOf(dto.getScoreType().toUpperCase())
+        );
 
         certificateDAO.add(certificate);
+
+        // Đồng bộ id vừa được DB sinh ra vào DTO
+        dto.setId(certificate.getId());
     }
 
 

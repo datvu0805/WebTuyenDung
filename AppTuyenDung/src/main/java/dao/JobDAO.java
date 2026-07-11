@@ -29,10 +29,12 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
                     application_deadline,
                     status,
                     is_hidden_on_expiry,
+                    company_id,
+                    job_position_id,
                     created_at,
                     updated_at
                 )
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
                 RETURNING id
                 """;
 
@@ -52,8 +54,14 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
             ps.setObject(12, jobs.getApplicationDeadline());
             ps.setShort(13, jobs.getStatus().getValue());
             ps.setBoolean(14, jobs.getHiddenOnExpiry());
-            ps.setObject(15, jobs.getCreatedAt());
-            ps.setObject(16, jobs.getUpdatedAt());
+            // company_id nullable
+            if (jobs.getCompanyId() != null) ps.setInt(15, jobs.getCompanyId());
+            else ps.setNull(15, java.sql.Types.INTEGER);
+            // job_position_id nullable
+            if (jobs.getJobPositionId() != null) ps.setInt(16, jobs.getJobPositionId());
+            else ps.setNull(16, java.sql.Types.INTEGER);
+            ps.setObject(17, jobs.getCreatedAt());
+            ps.setObject(18, jobs.getUpdatedAt());
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -85,6 +93,8 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
                     application_deadline = ?,
                     status = ?,
                     is_hidden_on_expiry = ?,
+                    company_id = ?,
+                    job_position_id = ?,
                     updated_at = CURRENT_TIMESTAMP
                 WHERE id = ?
                 """;
@@ -105,7 +115,11 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
             ps.setObject(12, jobs.getApplicationDeadline());
             ps.setShort(13, jobs.getStatus().getValue());
             ps.setBoolean(14, jobs.getHiddenOnExpiry());
-            ps.setInt(15, jobs.getId());
+            if (jobs.getCompanyId() != null) ps.setInt(15, jobs.getCompanyId());
+            else ps.setNull(15, java.sql.Types.INTEGER);
+            if (jobs.getJobPositionId() != null) ps.setInt(16, jobs.getJobPositionId());
+            else ps.setNull(16, java.sql.Types.INTEGER);
+            ps.setInt(17, jobs.getId());
 
             ps.executeUpdate();
 

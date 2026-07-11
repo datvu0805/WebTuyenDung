@@ -43,7 +43,7 @@ public class CandidateCertificateDAO extends DatabaseConfig implements TDAO<Cand
         String sql = """
             INSERT INTO candidate_certificates
             (candidate_id, certificate_id, score, issue_date, expiry_date, description)
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?) 
             """;
 
         try (Connection conn = getConnection();

@@ -36,6 +36,12 @@ public class JobMapper {
         job.setStatus(JobStatus.fromValue(rs.getShort("status")));
         job.setHiddenOnExpiry(rs.getBoolean("is_hidden_on_expiry"));
 
+        // company_id và job_position_id (nullable)
+        int cid = rs.getInt("company_id");
+        if (!rs.wasNull()) job.setCompanyId(cid);
+        int pid = rs.getInt("job_position_id");
+        if (!rs.wasNull()) job.setJobPositionId(pid);
+
         job.setCreatedAt(rs.getObject("created_at", LocalDateTime.class));
         job.setUpdatedAt(rs.getObject("updated_at", LocalDateTime.class));
 
@@ -71,6 +77,8 @@ public class JobMapper {
 
         job.setStatus(JobStatus.fromValue(dto.getStatus()));
         job.setHiddenOnExpiry(dto.getHiddenOnExpiry());
+        job.setCompanyId(dto.getCompanyId());
+        job.setJobPositionId(dto.getJobPositionId());
 
         return job;
     }
@@ -105,6 +113,8 @@ public class JobMapper {
 
         dto.setStatus(job.getStatus().getValue());
         dto.setHiddenOnExpiry(job.getHiddenOnExpiry());
+        dto.setCompanyId(job.getCompanyId());
+        dto.setJobPositionId(job.getJobPositionId());
 
         return dto;
     }

@@ -1,8 +1,10 @@
 package controller;
 
 import com.google.gson.Gson;
+import dao.EmployerDAO;
 import dto.ApiResponse;
 import dto.LoginResponseDTO;
+import model.Employers;
 import model.Users;
 import service.AuthService;
 import service.FileService;
@@ -17,6 +19,7 @@ public class LoginServlet extends BaseServlet {
     private final Gson gson = new Gson();
     private final AuthService authService = new AuthService();
     private final FileService fileService = new FileService();
+    private final EmployerDAO employerDAO = new EmployerDAO();
 
     @Override
     protected void doPost(HttpServletRequest req,
@@ -65,6 +68,15 @@ public class LoginServlet extends BaseServlet {
                     } catch (Exception ignored) {}
                 }
                 data.setAvatarUrl(avatarUrl);
+
+                // Nếu là EMPLOYER, thêm employerId vào response
+                if ("EMPLOYER".equals(user.getRole().getRoleName())) {
+                    Employers employer = employerDAO.findByUserId(user.getId());
+                    if (employer != null) {
+                        data.setEmployerId(employer.getId());
+                        session.setAttribute("employerId", employer.getId());
+                    }
+                }
 
                 result = new ApiResponse<>(
                         true,

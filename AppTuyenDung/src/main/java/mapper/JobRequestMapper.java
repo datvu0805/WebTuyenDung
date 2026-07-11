@@ -72,6 +72,18 @@ public class JobRequestMapper {
             dto.setHiddenOnExpiry(false);
         }
 
+        // companyId
+        String companyId = req.getParameter("companyId");
+        if (companyId != null && !companyId.isBlank()) {
+            try { dto.setCompanyId(Integer.parseInt(companyId)); } catch (NumberFormatException ignored) {}
+        }
+
+        // jobPositionId
+        String jobPositionId = req.getParameter("jobPositionId");
+        if (jobPositionId != null && !jobPositionId.isBlank()) {
+            try { dto.setJobPositionId(Integer.parseInt(jobPositionId)); } catch (NumberFormatException ignored) {}
+        }
+
         return dto;
     }
 

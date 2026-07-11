@@ -20,6 +20,7 @@ export const jobApi = {
   create: (data) => api.post('/jobs', new URLSearchParams(data)),
   update: (data) => api.put('/jobs', new URLSearchParams(data)),
   delete: (id) => api.delete(`/jobs?id=${id}`),
+  import: (formData) => api.post('/jobs/import', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
 };
 
 export const skillApi = {
@@ -107,4 +108,13 @@ export const adminCompanyApi = {
   create: (data) => api.post('/admin/company/create', data, { headers: { 'Content-Type': 'application/json' } }),
   update: (data) => api.put('/admin/company/update', data, { headers: { 'Content-Type': 'application/json' } }),
   delete: (id) => api.delete(`/admin/company/delete?id=${id}`),
+  import: (formData) => api.post('/admin/company/import', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+};
+
+export const jobPositionApi = {
+  getAll: () => api.get('/admin/job-positions'),
+  create: (data) => api.post('/admin/job-positions', data, { headers: { 'Content-Type': 'application/json' } }),
+  update: (data) => api.put('/admin/job-positions', data, { headers: { 'Content-Type': 'application/json' } }),
+  delete: (id) => api.delete(`/admin/job-positions?id=${id}`),
+  import: (formData) => api.post('/admin/job-positions/import', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
 };

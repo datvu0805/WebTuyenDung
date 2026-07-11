@@ -20,7 +20,8 @@ export default function LoginPage() {
       if (res.data.success) {
         login(res.data.data);
         message.success('Đăng nhập thành công!');
-        navigate(res.data.data.role === 'EMPLOYER' ? '/employer/dashboard' : '/jobs');
+        const { role } = res.data.data;
+        navigate(role === 'ADMIN' ? '/admin' : role === 'EMPLOYER' ? '/employer/dashboard' : '/jobs');
       } else {
         message.error(res.data.message || 'Sai tài khoản hoặc mật khẩu');
       }

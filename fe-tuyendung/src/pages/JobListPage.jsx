@@ -94,9 +94,19 @@ export default function JobListPage() {
           const pageData = res.data.data;
           setJobs(pageData.content || []);
           setTotalItems(pageData.totalItems || 0);
+        } else {
+          setJobs([]);
+          setTotalItems(0);
         }
       })
-      .catch(() => {})
+      .catch((err) => {
+        const status = err?.response?.status;
+        if (status === 401) {
+          window.location.href = '/login';
+        }
+        setJobs([]);
+        setTotalItems(0);
+      })
       .finally(() => setLoading(false));
   }, [pageSize]);
 

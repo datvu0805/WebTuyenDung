@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import {
   Table, Button, Modal, Form, Input, Select, InputNumber,
-  DatePicker, Switch, Space, Tag, message, Popconfirm, Typography, Row, Col, Tooltip
+  DatePicker, Switch, Space, Tag, message, Popconfirm, Typography, Row, Col, Tooltip, Upload
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, FileTextOutlined, CheckCircleOutlined, ClockCircleOutlined, TagsOutlined, CloseOutlined } from '@ant-design/icons';
-import { jobApi, jobSkillApi, skillApi } from '../api/services';
+import { PlusOutlined, EditOutlined, DeleteOutlined, FileTextOutlined, CheckCircleOutlined, ClockCircleOutlined, TagsOutlined, CloseOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
+import { jobApi, jobSkillApi, skillApi, jobPositionApi, employerApi, adminCompanyApi } from '../api/services';
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/AppLayout';
 import dayjs from 'dayjs';
+import { downloadJobTemplate } from '../utils/excelTemplates';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -32,6 +33,35 @@ export default function EmployerDashboardPage() {
   const [skillsLoading, setSkillsLoading] = useState(false);
   const [addingSkillId, setAddingSkillId] = useState(null);
 
+  const [importing, setImporting] = useState(false);
+  const [jobPositions, setJobPositions] = useState([]);
+  const [companies, setCompanies] = useState([]);
+  const [employerProfile, setEmployerProfile] = useState(null);
+
+  useEffect(() => {
+    jobPositionApi.getAll().then(r => { if (r.data.success) setJobPositions(r.data.data || []); }).catch(() => {});
+    employerApi.getProfile().then(r => { if (r.data.success) setEmployerProfile(r.data.data); }).catch(() => {});
+    adminCompanyApi.getAll().then(r => { if (r.data.success) setCompanies(r.data.data || []); }).catch(() => {});
+  }, []);
+
+  // Download file mẫu jobs — ghi chú chức danh và thông tin từ API
+  const handleDownloadJobTemplate = () => {
+    downloadJobTemplate({ companies, jobPositions }).catch(() => message.error('Tạo file mẫu thất bại'));
+  };
+
+  const handleImportJobs = async ({ file }) => {
+    setImporting(true);
+    try {
+      const form = new FormData();
+      form.append('file', file);
+      const res = await jobApi.import(form);
+      if (res.data.success) { message.success(res.data.message); loadJobs(); }
+      else message.error(res.data.message);
+    } catch { message.error('Import thất bại'); }
+    finally { setImporting(false); }
+    return false;
+  };
+
   const loadJobs = () => {
     setLoading(true);
     jobApi.getAll()
@@ -39,7 +69,7 @@ export default function EmployerDashboardPage() {
         if (res.data.success) {
           const all = res.data.data || [];
           // Lọc chỉ lấy job của employer đang đăng nhập
-          const mine = user?.userId ? all.filter(j => String(j.employerId) === String(user.userId)) : all;
+          const mine = user?.employerId ? all.filter(j => String(j.employerId) === String(user.employerId)) : all;
           setJobs(mine);
         }
       })
@@ -59,6 +89,8 @@ export default function EmployerDashboardPage() {
       postedAt: job.postedAt ? dayjs(job.postedAt) : null,
       expiredAt: job.expiredAt ? dayjs(job.expiredAt) : null,
       applicationDeadline: job.applicationDeadline ? dayjs(job.applicationDeadline) : null,
+      companyId: job.companyId || null,
+      jobPositionId: job.jobPositionId || null,
     });
     setModalOpen(true);
   };
@@ -73,7 +105,9 @@ export default function EmployerDashboardPage() {
       expiredAt: values.expiredAt?.toISOString() || '',
       applicationDeadline: values.applicationDeadline?.toISOString() || '',
       hiddenOnExpiry: values.hiddenOnExpiry ? 'true' : 'false',
-      employerId: user?.userId || '',
+      employerId: user?.employerId || '',
+      companyId: values.companyId || employerProfile?.companyId || '',
+      jobPositionId: values.jobPositionId || '',
     };
     try {
       const res = editingJob
@@ -219,10 +253,18 @@ export default function EmployerDashboardPage() {
         <div style={{ background: '#fff', borderRadius: 14, padding: '20px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
             <Title level={5} style={{ margin: 0 }}>Danh sách tin tuyển dụng</Title>
-            <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}
-              style={{ background: GREEN, borderColor: GREEN, borderRadius: 8, fontWeight: 600 }}>
-              Đăng tin mới
-            </Button>
+            <Space wrap>
+              <Tooltip title="Tải file mẫu Excel">
+                <Button icon={<DownloadOutlined />} onClick={handleDownloadJobTemplate}>File mẫu</Button>
+              </Tooltip>
+              <Upload showUploadList={false} accept=".xlsx,.xls" customRequest={handleImportJobs} disabled={importing}>
+                <Button icon={<UploadOutlined />} loading={importing}>Import Excel</Button>
+              </Upload>
+              <Button type="primary" icon={<PlusOutlined />} onClick={openCreate}
+                style={{ background: GREEN, borderColor: GREEN, borderRadius: 8, fontWeight: 600 }}>
+                Đăng tin mới
+              </Button>
+            </Space>
           </div>
           <Table columns={columns} dataSource={jobs} rowKey="id" loading={loading}
             scroll={{ x: 600 }} pagination={{ pageSize: 10, showSizeChanger: true }}
@@ -234,11 +276,43 @@ export default function EmployerDashboardPage() {
         open={modalOpen} onCancel={() => setModalOpen(false)} footer={null} width={660}>
         <Form form={form} layout="vertical" onFinish={onSave} style={{ marginTop: 16 }}>
           <Form.Item name="title" label={<span style={{ fontWeight: 600 }}>Tiêu đề công việc</span>} rules={[{ required: true }]}>
-            <Input placeholder="Lập trình viên Java Senior" style={{ borderRadius: 8 }} />
+            <Select
+              showSearch placeholder="Chọn hoặc nhập tiêu đề..."
+              filterOption={(input, opt) => (opt?.children ?? '').toLowerCase().includes(input.toLowerCase())}
+              style={{ borderRadius: 8 }}
+              allowClear
+              notFoundContent="Không tìm thấy chức danh"
+            >
+              {jobPositions.map(p => <Option key={p.id} value={p.name}>{p.name}</Option>)}
+            </Select>
           </Form.Item>
           <Form.Item name="description" label={<span style={{ fontWeight: 600 }}>Mô tả công việc</span>} rules={[{ required: true }]}>
             <Input.TextArea rows={4} placeholder="Mô tả chi tiết về công việc..." style={{ borderRadius: 8 }} />
           </Form.Item>
+          <Row gutter={12}>
+            <Col xs={24} sm={12}>
+              <Form.Item name="companyId" label={<span style={{ fontWeight: 600 }}>Công ty</span>}>
+                <Select
+                  showSearch placeholder="Chọn công ty..."
+                  filterOption={(input, opt) => (opt?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                  style={{ borderRadius: 8 }}
+                  allowClear
+                  options={companies.map(c => ({ value: c.id, label: c.companyName }))}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12}>
+              <Form.Item name="jobPositionId" label={<span style={{ fontWeight: 600 }}>Chức danh</span>}>
+                <Select
+                  showSearch placeholder="Chọn chức danh..."
+                  filterOption={(input, opt) => (opt?.label ?? '').toLowerCase().includes(input.toLowerCase())}
+                  style={{ borderRadius: 8 }}
+                  allowClear
+                  options={jobPositions.map(p => ({ value: p.id, label: p.name }))}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
           <Row gutter={12}>
             <Col span={7}>
               <Form.Item name="minSalary" label={<span style={{ fontWeight: 600 }}>Lương tối thiểu</span>}>

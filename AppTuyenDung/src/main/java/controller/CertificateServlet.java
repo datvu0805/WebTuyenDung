@@ -9,7 +9,6 @@ import service.CertificateService;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -17,7 +16,6 @@ import java.util.List;
 public class CertificateServlet extends HttpServlet {
 
     private final CertificateService service = new CertificateService();
-
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Override
@@ -26,54 +24,148 @@ public class CertificateServlet extends HttpServlet {
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
-        String path = req.getPathInfo();
+        try {
 
-        if (path == null || path.equals("/")) {
+            String path = req.getPathInfo();
 
-            List<CertificateDTO> list = service.getAll();
+            // GET /certificate
+            if (path == null || "/".equals(path)) {
 
-            mapper.writeValue(resp.getWriter(), new ApiResponse<>(true, "Lấy danh sách chứng chỉ thành công!", list));
+                List<CertificateDTO> list = service.getAll();
 
-            return;
+                resp.setStatus(HttpServletResponse.SC_OK);
+
+                mapper.writeValue(resp.getWriter(), new ApiResponse<>(true, "Lấy danh sách chứng chỉ thành công!", list));
+                return;
+            }
+
+            // GET /certificate/{id}
+            int id = Integer.parseInt(path.substring(1));
+
+            CertificateDTO dto = service.getById(id);
+
+            if (dto == null) {
+
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+
+                mapper.writeValue(resp.getWriter(), new ApiResponse<>(false, "Không tìm thấy chứng chỉ!", null));
+                return;
+            }
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+
+            mapper.writeValue(resp.getWriter(), new ApiResponse<>(true, "Lấy chứng chỉ thành công!", dto));
+
+        } catch (NumberFormatException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            mapper.writeValue(resp.getWriter(), new ApiResponse<>(false, "ID không hợp lệ!", null));
+
+        } catch (Exception e) {
+
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+            mapper.writeValue(resp.getWriter(), new ApiResponse<>(false, "Có lỗi hệ thống: " + e.getMessage(), null));
         }
-
-        int id = Integer.parseInt(path.substring(1));
-
-        mapper.writeValue(resp.getWriter(), new ApiResponse<>(true, "Lấy chứng chỉ thành công!", service.getById(id)));
-
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        CertificateDTO dto = CertificateRequestMapper.toDTO(req);
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
 
-        service.add(dto);
+        try {
 
-        mapper.writeValue(resp.getWriter(), new ApiResponse<>(true, "Thêm chứng chỉ thành công!", null));
+            CertificateDTO dto = CertificateRequestMapper.toDTO(req);
 
+            service.add(dto);
+
+            resp.setStatus(HttpServletResponse.SC_CREATED);
+
+            mapper.writeValue(resp.getWriter(), new ApiResponse<>(true, "Thêm chứng chỉ thành công!", dto));
+
+        } catch (IllegalArgumentException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            mapper.writeValue(resp.getWriter(), new ApiResponse<>(false, e.getMessage(), null));
+
+        } catch (Exception e) {
+
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+            mapper.writeValue(resp.getWriter(), new ApiResponse<>(false, "Có lỗi hệ thống: " + e.getMessage(), null));
+        }
     }
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        CertificateDTO dto = CertificateRequestMapper.toDTO(req);
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
 
-        service.update(dto);
+        try {
 
-        mapper.writeValue(resp.getWriter(), new ApiResponse<>(true, "Cập nhật chứng chỉ thành công!", null));
+            CertificateDTO dto = CertificateRequestMapper.toDTO(req);
 
+            service.update(dto);
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+
+            mapper.writeValue(resp.getWriter(), new ApiResponse<>(true, "Cập nhật chứng chỉ thành công!", dto));
+
+        } catch (IllegalArgumentException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            mapper.writeValue(resp.getWriter(), new ApiResponse<>(false, e.getMessage(), null));
+
+        } catch (Exception e) {
+
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+            mapper.writeValue(resp.getWriter(), new ApiResponse<>(false, "Có lỗi hệ thống: " + e.getMessage(), null));
+        }
     }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        int id = Integer.parseInt(req.getParameter("id"));
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
 
-        service.delete(id);
+        try {
 
-        mapper.writeValue(resp.getWriter(), new ApiResponse<>(true, "Xóa chứng chỉ thành công!", null));
+            int id = Integer.parseInt(req.getParameter("id"));
 
+            service.delete(id);
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+
+            mapper.writeValue(resp.getWriter(), new ApiResponse<>(true, "Xóa chứng chỉ thành công!", id));
+
+        } catch (NumberFormatException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            mapper.writeValue(resp.getWriter(), new ApiResponse<>(false, "ID không hợp lệ!", null));
+
+        } catch (IllegalArgumentException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            mapper.writeValue(resp.getWriter(), new ApiResponse<>(false, e.getMessage(), null));
+
+        } catch (Exception e) {
+
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+            mapper.writeValue(resp.getWriter(), new ApiResponse<>(false, "Có lỗi hệ thống: " + e.getMessage(), null));
+        }
     }
-
 }

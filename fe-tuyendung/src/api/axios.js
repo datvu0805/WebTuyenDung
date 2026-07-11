@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/AppTuyenDung',
+  baseURL: import.meta.env.VITE_API_BASE_URL || '/AppTuyenDung',
   withCredentials: true, // gửi session cookie
   headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
 });

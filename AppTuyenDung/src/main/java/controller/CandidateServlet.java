@@ -1,7 +1,7 @@
 package controller;
 
 import com.google.gson.Gson;
-import dao.CandicateDAO;
+import dao.CandidateDAO;
 import dao.UserDAO;
 import dto.ApiResponse;
 import dto.CandidateDTO;
@@ -14,14 +14,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.LocalDate;
 
 @WebServlet("/candidate/profile")
 public class CandidateServlet extends BaseServlet {
 
     private final Gson gson = new Gson();
-    private final CandicateDAO candicateDAO = new CandicateDAO();
+    private final CandidateDAO candicateDAO = new CandidateDAO();
     private final UserDAO userDAO = new UserDAO();
     private final FileService fileService = new FileService();
 

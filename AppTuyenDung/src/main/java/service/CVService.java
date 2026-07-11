@@ -2,7 +2,7 @@ package service;
 
 import config.MinIOConfig;
 import dao.CVDAO;
-import dao.CandicateDAO;
+import dao.CandidateDAO;
 import dto.UploadCVDTO;
 import io.minio.*;
 import model.CV;
@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class CVService {
     private final String BUCKET_NAME = "other-project";
     private final CVDAO cvdao = new CVDAO();
-    private final CandicateDAO candicateDAO = new CandicateDAO();
+    private final CandidateDAO candicateDAO = new CandidateDAO();
 
     public CV handleUploadCV(UploadCVDTO dto) throws Exception {
         String valResult = CVValidator.validate(dto);

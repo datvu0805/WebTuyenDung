@@ -101,6 +101,7 @@ public class CVDAO   implements IDAO<CV>{
                     CV cv = new CV();
                     cv.setId(rs.getInt("id"));
                     cv.setFileUrl(rs.getString("file_url"));
+                    return cv;
                 }
             }
         }catch (SQLException e){

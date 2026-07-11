@@ -314,17 +314,26 @@ export default function EmployerDashboardPage() {
             </Col>
           </Row>
           <Row gutter={12}>
-            <Col span={7}>
+            <Col span={6}>
               <Form.Item name="minSalary" label={<span style={{ fontWeight: 600 }}>Lương tối thiểu</span>}>
                 <InputNumber style={{ width: '100%', borderRadius: 8 }} placeholder="10000000" min={0} />
               </Form.Item>
             </Col>
-            <Col span={7}>
+            <Col span={6}>
               <Form.Item name="maxSalary" label={<span style={{ fontWeight: 600 }}>Lương tối đa</span>}>
                 <InputNumber style={{ width: '100%', borderRadius: 8 }} placeholder="20000000" min={0} />
               </Form.Item>
             </Col>
-            <Col span={10}>
+            <Col span={6}>
+              <Form.Item name="currency" label={<span style={{ fontWeight: 600 }}>Tiền tệ</span>} initialValue="VND">
+                <Select style={{ borderRadius: 8 }}>
+                  <Option value="VND">VND</Option>
+                  <Option value="USD">USD</Option>
+                  <Option value="EUR">EUR</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={6}>
               <Form.Item name="quantity" label={<span style={{ fontWeight: 600 }}>Số lượng</span>} rules={[{ required: true }]}>
                 <InputNumber min={1} style={{ width: '100%', borderRadius: 8 }} />
               </Form.Item>

@@ -35,7 +35,14 @@ export default function EmployerDashboardPage() {
   const loadJobs = () => {
     setLoading(true);
     jobApi.getAll()
-      .then((res) => { if (res.data.success) setJobs(res.data.data || []); })
+      .then((res) => {
+        if (res.data.success) {
+          const all = res.data.data || [];
+          // Lọc chỉ lấy job của employer đang đăng nhập
+          const mine = user?.userId ? all.filter(j => String(j.employerId) === String(user.userId)) : all;
+          setJobs(mine);
+        }
+      })
       .catch(() => message.error('Tải danh sách thất bại'))
       .finally(() => setLoading(false));
   };
@@ -47,6 +54,8 @@ export default function EmployerDashboardPage() {
     setEditingJob(job);
     form.setFieldsValue({
       ...job,
+      minSalary: job.minSalary || null,
+      maxSalary: job.maxSalary || null,
       postedAt: job.postedAt ? dayjs(job.postedAt) : null,
       expiredAt: job.expiredAt ? dayjs(job.expiredAt) : null,
       applicationDeadline: job.applicationDeadline ? dayjs(job.applicationDeadline) : null,
@@ -58,10 +67,13 @@ export default function EmployerDashboardPage() {
     setSaving(true);
     const payload = {
       ...values,
+      minSalary: values.minSalary || 0,
+      maxSalary: values.maxSalary || 0,
       postedAt: values.postedAt?.toISOString() || '',
       expiredAt: values.expiredAt?.toISOString() || '',
       applicationDeadline: values.applicationDeadline?.toISOString() || '',
       hiddenOnExpiry: values.hiddenOnExpiry ? 'true' : 'false',
+      employerId: user?.userId || '',
     };
     try {
       const res = editingJob
@@ -143,8 +155,13 @@ export default function EmployerDashboardPage() {
     },
     { title: 'Địa điểm', dataIndex: 'location', key: 'location', responsive: ['md'] },
     {
-      title: 'Mức lương', dataIndex: 'salary', key: 'salary', responsive: ['sm'],
-      render: (v) => v ? <Text style={{ color: GREEN, fontWeight: 600 }}>{v.toLocaleString('vi-VN')} VNĐ</Text> : <Text type="secondary">Thỏa thuận</Text>
+      title: 'Mức lương', key: 'salary', responsive: ['sm'],
+      render: (_, r) => {
+        const min = r.minSalary, max = r.maxSalary;
+        if (!min && !max) return <Text type="secondary">Thỏa thuận</Text>;
+        if (min && max) return <Text style={{ color: GREEN, fontWeight: 600 }}>{min.toLocaleString('vi-VN')} – {max.toLocaleString('vi-VN')} VNĐ</Text>;
+        return <Text style={{ color: GREEN, fontWeight: 600 }}>{(min || max).toLocaleString('vi-VN')} VNĐ</Text>;
+      }
     },
     { title: 'SL', dataIndex: 'quantity', key: 'quantity', responsive: ['lg'], width: 60, align: 'center' },
     {
@@ -223,9 +240,14 @@ export default function EmployerDashboardPage() {
             <Input.TextArea rows={4} placeholder="Mô tả chi tiết về công việc..." style={{ borderRadius: 8 }} />
           </Form.Item>
           <Row gutter={12}>
-            <Col span={14}>
-              <Form.Item name="salary" label={<span style={{ fontWeight: 600 }}>Mức lương (VNĐ)</span>}>
-                <InputNumber style={{ width: '100%', borderRadius: 8 }} placeholder="15000000" min={0} />
+            <Col span={7}>
+              <Form.Item name="minSalary" label={<span style={{ fontWeight: 600 }}>Lương tối thiểu</span>}>
+                <InputNumber style={{ width: '100%', borderRadius: 8 }} placeholder="10000000" min={0} />
+              </Form.Item>
+            </Col>
+            <Col span={7}>
+              <Form.Item name="maxSalary" label={<span style={{ fontWeight: 600 }}>Lương tối đa</span>}>
+                <InputNumber style={{ width: '100%', borderRadius: 8 }} placeholder="20000000" min={0} />
               </Form.Item>
             </Col>
             <Col span={10}>

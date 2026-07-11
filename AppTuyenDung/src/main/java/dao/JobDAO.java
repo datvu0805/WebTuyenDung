@@ -184,9 +184,9 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
 
         if (search.getLocation() != null && !search.getLocation().isBlank()) {
 
-            sql.append(" AND location=?");
+            sql.append(" AND location ILIKE ?");
 
-            params.add(search.getLocation());
+            params.add("%" + search.getLocation() + "%");
         }
 
         if (search.getMinSalary() != null) {
@@ -194,6 +194,20 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
             sql.append(" AND min_salary>=?");
 
             params.add(search.getMinSalary());
+        }
+
+        if (search.getMaxSalary() != null) {
+
+            sql.append(" AND max_salary<=?");
+
+            params.add(search.getMaxSalary());
+        }
+
+        if (search.getStatus() != null) {
+
+            sql.append(" AND status=?");
+
+            params.add(search.getStatus());
         }
 
         sql.append(" ORDER BY posted_at DESC");
@@ -243,8 +257,8 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
         }
 
         if (search.getLocation() != null && !search.getLocation().isBlank()) {
-            sql.append(" AND location = ?");
-            params.add(search.getLocation());
+            sql.append(" AND location ILIKE ?");
+            params.add("%" + search.getLocation() + "%");
         }
 
         if (search.getMinSalary() != null) {
@@ -255,6 +269,11 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
         if (search.getMaxSalary() != null) {
             sql.append(" AND max_salary <= ?");
             params.add(search.getMaxSalary());
+        }
+
+        if (search.getStatus() != null) {
+            sql.append(" AND status = ?");
+            params.add(search.getStatus());
         }
 
         try (Connection conn = getConnection();

@@ -16,6 +16,7 @@ export const authApi = {
 export const jobApi = {
   getAll: () => api.get('/jobs'),
   getById: (id) => api.get(`/jobs/${id}`),
+  search: (params) => api.get('/jobs/search', { params }),
   create: (data) => api.post('/jobs', new URLSearchParams(data)),
   update: (data) => api.put('/jobs', new URLSearchParams(data)),
   delete: (id) => api.delete(`/jobs?id=${id}`),
@@ -41,6 +42,9 @@ export const cvApi = {
     api.post('/UploadCV', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     }),
+  getByCandidate: (candidateId) => api.get(`/quanLyCV?candidate_id=${candidateId}`),
+  delete: (cvId, candidateId) =>
+    api.post('/XoaCV', new URLSearchParams({ cv_id: cvId, candidate_id: candidateId })),
 };
 
 export const candidateApi = {
@@ -73,4 +77,34 @@ export const applicationApi = {
       new URLSearchParams({ id, status, action: 'updateStatus' })
     ),
   getRecruiterList: () => api.get('/api/aplication?action=viewList'),
+};
+
+export const paymentApi = {
+  purchase: (userID, packageID) =>
+    api.post('/api/payment/purchase', { userID, packageID }, {
+      headers: { 'Content-Type': 'application/json' },
+    }),
+};
+
+export const certificateApi = {
+  getAll: () => api.get('/certificate'),
+  getById: (id) => api.get(`/certificate/${id}`),
+  create: (data) => api.post('/certificate', new URLSearchParams(data)),
+  update: (data) => api.put('/certificate', new URLSearchParams(data)),
+  delete: (id) => api.delete(`/certificate?id=${id}`),
+};
+
+export const candidateCertificateApi = {
+  getAll: () => api.get('/candidate-certificate'),
+  getById: (id) => api.get(`/candidate-certificate/${id}`),
+  create: (data) => api.post('/candidate-certificate', new URLSearchParams(data)),
+  update: (data) => api.put('/candidate-certificate', new URLSearchParams(data)),
+  delete: (id) => api.delete(`/candidate-certificate?id=${id}`),
+};
+
+export const adminCompanyApi = {
+  getAll: () => api.get('/admin/company/list'),
+  create: (data) => api.post('/admin/company/create', data, { headers: { 'Content-Type': 'application/json' } }),
+  update: (data) => api.put('/admin/company/update', data, { headers: { 'Content-Type': 'application/json' } }),
+  delete: (id) => api.delete(`/admin/company/delete?id=${id}`),
 };

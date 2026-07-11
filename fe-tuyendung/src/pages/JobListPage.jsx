@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { Input, Select, Button, Spin, Empty, Tag, Typography, Row, Col } from 'antd';
+import React, { useEffect, useState, useCallback } from 'react';
+import { Input, Select, Spin, Empty, Tag, Typography, Pagination } from 'antd';
 import {
   SearchOutlined, EnvironmentOutlined, DollarOutlined,
-  TeamOutlined, ClockCircleOutlined, FireOutlined, ApartmentOutlined
+  TeamOutlined, ClockCircleOutlined, FireOutlined
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { jobApi } from '../api/services';
@@ -48,7 +48,9 @@ function JobCard({ job, onClick }) {
           </Text>
           <Text style={{ fontSize: 13, color: GREEN, fontWeight: 600 }}>
             <DollarOutlined style={{ marginRight: 4 }} />
-            {job.salary ? job.salary.toLocaleString('vi-VN') + ' VNĐ' : 'Thỏa thuận'}
+            {job.minSalary || job.maxSalary
+              ? `${(job.minSalary || 0).toLocaleString('vi-VN')}${job.maxSalary ? ' – ' + job.maxSalary.toLocaleString('vi-VN') : ''} VNĐ`
+              : 'Thỏa thuận'}
           </Text>
           <Text style={{ fontSize: 13, color: '#666' }}>
             <TeamOutlined style={{ marginRight: 4, color: '#aaa' }} />{job.quantity} người
@@ -71,24 +73,43 @@ function JobCard({ job, onClick }) {
 export default function JobListPage() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [title, setTitle] = useState('');
+  const [location, setLocation] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(20);
+  const [totalItems, setTotalItems] = useState(0);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    jobApi.getAll()
-      .then((res) => { if (res.data.success) setJobs(res.data.data || []); })
+  const fetchJobs = useCallback((p = 1, t = title, loc = location, st = statusFilter) => {
+    setLoading(true);
+    const params = { page: p, size: pageSize };
+    if (t) params.title = t;
+    if (loc) params.location = loc;
+    if (st !== '') params.status = st;
+
+    jobApi.search(params)
+      .then((res) => {
+        if (res.data.success) {
+          const pageData = res.data.data;
+          setJobs(pageData.content || []);
+          setTotalItems(pageData.totalItems || 0);
+        }
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, []);
+  }, [pageSize]);
 
-  const filtered = jobs.filter((j) => {
-    const matchSearch =
-      j.title?.toLowerCase().includes(search.toLowerCase()) ||
-      j.location?.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === 'all' || String(j.status) === statusFilter;
-    return matchSearch && matchStatus;
-  });
+  useEffect(() => {
+    setPage(1);
+    fetchJobs(1, title, location, statusFilter);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [title, location, statusFilter]);
+
+  const handlePageChange = (p) => {
+    setPage(p);
+    fetchJobs(p, title, location, statusFilter);
+  };
 
   return (
     <AppLayout>
@@ -99,16 +120,20 @@ export default function JobListPage() {
             <FireOutlined style={{ marginRight: 8 }} />Khám phá cơ hội việc làm
           </Title>
           <Text style={{ color: 'rgba(255,255,255,0.85)', fontSize: 15 }}>
-            {jobs.length} tin tuyển dụng đang chờ bạn
+            {totalItems} tin tuyển dụng đang chờ bạn
           </Text>
-          <div style={{ marginTop: 24, display: 'flex', gap: 10, maxWidth: 680, margin: '24px auto 0', flexWrap: 'wrap' }}>
+          <div style={{ marginTop: 24, display: 'flex', gap: 10, maxWidth: 780, margin: '24px auto 0', flexWrap: 'wrap' }}>
             <Input size="large" prefix={<SearchOutlined style={{ color: '#aaa' }} />}
-              placeholder="Tên vị trí, địa điểm..."
-              value={search} onChange={(e) => setSearch(e.target.value)}
-              style={{ flex: 1, minWidth: 200, borderRadius: 8, height: 48 }} />
+              placeholder="Tên vị trí..."
+              value={title} onChange={(e) => setTitle(e.target.value)}
+              style={{ flex: 2, minWidth: 160, borderRadius: 8, height: 48 }} />
+            <Input size="large" prefix={<EnvironmentOutlined style={{ color: '#aaa' }} />}
+              placeholder="Địa điểm..."
+              value={location} onChange={(e) => setLocation(e.target.value)}
+              style={{ flex: 1, minWidth: 120, borderRadius: 8, height: 48 }} />
             <Select size="large" value={statusFilter} onChange={setStatusFilter}
-              style={{ width: 170, borderRadius: 8 }}>
-              <Option value="all">Tất cả</Option>
+              style={{ width: 160, borderRadius: 8 }}>
+              <Option value="">Tất cả</Option>
               <Option value="0">Đang tuyển</Option>
               <Option value="1">Tạm dừng</Option>
               <Option value="2">Đã đóng</Option>
@@ -120,17 +145,26 @@ export default function JobListPage() {
       <div style={{ maxWidth: 920, margin: '0 auto', padding: '28px 16px' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: 80 }}><Spin size="large" /></div>
-        ) : filtered.length === 0 ? (
+        ) : jobs.length === 0 ? (
           <Empty description="Không tìm thấy việc làm phù hợp" style={{ padding: 60 }} />
         ) : (
           <div>
             <Text style={{ color: '#888', fontSize: 13, marginBottom: 16, display: 'block' }}>
-              Tìm thấy <strong>{filtered.length}</strong> việc làm
+              Tìm thấy <strong>{totalItems}</strong> việc làm
             </Text>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {filtered.map((job) => (
+              {jobs.map((job) => (
                 <JobCard key={job.id} job={job} onClick={() => navigate(`/jobs/${job.id}`)} />
               ))}
+            </div>
+            <div style={{ marginTop: 24, textAlign: 'center' }}>
+              <Pagination
+                current={page}
+                pageSize={pageSize}
+                total={totalItems}
+                onChange={handlePageChange}
+                showSizeChanger={false}
+              />
             </div>
           </div>
         )}

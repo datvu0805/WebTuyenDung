@@ -131,8 +131,8 @@ public class CVService {
                 }
             }
 
-            // Thực thi xóa dòng dữ liệu trong PostgreSQL bằng hàm chạy tốt của bạn
-            cvdao.delete(cvId);
+            // Thực thi xóa dòng dữ liệu trong PostgreSQL
+            cvdao.deleteID(cvId, candidateID);
             System.out.println(">> Đã xóa bản ghi dưới DB thành công.");
             return true;
 

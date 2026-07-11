@@ -1,6 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Form, Input, Button, Upload, Typography, message, Table, Popconfirm, Tag, Empty, Spin } from 'antd';
-import { UploadOutlined, FilePdfOutlined, DeleteOutlined, PlusOutlined, FileTextOutlined } from '@ant-design/icons';
+import {
+  Form, Input, Button, Upload, Typography, message,
+  Table, Popconfirm, Tag, Empty, Spin, Modal,
+} from 'antd';
+import {
+  UploadOutlined, FilePdfOutlined, DeleteOutlined,
+  PlusOutlined, FileTextOutlined, EyeOutlined,
+} from '@ant-design/icons';
+import { Worker, Viewer } from '@react-pdf-viewer/core';
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
+import '@react-pdf-viewer/core/lib/styles/index.css';
+import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import { cvApi } from '../api/services';
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/AppLayout';
@@ -8,15 +18,22 @@ import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 const GREEN = '#00b14f';
+// Worker URL trỏ vào pdfjs-dist từ CDN khớp đúng phiên bản 3.11.174
+const PDFJS_WORKER_URL =
+  'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
 export default function UploadCVPage() {
-  const [uploading, setUploading] = useState(false);
-  const [cvFile, setCvFile] = useState(null);
-  const [cvList, setCvList] = useState([]);
-  const [listLoading, setListLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
+  const [uploading, setUploading]       = useState(false);
+  const [cvFile, setCvFile]             = useState(null);
+  const [cvList, setCvList]             = useState([]);
+  const [listLoading, setListLoading]   = useState(true);
+  const [showForm, setShowForm]         = useState(false);
+  const [viewingCV, setViewingCV]       = useState(null); // { cvTitle, fileUrl }
   const { user } = useAuth();
   const [form] = Form.useForm();
+
+  // plugin default layout (toolbar zoom, trang, v.v.)
+  const layoutPlugin = defaultLayoutPlugin();
 
   const loadCVs = useCallback(() => {
     if (!user?.userId) return;
@@ -76,54 +93,80 @@ export default function UploadCVPage() {
     {
       title: 'Tiêu đề CV', dataIndex: 'cvTitle', key: 'cvTitle',
       render: (v, r) => (
-        <div>
-          <Text strong>{v || r.cv_title}</Text>
-          {(r.version) && <Tag style={{ marginLeft: 8, borderRadius: 4 }} color="blue">v{r.version}</Tag>}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <FilePdfOutlined style={{ color: '#e74c3c', fontSize: 18, flexShrink: 0 }} />
+          <div>
+            <Text strong style={{ display: 'block' }}>{v || r.cv_title}</Text>
+            {r.version && (
+              <Tag color="blue" style={{ borderRadius: 4, marginTop: 2 }}>v{r.version}</Tag>
+            )}
+          </div>
         </div>
-      )
+      ),
     },
     {
       title: 'Mô tả', dataIndex: 'description', key: 'description', responsive: ['md'],
-      render: (v) => v ? <Text type="secondary" ellipsis style={{ maxWidth: 200 }}>{v}</Text> : '—'
-    },
-    {
-      title: 'Ngày tải lên', dataIndex: 'uploadedAt', key: 'uploadedAt', responsive: ['lg'],
-      render: (v) => v ? dayjs(v).format('DD/MM/YYYY') : '—'
-    },
-    {
-      title: 'File', dataIndex: 'fileUrl', key: 'fileUrl',
       render: (v) => v
-        ? <a href={v} target="_blank" rel="noreferrer" style={{ color: GREEN }}>Xem CV</a>
-        : '—'
+        ? <Text type="secondary" ellipsis={{ tooltip: v }} style={{ maxWidth: 200 }}>{v}</Text>
+        : <Text type="secondary">—</Text>,
     },
     {
-      title: '', key: 'actions', width: 60, align: 'center',
+      title: 'Ngày tải lên', dataIndex: 'uploadedAt', key: 'uploadedAt',
+      responsive: ['lg'], width: 130,
+      render: (v, r) => {
+        const date = v || r.createdAt;
+        return date ? dayjs(date).format('DD/MM/YYYY') : '—';
+      },
+    },
+    {
+      title: 'Thao tác', key: 'actions', width: 120, align: 'center',
       render: (_, record) => (
-        <Popconfirm title="Xóa CV này?" onConfirm={() => handleDelete(record.id)} okText="Xóa" cancelText="Hủy" okButtonProps={{ danger: true }}>
-          <Button icon={<DeleteOutlined />} size="small" danger style={{ borderRadius: 6 }} />
-        </Popconfirm>
-      )
-    }
+        <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
+          <Button
+            icon={<EyeOutlined />}
+            size="small"
+            type="primary"
+            style={{ borderRadius: 6, background: GREEN, borderColor: GREEN }}
+            onClick={() => setViewingCV({ cvTitle: record.cvTitle || record.cv_title, fileUrl: record.fileUrl })}
+          >
+            Xem
+          </Button>
+          <Popconfirm
+            title="Xóa CV này?"
+            onConfirm={() => handleDelete(record.id)}
+            okText="Xóa" cancelText="Hủy"
+            okButtonProps={{ danger: true }}
+          >
+            <Button icon={<DeleteOutlined />} size="small" danger style={{ borderRadius: 6 }} />
+          </Popconfirm>
+        </div>
+      ),
+    },
   ];
 
   return (
     <AppLayout>
+      {/* Header banner */}
       <div style={{ background: 'linear-gradient(135deg, #00b14f 0%, #007a38 100%)', padding: '28px 24px 56px' }}>
-        <div style={{ maxWidth: 820, margin: '0 auto' }}>
+        <div style={{ maxWidth: 860, margin: '0 auto' }}>
           <Title level={3} style={{ color: '#fff', marginBottom: 4 }}>Quản lý CV</Title>
           <Text style={{ color: 'rgba(255,255,255,0.8)' }}>Tải lên và quản lý hồ sơ ứng tuyển của bạn</Text>
         </div>
       </div>
 
-      <div style={{ maxWidth: 820, margin: '-28px auto 0', padding: '0 16px 40px' }}>
-        {/* CV list card */}
-        <div style={{ background: '#fff', borderRadius: 16, padding: '24px', boxShadow: '0 2px 16px rgba(0,0,0,0.08)', marginBottom: 16 }}>
+      <div style={{ maxWidth: 860, margin: '-28px auto 0', padding: '0 16px 40px' }}>
+        {/* Danh sách CV */}
+        <div style={{ background: '#fff', borderRadius: 16, padding: 24, boxShadow: '0 2px 16px rgba(0,0,0,0.08)', marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
             <Title level={5} style={{ margin: 0 }}>
-              <FileTextOutlined style={{ marginRight: 8, color: GREEN }} />CV đã tải lên ({cvList.length})
+              <FileTextOutlined style={{ marginRight: 8, color: GREEN }} />
+              CV đã tải lên ({cvList.length})
             </Title>
-            <Button type="primary" icon={<PlusOutlined />} onClick={() => setShowForm(!showForm)}
-              style={{ borderRadius: 8, background: GREEN, borderColor: GREEN, fontWeight: 600 }}>
+            <Button
+              type="primary" icon={<PlusOutlined />}
+              onClick={() => setShowForm(!showForm)}
+              style={{ borderRadius: 8, background: GREEN, borderColor: GREEN, fontWeight: 600 }}
+            >
               {showForm ? 'Hủy' : 'Tải lên CV mới'}
             </Button>
           </div>
@@ -133,24 +176,31 @@ export default function UploadCVPage() {
           ) : cvList.length === 0 && !showForm ? (
             <Empty description="Bạn chưa có CV nào. Hãy tải lên CV đầu tiên!" style={{ padding: '32px 0' }} />
           ) : (
-            <Table columns={columns} dataSource={cvList} rowKey="id" pagination={false} size="middle" />
+            <Table
+              columns={columns}
+              dataSource={cvList}
+              rowKey="id"
+              pagination={false}
+              size="middle"
+              rowClassName="table-row-hover"
+            />
           )}
         </div>
 
-        {/* Upload form */}
+        {/* Form upload */}
         {showForm && (
           <div style={{ background: '#fff', borderRadius: 16, padding: '28px 32px', boxShadow: '0 2px 16px rgba(0,0,0,0.08)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24, padding: '14px 16px', background: '#f0faf4', borderRadius: 10, border: '1px solid #c7f0d6' }}>
               <FilePdfOutlined style={{ fontSize: 28, color: GREEN }} />
               <div>
-                <Text strong style={{ color: '#1a1a1a' }}>Định dạng PDF</Text><br />
+                <Text strong>Định dạng PDF</Text><br />
                 <Text style={{ fontSize: 13, color: '#888' }}>Hỗ trợ file .pdf, tối đa 2MB</Text>
               </div>
             </div>
             <Form form={form} layout="vertical" onFinish={onFinish} size="large">
               <Form.Item name="cv_title" label={<span style={{ fontWeight: 600 }}>Tiêu đề CV</span>}
                 rules={[{ required: true, message: 'Vui lòng nhập tiêu đề CV' }]}>
-                <Input placeholder="CV Frontend Developer - 2025" style={{ borderRadius: 8 }} />
+                <Input placeholder="CV Frontend Developer - 2026" style={{ borderRadius: 8 }} />
               </Form.Item>
               <Form.Item name="version" label={<span style={{ fontWeight: 600 }}>Phiên bản</span>}>
                 <Input placeholder="1.0" style={{ borderRadius: 8 }} />
@@ -159,16 +209,21 @@ export default function UploadCVPage() {
                 <Input.TextArea rows={2} placeholder="Mô tả ngắn về CV này..." style={{ borderRadius: 8 }} />
               </Form.Item>
               <Form.Item label={<span style={{ fontWeight: 600 }}>File CV (PDF) <span style={{ color: '#f00' }}>*</span></span>}>
-                <Upload beforeUpload={(file) => { setCvFile(file); return false; }} maxCount={1} accept=".pdf"
+                <Upload
+                  beforeUpload={(file) => { setCvFile(file); return false; }}
+                  maxCount={1} accept=".pdf"
                   fileList={cvFile ? [{ uid: '1', name: cvFile.name, status: 'done' }] : []}
-                  onRemove={() => setCvFile(null)}>
+                  onRemove={() => setCvFile(null)}
+                >
                   <Button icon={<UploadOutlined />} style={{ borderRadius: 8, borderColor: GREEN, color: GREEN }}>
                     Chọn file PDF
                   </Button>
                 </Upload>
               </Form.Item>
               <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-                <Button onClick={() => { setShowForm(false); form.resetFields(); setCvFile(null); }} style={{ borderRadius: 8 }}>Hủy</Button>
+                <Button onClick={() => { setShowForm(false); form.resetFields(); setCvFile(null); }} style={{ borderRadius: 8 }}>
+                  Hủy
+                </Button>
                 <Button type="primary" htmlType="submit" loading={uploading}
                   style={{ borderRadius: 8, fontWeight: 600, background: GREEN, borderColor: GREEN }}>
                   Tải lên CV
@@ -178,6 +233,35 @@ export default function UploadCVPage() {
           </div>
         )}
       </div>
+
+      {/* Modal xem PDF */}
+      <Modal
+        open={!!viewingCV}
+        onCancel={() => setViewingCV(null)}
+        footer={null}
+        title={
+          <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <FilePdfOutlined style={{ color: '#e74c3c' }} />
+            {viewingCV?.cvTitle}
+          </span>
+        }
+        width="85vw"
+        style={{ top: 20 }}
+        styles={{ body: { height: '82vh', padding: 0, overflow: 'hidden' } }}
+        destroyOnHidden
+      >
+        {viewingCV?.fileUrl ? (
+          <Worker workerUrl={PDFJS_WORKER_URL}>
+            <div style={{ height: '82vh' }}>
+              <Viewer fileUrl={viewingCV.fileUrl} plugins={[layoutPlugin]} />
+            </div>
+          </Worker>
+        ) : (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '82vh' }}>
+            <Text type="secondary">Không thể tải file PDF</Text>
+          </div>
+        )}
+      </Modal>
     </AppLayout>
   );
 }

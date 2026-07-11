@@ -30,6 +30,9 @@ public class SkillService {
         Skill skill = SkillMapper.toEntity(dto);
 
         skillDAO.add(skill);
+
+        // Đồng bộ id vừa được DB sinh ra vào DTO
+        dto.setId(skill.getId());
     }
 
     public void updateSkill(int id, SkillDTO dto) {

@@ -34,6 +34,9 @@ public class JobService {
         Job job = JobMapper.toEntity(dto);
 
         JobDAO.add(job);
+
+        // Đồng bộ id do DB sinh ra vào DTO
+        dto.setId(job.getId());
     }
 
 

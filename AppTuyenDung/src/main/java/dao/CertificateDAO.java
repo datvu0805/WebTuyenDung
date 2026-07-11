@@ -13,20 +13,30 @@ import java.util.List;
 public class CertificateDAO extends DatabaseConfig implements TDAO<Certificate> {
 
     @Override
-    public void add(Certificate entity) {
+    public void add(Certificate certificate) {
 
         String sql = """
-                INSERT INTO certificates(certificate_name, score_type)
-                VALUES (?, ?)
-                """;
+        INSERT INTO certificates(certificate_name, score_type,created_at,
+                    updated_at)
+        VALUES (?, ?,?,?)
+        RETURNING id
+        """;
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, entity.getCertificatesName());
-            ps.setString(2, entity.getScoreType().name());
+            ps.setString(1, certificate.getCertificatesName());
+            ps.setString(2, certificate.getScoreType().name());
+            ps.setObject(3, certificate.getCreatedAt());
+            ps.setObject(4, certificate.getUpdatedAt());
 
-            ps.executeUpdate();
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+                    certificate.setId(rs.getInt("id"));
+                }
+
+            }
 
         } catch (Exception e) {
             throw new RuntimeException(e);

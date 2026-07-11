@@ -142,7 +142,7 @@ export default function AppLayout({ children }) {
 
         <div className="desktop-menu" style={{ flex: 1 }}>
           <Menu mode="horizontal" selectedKeys={[location.pathname]} items={navItems}
-            onClick={({ key }) => navigate(key)}
+            onClick={({ key }) => navigate(key)} disabledOverflow
             style={{ border: 'none', background: 'transparent', fontWeight: 500 }} />
         </div>
 

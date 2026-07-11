@@ -110,3 +110,10 @@ export const adminCompanyApi = {
   delete: (id) => api.delete(`/admin/company/delete?id=${id}`),
   import: (formData) => api.post('/admin/company/import', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
 };
+
+export const jobPositionApi = {
+  getAll: () => api.get('/admin/job-positions'),
+  create: (data) => api.post('/admin/job-positions', data, { headers: { 'Content-Type': 'application/json' } }),
+  update: (data) => api.put('/admin/job-positions', data, { headers: { 'Content-Type': 'application/json' } }),
+  delete: (id) => api.delete(`/admin/job-positions?id=${id}`),
+};

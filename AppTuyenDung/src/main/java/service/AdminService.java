@@ -52,7 +52,9 @@ public class AdminService {
         if (!validator.isValidEmail(dto.getEmail())){
             return "Email không hợp lệ";
         }
-
+        if (userDAO.findByEmail(user.getEmail()) != null) {
+            return "Email đã tồn tại";
+        }
         if (dto.getDateOfBirth() != null && !dto.getDateOfBirth().isBlank()) {
             user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth()));
         }

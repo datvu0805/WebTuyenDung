@@ -25,6 +25,8 @@ public class EmployerServlet extends BaseServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setCharacterEncoding("UTF-8");
+        req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
 
         HttpSession session = req.getSession(false);
@@ -60,6 +62,8 @@ public class EmployerServlet extends BaseServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setCharacterEncoding("UTF-8");
+        req.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
 
         HttpSession session = req.getSession(false);

@@ -19,9 +19,9 @@ public class AdminProfileServlet extends BaseServlet {
 
     @Override
     protected void doGet(HttpServletRequest req , HttpServletResponse res) throws IOException {
-
-        res.setContentType("application/json;charset=UTF-8");
         res.setCharacterEncoding("UTF-8");
+        req.setCharacterEncoding("UTF-8");
+        res.setContentType("application/json;charset=UTF-8");
 
         HttpSession session = req.getSession(false);
         int Id  = (Integer) session.getAttribute("userId");
@@ -42,8 +42,10 @@ public class AdminProfileServlet extends BaseServlet {
 
     @Override
     protected void doPut(HttpServletRequest req , HttpServletResponse res) throws IOException {
-        res.setContentType("application/json;charset=UTF-8");
         res.setCharacterEncoding("UTF-8");
+        req.setCharacterEncoding("UTF-8");
+
+        res.setContentType("application/json;charset=UTF-8");
 
         HttpSession session = req.getSession(false);
         Integer userId = (Integer) session.getAttribute("userId");

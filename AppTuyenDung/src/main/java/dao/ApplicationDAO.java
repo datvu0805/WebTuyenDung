@@ -7,6 +7,7 @@ import model.Application;
 import model.CV;
 import model.Candidates;
 import model.Job;
+import model.Users;
 
 import java.sql.*;
 import java.time.LocalDateTime;
@@ -123,14 +124,17 @@ public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> 
     // lấy ra ds đơn ứng tuyển của từng ứng viên
     public List<ApplicationDTO> getApplicationsForRecruiter(int recruiterId) {
         List<ApplicationDTO> list = new ArrayList<>();
+        // recruiterId = users.id — join qua employers để lấy jobs của nhà tuyển dụng này
         String sql = "SELECT a.id AS app_id, a.cover_letter, a.description, " +
-                "c.id AS candidate_id, " +
+                "c.id AS candidate_id, u.full_name AS candidate_full_name, " +
                 "j.title AS job_title, cv.cv_title AS cv_title, cv.file_url, a.status, a.applied_at " +
                 "FROM applications a " +
                 "JOIN candidates c ON a.candidate_id = c.id " +
+                "JOIN users u ON c.user_id = u.id " +
                 "JOIN jobs j ON a.job_id = j.id " +
+                "JOIN employers e ON j.employer_id = e.id " +
                 "JOIN cvs cv ON a.cv_id = cv.id " +
-                "WHERE j.recruiter_id = ? ORDER BY a.applied_at DESC";
+                "WHERE e.user_id = ? ORDER BY a.applied_at DESC";
 
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -147,6 +151,9 @@ public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> 
 
                     Candidates candidate = new Candidates();
                     candidate.setId(rs.getInt("candidate_id"));
+                    Users u = new Users();
+                    u.setFullName(rs.getString("candidate_full_name"));
+                    candidate.setUser(u);
                     dto.setCandidateName(candidate);
 
                     dto.setJobTitle(rs.getString("job_title"));

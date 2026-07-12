@@ -1,9 +1,11 @@
 package controller;
 
 import com.google.gson.Gson;
+import dao.CandicateDAO;
 import dao.EmployerDAO;
 import dto.ApiResponse;
 import dto.LoginResponseDTO;
+import model.Candidates;
 import model.Employers;
 import model.Users;
 import service.AuthService;
@@ -20,6 +22,7 @@ public class LoginServlet extends BaseServlet {
     private final AuthService authService = new AuthService();
     private final FileService fileService = new FileService();
     private final EmployerDAO employerDAO = new EmployerDAO();
+    private final CandicateDAO candidateDAO = new CandicateDAO();
 
     @Override
     protected void doPost(HttpServletRequest req,
@@ -75,6 +78,15 @@ public class LoginServlet extends BaseServlet {
                     if (employer != null) {
                         data.setEmployerId(employer.getId());
                         session.setAttribute("employerId", employer.getId());
+                    }
+                }
+
+                // Nếu là CANDIDATE, thêm candidateId vào response
+                if ("CANDIDATE".equals(user.getRole().getRoleName())) {
+                    Candidates candidate = candidateDAO.findByUserId(user.getId());
+                    if (candidate != null) {
+                        data.setCandidateId(candidate.getId());
+                        session.setAttribute("candidateId", candidate.getId());
                     }
                 }
 

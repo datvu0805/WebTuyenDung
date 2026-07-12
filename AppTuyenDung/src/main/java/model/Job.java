@@ -21,7 +21,15 @@ public class Job extends BaseEntity{
     private Boolean isHiddenOnExpiry;
     private Integer companyId;
     private Integer jobPositionId;
+    private String companyName; // transient — populated by JOIN queries, not stored in DB
 
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
     public Job(Employers employerID, String title, String description, Double minSalary, Double maxSalary, String currency, String location, String experience, int quantity, LocalDateTime postedAt, LocalDateTime expiredAt, LocalDateTime applicationDeadline, JobStatus status, Boolean isHiddenOnExpiry) {
         this.employerID = employerID;
         this.title = title;

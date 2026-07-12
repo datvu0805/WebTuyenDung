@@ -28,6 +28,7 @@ public class JobDTO {
     private Short status;
     private Boolean hiddenOnExpiry;
     private Integer companyId;
+    private String companyName;
     private Integer jobPositionId;
 
     public JobDTO() {
@@ -177,6 +178,14 @@ public class JobDTO {
 
     public void setCompanyId(Integer companyId) {
         this.companyId = companyId;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
     }
 
     public Integer getJobPositionId() {

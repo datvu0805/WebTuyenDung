@@ -114,6 +114,7 @@ public class JobMapper {
         dto.setStatus(job.getStatus().getValue());
         dto.setHiddenOnExpiry(job.getHiddenOnExpiry());
         dto.setCompanyId(job.getCompanyId());
+        dto.setCompanyName(job.getCompanyName());
         dto.setJobPositionId(job.getJobPositionId());
 
         return dto;

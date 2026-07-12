@@ -185,46 +185,47 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
 
     public List<Job> search(JobSearchDTO search) {
 
-        StringBuilder sql = new StringBuilder("SELECT * FROM jobs WHERE 1=1");
+        StringBuilder sql = new StringBuilder(
+            "SELECT j.*, c.company_name FROM jobs j LEFT JOIN companies c ON j.company_id = c.id WHERE 1=1");
 
         List<Object> params = new ArrayList<>();
 
         if (search.getTitle() != null && !search.getTitle().isBlank()) {
 
-            sql.append(" AND title ILIKE ?");
+            sql.append(" AND j.title ILIKE ?");
 
             params.add("%" + search.getTitle() + "%");
         }
 
         if (search.getLocation() != null && !search.getLocation().isBlank()) {
 
-            sql.append(" AND location ILIKE ?");
+            sql.append(" AND j.location ILIKE ?");
 
             params.add("%" + search.getLocation() + "%");
         }
 
         if (search.getMinSalary() != null) {
 
-            sql.append(" AND min_salary>=?");
+            sql.append(" AND j.min_salary>=?");
 
             params.add(search.getMinSalary());
         }
 
         if (search.getMaxSalary() != null) {
 
-            sql.append(" AND max_salary<=?");
+            sql.append(" AND j.max_salary<=?");
 
             params.add(search.getMaxSalary());
         }
 
         if (search.getStatus() != null) {
 
-            sql.append(" AND status=?");
+            sql.append(" AND j.status=?");
 
             params.add(search.getStatus());
         }
 
-        sql.append(" ORDER BY posted_at DESC");
+        sql.append(" ORDER BY j.posted_at DESC");
         sql.append(" LIMIT ? OFFSET ?");
 
         params.add(search.getSize());
@@ -246,9 +247,11 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-
-                list.add(JobMapper.map(rs));
-
+                Job job = JobMapper.map(rs);
+                // Populate companyName from LEFT JOIN
+                String companyName = rs.getString("company_name");
+                if (!rs.wasNull()) job.setCompanyName(companyName);
+                list.add(job);
             }
 
         } catch (Exception e) {

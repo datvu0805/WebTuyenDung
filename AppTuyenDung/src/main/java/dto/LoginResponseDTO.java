@@ -11,6 +11,10 @@ public class LoginResponseDTO {
     private String address;
     private String role;
     private Integer employerId;
+    private Integer candidateId;
+
+    public Integer getCandidateId() { return candidateId; }
+    public void setCandidateId(Integer candidateId) { this.candidateId = candidateId; }
 
     public Integer getEmployerId() {
         return employerId;

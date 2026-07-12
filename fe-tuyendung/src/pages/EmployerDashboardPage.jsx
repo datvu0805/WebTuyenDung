@@ -13,8 +13,8 @@ import { downloadJobTemplate } from '../utils/excelTemplates';
 const { Title, Text } = Typography;
 const { Option } = Select;
 const GREEN = '#00b14f';
-const STATUS_LABELS = ['Đang tuyển', 'Tạm dừng', 'Đã đóng'];
-const STATUS_COLORS = ['success', 'warning', 'default'];
+const STATUS_LABELS = { 1: 'Đang tuyển', 2: 'Tạm dừng', 3: 'Đã hết hạn', 4: 'Đã đóng' };
+const STATUS_COLORS = { 1: 'success', 2: 'warning', 3: 'default', 4: 'default' };
 
 export default function EmployerDashboardPage() {
   const [jobs, setJobs] = useState([]);
@@ -37,11 +37,16 @@ export default function EmployerDashboardPage() {
   const [jobPositions, setJobPositions] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [employerProfile, setEmployerProfile] = useState(null);
+  const [provinces, setProvinces] = useState([]);
 
   useEffect(() => {
     jobPositionApi.getAll().then(r => { if (r.data.success) setJobPositions(r.data.data || []); }).catch(() => {});
     employerApi.getProfile().then(r => { if (r.data.success) setEmployerProfile(r.data.data); }).catch(() => {});
     adminCompanyApi.getAll().then(r => { if (r.data.success) setCompanies(r.data.data || []); }).catch(() => {});
+    fetch('https://provinces.open-api.vn/api/p/')
+      .then(r => r.json())
+      .then(data => setProvinces(data || []))
+      .catch(() => {});
   }, []);
 
   // Download file mẫu jobs — ghi chú chức danh và thông tin từ API
@@ -180,7 +185,7 @@ export default function EmployerDashboardPage() {
     }
   };
 
-  const activeCount = jobs.filter(j => j.status === 0).length;
+  const activeCount = jobs.filter(j => j.status === 1).length;
 
   const columns = [
     {
@@ -342,7 +347,16 @@ export default function EmployerDashboardPage() {
           <Row gutter={12}>
             <Col span={14}>
               <Form.Item name="location" label={<span style={{ fontWeight: 600 }}>Địa điểm</span>} rules={[{ required: true }]}>
-                <Input placeholder="Hà Nội" style={{ borderRadius: 8 }} />
+                <Select
+                  showSearch
+                  allowClear
+                  placeholder="Chọn tỉnh / thành phố..."
+                  filterOption={(input, option) =>
+                    option.label.toLowerCase().includes(input.toLowerCase())
+                  }
+                  style={{ borderRadius: 8 }}
+                  options={provinces.map(p => ({ value: p.name, label: p.name }))}
+                />
               </Form.Item>
             </Col>
             <Col span={10}>
@@ -370,11 +384,11 @@ export default function EmployerDashboardPage() {
           </Row>
           <Row gutter={12} align="middle">
             <Col flex={1}>
-              <Form.Item name="status" label={<span style={{ fontWeight: 600 }}>Trạng thái</span>} initialValue={0}>
+              <Form.Item name="status" label={<span style={{ fontWeight: 600 }}>Trạng thái</span>} initialValue={1}>
                 <Select style={{ borderRadius: 8 }}>
-                  <Option value={0}>Đang tuyển</Option>
-                  <Option value={1}>Tạm dừng</Option>
-                  <Option value={2}>Đóng</Option>
+                  <Option value={1}>Đang tuyển</Option>
+                  <Option value={2}>Tạm dừng</Option>
+                  <Option value={4}>Đóng</Option>
                 </Select>
               </Form.Item>
             </Col>

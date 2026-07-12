@@ -2,7 +2,8 @@ import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Input, Select, Spin, Empty, Tag, Typography, Pagination } from 'antd';
 import {
   SearchOutlined, EnvironmentOutlined, DollarOutlined,
-  TeamOutlined, ClockCircleOutlined, FireOutlined, BankOutlined
+  TeamOutlined, ClockCircleOutlined, FireOutlined, BankOutlined,
+  SolutionOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { jobApi } from '../api/services';
@@ -18,9 +19,9 @@ const { Title, Text } = Typography;
 const { Option } = Select;
 const GREEN = '#00b14f';
 
-const STATUS_LABELS = ['Đang tuyển', 'Tạm dừng', 'Đã đóng'];
-const STATUS_COLORS = ['#e8f9f0', '#fff7e6', '#f5f5f5'];
-const STATUS_TEXT = ['#00b14f', '#fa8c16', '#999'];
+const STATUS_LABELS = { 1: 'Đang tuyển', 2: 'Tạm dừng', 3: 'Đã hết hạn', 4: 'Đã đóng' };
+const STATUS_COLORS = { 1: '#e8f9f0', 2: '#fff7e6', 3: '#f5f5f5', 4: '#f5f5f5' };
+const STATUS_TEXT   = { 1: '#00b14f', 2: '#fa8c16', 3: '#999', 4: '#999' };
 
 const LOGO_COLORS = ['#e8f9f0','#e6f4ff','#fff7e6','#f9f0ff','#fff1f0','#f0fff4'];
 const LOGO_TEXT   = ['#00b14f','#1677ff','#fa8c16','#722ed1','#f5222d','#389e0d'];
@@ -31,70 +32,130 @@ function getCompanyInitials(name = '') {
   return name.trim().slice(0, 2).toUpperCase() || 'CT';
 }
 
-function colorIndex(id = 0) { return id % LOGO_COLORS.length; }
+function colorIdx(id = 0) { return id % LOGO_COLORS.length; }
+
+function isExpired(job) {
+  if (job.status !== 1) return true;
+  if (job.expiredAt && dayjs(job.expiredAt).isBefore(dayjs())) return true;
+  return false;
+}
 
 function JobCard({ job, onClick }) {
-  const statusIdx = job.status ?? 0;
-  const ci = colorIndex(job.id);
+  const statusIdx = job.status ?? 1;
+  const expired = isExpired(job);
+  const ci = colorIdx(job.id);
+
   return (
     <div
-      className="job-card"
       onClick={onClick}
       style={{
-        background: '#fff', borderRadius: 12, padding: '20px',
-        border: '1px solid #eee', cursor: 'pointer',
-        display: 'flex', gap: 16, alignItems: 'flex-start',
+        background: expired ? '#fafafa' : '#fff',
+        borderRadius: 12,
+        padding: '18px 20px',
+        border: `1px solid ${expired ? '#e8e8e8' : '#eee'}`,
+        cursor: 'pointer',
+        display: 'flex',
+        gap: 16,
+        alignItems: 'flex-start',
+        opacity: expired ? 0.75 : 1,
         transition: 'box-shadow 0.15s, border-color 0.15s',
       }}
-      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,177,79,0.12)'; e.currentTarget.style.borderColor = '#b7ebd0'; }}
-      onMouseLeave={(e) => { e.currentTarget.style.boxShadow = ''; e.currentTarget.style.borderColor = '#eee'; }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = expired
+          ? '0 2px 8px rgba(0,0,0,0.06)'
+          : '0 4px 16px rgba(0,177,79,0.12)';
+        e.currentTarget.style.borderColor = expired ? '#d9d9d9' : '#b7ebd0';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = '';
+        e.currentTarget.style.borderColor = expired ? '#e8e8e8' : '#eee';
+      }}
     >
       {/* Logo */}
       <div style={{
         width: 52, height: 52, borderRadius: 10, flexShrink: 0,
-        background: LOGO_COLORS[ci], color: LOGO_TEXT[ci],
+        background: expired ? '#f0f0f0' : LOGO_COLORS[ci],
+        color: expired ? '#bbb' : LOGO_TEXT[ci],
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontWeight: 700, fontSize: 16, border: `1px solid ${LOGO_COLORS[ci]}`,
+        fontWeight: 700, fontSize: 16,
       }}>
         {getCompanyInitials(job.companyName || job.title)}
       </div>
+
       <div style={{ flex: 1, minWidth: 0 }}>
+        {/* Title + status badge */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, flexWrap: 'wrap' }}>
-          <Text strong style={{ fontSize: 15, color: '#1a1a1a', lineHeight: 1.4 }}>{job.title}</Text>
+          <Text strong style={{ fontSize: 15, color: expired ? '#888' : '#1a1a1a', lineHeight: 1.4 }}>
+            {job.title}
+          </Text>
           <span style={{
-            background: STATUS_COLORS[statusIdx], color: STATUS_TEXT[statusIdx],
+            background: STATUS_COLORS[statusIdx],
+            color: STATUS_TEXT[statusIdx],
             borderRadius: 4, padding: '2px 10px', fontSize: 12, fontWeight: 600, flexShrink: 0,
           }}>
             {STATUS_LABELS[statusIdx]}
           </span>
         </div>
+
+        {/* Company */}
         {job.companyName && (
           <div style={{ marginTop: 4 }}>
-            <Text style={{ fontSize: 13, color: GREEN, fontWeight: 500 }}>
+            <Text style={{ fontSize: 13, color: expired ? '#aaa' : GREEN, fontWeight: 500 }}>
               <BankOutlined style={{ marginRight: 4 }} />{job.companyName}
             </Text>
           </div>
         )}
+
+        {/* Description preview */}
+        {job.description && (
+          <div style={{
+            marginTop: 6, fontSize: 13, color: '#888', lineHeight: 1.5,
+            overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+          }}>
+            {job.description}
+          </div>
+        )}
+
+        {/* Meta row */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', marginTop: 8 }}>
           <Text style={{ fontSize: 13, color: '#666' }}>
-            <EnvironmentOutlined style={{ marginRight: 4, color: '#aaa' }} />{job.location || 'Chưa cập nhật'}
+            <EnvironmentOutlined style={{ marginRight: 4, color: '#aaa' }} />
+            {job.location || 'Chưa cập nhật'}
           </Text>
-          <Text style={{ fontSize: 13, color: GREEN, fontWeight: 600 }}>
+          <Text style={{ fontSize: 13, color: expired ? '#aaa' : GREEN, fontWeight: 600 }}>
             <DollarOutlined style={{ marginRight: 4 }} />
             {job.minSalary || job.maxSalary
               ? `${(job.minSalary || 0).toLocaleString('vi-VN')}${job.maxSalary ? ' – ' + job.maxSalary.toLocaleString('vi-VN') : ''} ${job.currency || 'VNĐ'}`
               : 'Thỏa thuận'}
           </Text>
           <Text style={{ fontSize: 13, color: '#666' }}>
-            <TeamOutlined style={{ marginRight: 4, color: '#aaa' }} />{job.quantity} người
+            <TeamOutlined style={{ marginRight: 4, color: '#aaa' }} />
+            {job.quantity} người
           </Text>
         </div>
+
+        {/* Tags + time */}
         <div style={{ marginTop: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
           <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-            {job.experience && <Tag color="blue" style={{ borderRadius: 4, fontSize: 12 }}>{job.experience}</Tag>}
-            {job.applicationDeadline && (
+            {job.experience && (
+              <Tag color={expired ? 'default' : 'blue'} style={{ borderRadius: 4, fontSize: 12 }}>
+                {job.experience}
+              </Tag>
+            )}
+            {job.jobPositionId && (
+              <Tag color={expired ? 'default' : 'geekblue'} style={{ borderRadius: 4, fontSize: 12 }}>
+                <SolutionOutlined style={{ marginRight: 3 }} />Có chức danh
+              </Tag>
+            )}
+            {!expired && job.applicationDeadline && (
               <Tag color="orange" style={{ borderRadius: 4, fontSize: 12 }}>
                 Hạn: {dayjs(job.applicationDeadline).format('DD/MM/YYYY')}
+              </Tag>
+            )}
+            {expired && (
+              <Tag color="default" style={{ borderRadius: 4, fontSize: 12, color: '#999' }}>
+                Hết hạn
               </Tag>
             )}
           </div>
@@ -111,7 +172,6 @@ function JobCard({ job, onClick }) {
 export default function JobListPage() {
   const [jobs, setJobs]         = useState([]);
   const [loading, setLoading]   = useState(true);
-  // separate display state so list stays visible while refetching
   const [fetching, setFetching] = useState(false);
 
   const [title, setTitle]               = useState('');
@@ -119,13 +179,12 @@ export default function JobListPage() {
   const [statusFilter, setStatusFilter] = useState('');
   const [provinces, setProvinces]       = useState([]);
 
-  const [page, setPage]         = useState(1);
-  const [pageSize]               = useState(20);
+  const [page, setPage]             = useState(1);
+  const [pageSize]                   = useState(20);
   const [totalItems, setTotalItems] = useState(0);
   const navigate = useNavigate();
   const debounceRef = useRef(null);
 
-  // Load tỉnh/thành từ provinces API
   useEffect(() => {
     fetch('https://provinces.open-api.vn/api/p/')
       .then((r) => r.json())
@@ -159,10 +218,8 @@ export default function JobListPage() {
       .finally(() => { setFetching(false); setLoading(false); });
   }, [pageSize]);
 
-  // Initial load
   useEffect(() => { fetchJobs(1, '', '', ''); }, [fetchJobs]);
 
-  // Debounce search inputs (500ms) — no full spinner, just subtle loading indicator
   useEffect(() => {
     clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
@@ -177,6 +234,8 @@ export default function JobListPage() {
     setPage(p);
     fetchJobs(p, title, location, statusFilter);
   };
+
+  const activeCount = jobs.filter(j => j.status === 1).length;
 
   return (
     <AppLayout>
@@ -218,25 +277,33 @@ export default function JobListPage() {
               style={{ width: 150 }}
             >
               <Option value="">Tất cả</Option>
-              <Option value="0">Đang tuyển</Option>
-              <Option value="1">Tạm dừng</Option>
-              <Option value="2">Đã đóng</Option>
+              <Option value="1">Đang tuyển</Option>
+              <Option value="2">Tạm dừng</Option>
+              <Option value="4">Đã đóng</Option>
             </Select>
           </div>
         </div>
       </div>
 
-      <div style={{ maxWidth: 920, margin: '0 auto', padding: '28px 16px' }}>
+      <div style={{ maxWidth: 940, margin: '0 auto', padding: '28px 16px' }}>
         {loading ? (
           <div style={{ textAlign: 'center', padding: 80 }}><Spin size="large" /></div>
         ) : (
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-              <Text style={{ color: '#888', fontSize: 13 }}>
-                Tìm thấy <strong>{totalItems}</strong> việc làm
-              </Text>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16, flexWrap: 'wrap', gap: 8 }}>
+              <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                <Text style={{ color: '#888', fontSize: 13 }}>
+                  Tìm thấy <strong>{totalItems}</strong> việc làm
+                  {activeCount > 0 && totalItems !== activeCount && (
+                    <span style={{ marginLeft: 8, color: GREEN, fontWeight: 600 }}>
+                      ({activeCount} đang tuyển)
+                    </span>
+                  )}
+                </Text>
+              </div>
               {fetching && <Spin size="small" />}
             </div>
+
             {jobs.length === 0 ? (
               <Empty description="Không tìm thấy việc làm phù hợp" style={{ padding: 60 }} />
             ) : (

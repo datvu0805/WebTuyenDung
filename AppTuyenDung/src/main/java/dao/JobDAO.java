@@ -225,7 +225,7 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
             params.add(search.getStatus());
         }
 
-        sql.append(" ORDER BY j.posted_at DESC");
+        sql.append(" ORDER BY j.status ASC, j.posted_at DESC");
         sql.append(" LIMIT ? OFFSET ?");
 
         params.add(search.getSize());

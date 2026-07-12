@@ -1,7 +1,7 @@
 package controller;
 
 import com.google.gson.Gson;
-import dao.CandicateDAO;
+import dao.CandidateDAO;
 import dao.EmployerDAO;
 import dto.ApiResponse;
 import dto.LoginResponseDTO;
@@ -22,7 +22,7 @@ public class LoginServlet extends BaseServlet {
     private final AuthService authService = new AuthService();
     private final FileService fileService = new FileService();
     private final EmployerDAO employerDAO = new EmployerDAO();
-    private final CandicateDAO candidateDAO = new CandicateDAO();
+    private final CandidateDAO candidateDAO = new CandidateDAO();
 
     @Override
     protected void doPost(HttpServletRequest req,

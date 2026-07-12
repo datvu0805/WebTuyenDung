@@ -21,7 +21,7 @@ import java.time.format.DateTimeFormatter;
 public class AuthService {
     private final UserDAO userDAO = new UserDAO();
     private final RoleDAO roleDAO = new RoleDAO();
-    private final CandicateDAO candicateDAO = new CandicateDAO();
+    private final CandidateDAO candicateDAO = new CandidateDAO();
     private final EmployerDAO employerDAO = new EmployerDAO();
     private final CompanyDAO companyDAO = new CompanyDAO();
 

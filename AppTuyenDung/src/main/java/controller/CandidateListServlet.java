@@ -1,7 +1,7 @@
 package controller;
 
 import com.google.gson.Gson;
-import dao.CandicateDAO;
+import dao.CandidateDAO;
 import dto.ApiResponse;
 import dto.CandidateDTO;
 import model.Candidates;
@@ -16,7 +16,7 @@ import java.util.List;
 public class CandidateListServlet extends BaseServlet {
 
     private final Gson gson = new Gson();
-    private final CandicateDAO candicateDAO = new CandicateDAO();
+    private final CandidateDAO candicateDAO = new CandidateDAO();
 
     @Override
     protected void doGet(HttpServletRequest req,

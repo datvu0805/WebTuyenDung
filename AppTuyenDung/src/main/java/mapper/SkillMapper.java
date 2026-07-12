@@ -3,8 +3,21 @@ package mapper;
 import dto.SkillDTO;
 import model.Skill;
 
-public class SkillMapper {
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
+public class SkillMapper {
+    public static Skill map(ResultSet rs) throws SQLException {
+
+        Skill skill = new Skill();
+
+        skill.setId(rs.getInt("id"));
+        skill.setSkillName(rs.getString("skill_name"));
+        skill.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+        skill.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+
+        return skill;
+    }
     public static Skill toEntity(SkillDTO dto) {
 
         if (dto == null) {

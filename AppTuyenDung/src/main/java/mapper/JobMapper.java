@@ -116,6 +116,7 @@ public class JobMapper {
         dto.setCompanyId(job.getCompanyId());
         dto.setCompanyName(job.getCompanyName());
         dto.setJobPositionId(job.getJobPositionId());
+        dto.setEmployerUserId(job.getEmployerUserId());
 
         return dto;
     }

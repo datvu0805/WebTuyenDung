@@ -54,6 +54,24 @@ public class JobSevrlet extends BaseServlet {
                 return;
             }
 
+            // GET /jobs/company?companyId=X — jobs theo công ty
+            if ("/company".equals(pathInfo)) {
+                String companyIdParam = req.getParameter("companyId");
+                if (companyIdParam == null || companyIdParam.isBlank()) {
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                    resp.getWriter().print(objectMapper.writeValueAsString(new ApiResponse<>(false, "Thiếu companyId", null)));
+                    return;
+                }
+                JobSearchDTO dto = new JobSearchDTO();
+                dto.setCompanyId(Integer.parseInt(companyIdParam));
+                dto.setPage(1);
+                dto.setSize(50);
+                PageResponse<JobDTO> jobs = jobService.search(dto);
+                resp.setStatus(HttpServletResponse.SC_OK);
+                resp.getWriter().print(objectMapper.writeValueAsString(new ApiResponse<>(true, "Lấy jobs theo công ty thành công", jobs)));
+                return;
+            }
+
 
             // GET /jobs hoặc GET /jobs/
             if (pathInfo == null || "/".equals(pathInfo)) {

@@ -355,7 +355,10 @@ export default function EmployerDashboardPage() {
                     option.label.toLowerCase().includes(input.toLowerCase())
                   }
                   style={{ borderRadius: 8 }}
-                  options={provinces.map(p => ({ value: p.name, label: p.name }))}
+                  options={provinces.map(p => ({
+                    value: p.name.replace(/^Thành phố\s+/i, '').replace(/^Tỉnh\s+/i, '').trim(),
+                    label: p.name,
+                  }))}
                 />
               </Form.Item>
             </Col>

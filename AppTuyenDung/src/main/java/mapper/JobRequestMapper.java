@@ -5,8 +5,27 @@ import model.Employers;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeParseException;
 
 public class JobRequestMapper {
+
+    /** Parse ISO 8601 string thành LocalDateTime — hỗ trợ cả "2026-07-12T17:00:00.000Z" và "2026-07-12T17:00:00" */
+    private static LocalDateTime parseDateTime(String raw) {
+        if (raw == null || raw.isBlank()) return null;
+        String s = raw.trim();
+        // Có timezone offset (Z hoặc +07:00) — parse qua OffsetDateTime rồi chuyển sang local
+        if (s.endsWith("Z") || s.contains("+") || (s.length() > 19 && s.charAt(19) == '-' && s.indexOf('T') != -1)) {
+            try {
+                return OffsetDateTime.parse(s).toLocalDateTime();
+            } catch (DateTimeParseException ignored) {}
+        }
+        // Bỏ phần milliseconds nếu có: "2026-07-12T17:00:00.000" -> "2026-07-12T17:00:00"
+        if (s.length() > 19 && s.charAt(19) == '.') {
+            s = s.substring(0, 19);
+        }
+        return LocalDateTime.parse(s);
+    }
 
     public static JobDTO toDTO(HttpServletRequest req) {
 
@@ -45,17 +64,17 @@ public class JobRequestMapper {
         // DateTime
         String postedAt = req.getParameter("postedAt");
         if (postedAt != null && !postedAt.isBlank()) {
-            dto.setPostedAt(LocalDateTime.parse(postedAt));
+            dto.setPostedAt(parseDateTime(postedAt));
         }
 
         String expiredAt = req.getParameter("expiredAt");
         if (expiredAt != null && !expiredAt.isBlank()) {
-            dto.setExpiredAt(LocalDateTime.parse(expiredAt));
+            dto.setExpiredAt(parseDateTime(expiredAt));
         }
 
         String applicationDeadline = req.getParameter("applicationDeadline");
         if (applicationDeadline != null && !applicationDeadline.isBlank()) {
-            dto.setApplicationDeadline(LocalDateTime.parse(applicationDeadline));
+            dto.setApplicationDeadline(parseDateTime(applicationDeadline));
         }
 
         // Status

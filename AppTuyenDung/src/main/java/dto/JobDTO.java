@@ -30,6 +30,7 @@ public class JobDTO {
     private Integer companyId;
     private String companyName;
     private Integer jobPositionId;
+    private Integer employerUserId;  // users.id của employer — dùng cho chat
 
     public JobDTO() {
     }
@@ -194,5 +195,13 @@ public class JobDTO {
 
     public void setJobPositionId(Integer jobPositionId) {
         this.jobPositionId = jobPositionId;
+    }
+
+    public Integer getEmployerUserId() {
+        return employerUserId;
+    }
+
+    public void setEmployerUserId(Integer employerUserId) {
+        this.employerUserId = employerUserId;
     }
 }

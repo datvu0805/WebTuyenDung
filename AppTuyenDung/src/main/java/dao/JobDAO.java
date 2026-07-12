@@ -143,7 +143,11 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
     @Override
     public Job getById(int id) {
 
-        String sql = "SELECT * FROM jobs WHERE id = ?";
+        String sql = "SELECT j.*, c.company_name, e.user_id AS employer_user_id " +
+                     "FROM jobs j " +
+                     "LEFT JOIN companies c ON j.company_id = c.id " +
+                     "LEFT JOIN employers e ON j.employer_id = e.id " +
+                     "WHERE j.id = ?";
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -152,7 +156,13 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
             try (ResultSet rs = ps.executeQuery()) {
 
                 if (rs.next()) {
-                    return JobMapper.map(rs);
+                    Job job = JobMapper.map(rs);
+                    String companyName = rs.getString("company_name");
+                    if (!rs.wasNull()) job.setCompanyName(companyName);
+                    // employerUserId stored as transient in Job via companyName pattern — pass via DTO layer
+                    int empUserId = rs.getInt("employer_user_id");
+                    if (!rs.wasNull()) job.setEmployerUserId(empUserId);
+                    return job;
                 }
             }
 
@@ -225,6 +235,13 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
             params.add(search.getStatus());
         }
 
+        if (search.getCompanyId() != null) {
+
+            sql.append(" AND j.company_id=?");
+
+            params.add(search.getCompanyId());
+        }
+
         sql.append(" ORDER BY j.status ASC, j.posted_at DESC");
         sql.append(" LIMIT ? OFFSET ?");
 
@@ -291,6 +308,11 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
         if (search.getStatus() != null) {
             sql.append(" AND status = ?");
             params.add(search.getStatus());
+        }
+
+        if (search.getCompanyId() != null) {
+            sql.append(" AND company_id = ?");
+            params.add(search.getCompanyId());
         }
 
         try (Connection conn = getConnection();

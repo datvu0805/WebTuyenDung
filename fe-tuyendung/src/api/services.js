@@ -17,6 +17,7 @@ export const jobApi = {
   getAll: () => api.get('/jobs'),
   getById: (id) => api.get(`/jobs/${id}`),
   search: (params) => api.get('/jobs/search', { params }),
+  getByCompany: (companyId) => api.get('/jobs/company', { params: { companyId } }),
   create: (data) => api.post('/jobs', new URLSearchParams(data)),
   update: (data) => api.put('/jobs', new URLSearchParams(data)),
   delete: (id) => api.delete(`/jobs?id=${id}`),
@@ -93,6 +94,12 @@ export const certificateApi = {
   create: (data) => api.post('/certificate', new URLSearchParams(data)),
   update: (data) => api.put('/certificate', new URLSearchParams(data)),
   delete: (id) => api.delete(`/certificate?id=${id}`),
+};
+
+export const messageApi = {
+  getHistory: (withUserId) => api.get('/api/messages', { params: { action: 'history', withUserId } }),
+  getRecent: () => api.get('/api/messages', { params: { action: 'recent' } }),
+  getUnread: () => api.get('/api/messages', { params: { action: 'unread' } }),
 };
 
 export const candidateCertificateApi = {

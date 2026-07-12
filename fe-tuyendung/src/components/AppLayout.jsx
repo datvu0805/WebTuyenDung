@@ -3,7 +3,8 @@ import { Layout, Menu, Avatar, Dropdown, Button, Typography, Drawer, Modal, Form
 import {
   BankOutlined, UserOutlined, LogoutOutlined, FileTextOutlined,
   UnorderedListOutlined, MenuOutlined, TeamOutlined, BulbOutlined,
-  CaretDownOutlined, EditOutlined, MailOutlined, PhoneOutlined, EnvironmentOutlined, CalendarOutlined, CameraOutlined
+  CaretDownOutlined, EditOutlined, MailOutlined, PhoneOutlined, EnvironmentOutlined, CalendarOutlined, CameraOutlined,
+  MessageOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -105,11 +106,13 @@ export default function AppLayout({ children }) {
   const candidateNav = [
     { key: '/jobs', icon: <UnorderedListOutlined />, label: 'Việc làm' },
     { key: '/cv/upload', icon: <FileTextOutlined />, label: 'Hồ sơ CV' },
+    { key: '/messages', icon: <MessageOutlined />, label: 'Tin nhắn' },
   ];
   const employerNav = [
     { key: '/employer/dashboard', icon: <TeamOutlined />, label: 'Tin tuyển dụng' },
     { key: '/employer/applications', icon: <UnorderedListOutlined />, label: 'Đơn ứng tuyển' },
     { key: '/employer/skills', icon: <BulbOutlined />, label: 'Kỹ năng' },
+    { key: '/messages', icon: <MessageOutlined />, label: 'Tin nhắn' },
   ];
   const navItems = user?.role === 'ADMIN' ? adminNav : user?.role === 'EMPLOYER' ? employerNav : candidateNav;
   const homeRoute = user?.role === 'ADMIN' ? '/admin' : user?.role === 'EMPLOYER' ? '/employer/dashboard' : '/jobs';

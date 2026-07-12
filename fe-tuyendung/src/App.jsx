@@ -22,6 +22,7 @@ import CandidateProfilePage from './pages/CandidateProfilePage';
 import CandidateListPage from './pages/CandidateListPage';
 import CertificateManagePage from './pages/CertificateManagePage';
 import AdminPage from './pages/AdminPage';
+import ChatPage from './pages/ChatPage';
 
 dayjs.extend(relativeTime);
 dayjs.locale('vi');
@@ -73,6 +74,10 @@ export default function App() {
             } />
             <Route path="/employer/certificates" element={
               <PrivateRoute roles={['EMPLOYER', 'ADMIN']}><CertificateManagePage /></PrivateRoute>
+            } />
+
+            <Route path="/messages" element={
+              <PrivateRoute roles={['CANDIDATE', 'EMPLOYER']}><ChatPage /></PrivateRoute>
             } />
 
             <Route path="/admin" element={

@@ -106,7 +106,8 @@ public class AuthFilter implements Filter {
         if (PUBLIC_PATHS.contains(path)
                 || path.startsWith("/css/")
                 || path.startsWith("/js/")
-                || path.startsWith("/images/")) {
+                || path.startsWith("/images/")
+                || path.startsWith("/ws/")) {
             chain.doFilter(request, response);
             return;
         }

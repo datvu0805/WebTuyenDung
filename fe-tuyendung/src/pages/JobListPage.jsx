@@ -169,6 +169,14 @@ function JobCard({ job, onClick }) {
   );
 }
 
+// Strip "Thành phố " / "Tỉnh " để value khớp với dữ liệu trong DB
+function shortName(fullName = '') {
+  return fullName
+    .replace(/^Thành phố\s+/i, '')
+    .replace(/^Tỉnh\s+/i, '')
+    .trim();
+}
+
 export default function JobListPage() {
   const [jobs, setJobs]         = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -268,7 +276,7 @@ export default function JobListPage() {
                 option.label.toLowerCase().includes(input.toLowerCase())
               }
               style={{ flex: 1, minWidth: 160 }}
-              options={provinces.map((p) => ({ value: p.name, label: p.name }))}
+              options={provinces.map((p) => ({ value: shortName(p.name), label: p.name }))}
             />
             <Select
               size="large"

@@ -22,6 +22,10 @@ public class Job extends BaseEntity{
     private Integer companyId;
     private Integer jobPositionId;
     private String companyName; // transient — populated by JOIN queries, not stored in DB
+    private Integer employerUserId; // transient — users.id của employer
+
+    public Integer getEmployerUserId() { return employerUserId; }
+    public void setEmployerUserId(Integer employerUserId) { this.employerUserId = employerUserId; }
 
     public String getCompanyName() {
         return companyName;

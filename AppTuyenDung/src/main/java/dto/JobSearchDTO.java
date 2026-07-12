@@ -8,6 +8,7 @@ public class JobSearchDTO {
     private Double maxSalary;
     private String experience;
     private Short status;
+    private Integer companyId;
     private int page = 1;
     private int size = 20;
 
@@ -60,6 +61,14 @@ public class JobSearchDTO {
 
     public void setStatus(Short status) {
         this.status = status;
+    }
+
+    public Integer getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Integer companyId) {
+        this.companyId = companyId;
     }
 
     public int getPage() {

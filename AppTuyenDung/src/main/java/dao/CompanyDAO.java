@@ -149,4 +149,21 @@ public class CompanyDAO extends DatabaseConfig {
 
         return companies;
     }
+
+    public int countCompanies() {
+        String sql = "SELECT count(*) FROM companies";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()
+        ) {
+            if (rs.next()) {
+                return rs.getInt("count(*)");
+            }
+
+        } catch (SQLException e) {
+        }
+        return 0;
+    }
 }

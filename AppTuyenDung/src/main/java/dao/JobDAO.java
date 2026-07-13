@@ -334,4 +334,20 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
 
         return 0;
     }
+
+    public int totalJob() {
+        String  sql = "SELECT COUNT(*) FROM jobs";
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()
+                ){
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return 0;
+    }
 }

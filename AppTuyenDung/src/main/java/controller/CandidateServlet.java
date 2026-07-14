@@ -28,7 +28,8 @@ public class CandidateServlet extends BaseServlet {
     protected void doGet(HttpServletRequest req,
                          HttpServletResponse resp)
             throws IOException {
-
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
 
         HttpSession session = req.getSession(false);
@@ -81,8 +82,10 @@ public class CandidateServlet extends BaseServlet {
 
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
+
 
         HttpSession session = req.getSession(false);
         Integer userId = (Integer) session.getAttribute("userId");

@@ -86,4 +86,21 @@ public class SkillDAO extends DatabaseConfig implements TDAO<Skill> {
         s.setSkillName(rs.getString("skill_name"));
         return s;
     }
+
+    public int totalSkill(){
+        String sql = "SELECT COUNT(*) FROM skills";
+
+        try(
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()
+                ) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return 0;
+    }
 }

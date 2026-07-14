@@ -6,7 +6,9 @@ import model.Users;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class UserDAO extends DatabaseConfig {
 
@@ -332,5 +334,57 @@ public class UserDAO extends DatabaseConfig {
         return null;
     }
 
+
+    public int totalUsers() {
+        String sql = " select count(*) from users ";
+
+        try (Connection conn = getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery())
+        {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            ps.executeQuery();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return 0;
+    }
+
+
+    public Map<String, Integer> countUserByRole() {
+
+        Map<String, Integer> result = new HashMap<>();
+
+        String sql = """
+        SELECT
+            r.role_name,
+            COUNT(*) AS total
+        FROM users u
+        JOIN roles r ON u.role_id = r.id
+        GROUP BY r.role_name
+    """;
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()
+        ) {
+
+            while (rs.next()) {
+                String roleName = rs.getString("role_name");
+                int total = rs.getInt("total");
+
+                result.put(roleName, total);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return result;
+    }
 
 }

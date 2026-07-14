@@ -232,8 +232,10 @@ public class AuthService {
             user.setDateOfBirth(LocalDate.parse(dto.getDateOfBirth()));
             Users existingEmail = userDAO.findByEmailExceptId(user.getEmail(), userId);
             if (existingEmail != null) {
-                return "Email đã tồn tại";
+                return "update email thất bại";
             }
+
+
 
             boolean updateUser = userDAO.update(conn, userId, user);
 

@@ -14,6 +14,10 @@ public class CompanyService {
 
     private final CompanyDAO companyDAO = new CompanyDAO();
 
+    public final RedisService redis = new RedisService();
+
+    public final CacheService cacheService = new CacheService();
+
     public String createCompany(CreateCompanyDTO dto) {
         if (dto == null) {
             return "Dữ liệu công ty không hợp lệ";
@@ -32,6 +36,9 @@ public class CompanyService {
             return "Tạo công ty thất bại";
         }
 
+        cacheService.clearAdminStatistic();
+
+        cacheService.clearCacheCompany(companyId);
         return null;
     }
 
@@ -58,7 +65,8 @@ public class CompanyService {
         if (!updated) {
             return "Cập nhật công ty thất bại";
         }
-
+        cacheService.clearCacheCompany(dto.getId());
+        cacheService.clearAdminStatistic();
         return null;
     }
 
@@ -96,6 +104,8 @@ public class CompanyService {
             return "Xóa công ty thất bại";
         }
 
+        cacheService.clearCacheCompany(id);
+        cacheService.clearAdminStatistic();
         return null;
     }
 }

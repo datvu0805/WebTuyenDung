@@ -1,14 +1,8 @@
 package service;
 
 import dao.*;
-import dto.CandidateProfileDTO;
-import dto.EmployerProfileDTO;
-import dto.RegisterCandidateDTO;
-import dto.RegisterEmployerDTO;
-import model.Company;
-import model.Employers;
-import model.Role;
-import model.Users;
+import dto.*;
+import model.*;
 import utils.PasswordUtil;
 import validator.UserValidator;
 
@@ -27,9 +21,15 @@ public class AuthService {
 
 
     private final UserValidator validator = new UserValidator();
-
+    private final CacheService cacheService = new CacheService();
     private final FileService fileService = new FileService();
 
+
+    private static final int MAX_LOGIN_ATTEMPTS = 5;
+    private static final long ATTEMPT_TTL_SECONDS = 10 * 60;
+    private static final long LOCK_TTL_SECONDS = 10 * 60;
+
+    private final RedisService redisService = new RedisService();
 
     public String registerCandidate(RegisterCandidateDTO dto, Part avatar) {
 
@@ -83,7 +83,7 @@ public class AuthService {
             return "Tạo candidate thất bại";
         }
 
-
+        cacheService.clearAdminStatistic();
         return null;
     }
 
@@ -145,25 +145,87 @@ public class AuthService {
         if (employerId == -1) {
             return "Tạo employer thất bại";
         }
-
+        cacheService.clearAdminStatistic();
         return null;
     }
-    public Users login(String username, String password) {
+    public LoginResult login(String username, String password) {
+
+        if (username == null || username.isBlank()
+                || password == null || password.isBlank()) {
+
+            return LoginResult.failure(
+                    "Tên đăng nhập và mật khẩu không được để trống"
+            );
+        }
+
+        username = username.trim();
+
+        String failedKey = "login:failed:" + username;
+        String lockedKey = "login:locked:" + username;
+
+        // Kiểm tra tài khoản có đang bị khóa không
+        long lockedSeconds = redisService.ttl(lockedKey);
+
+        if (lockedSeconds > 0) {
+            return LoginResult.locked(lockedSeconds);
+        }
 
         Users user = userDAO.getByUsername(username);
 
-        if (user == null) {
-            return null;
+        boolean validPassword = false;
+
+        if (user != null) {
+            validPassword = PasswordUtil.verifyPassword(
+                    password,
+                    user.getPassword()
+            );
         }
 
-        boolean validPassword =
-                PasswordUtil.verifyPassword(password, user.getPassword());
+        // Đăng nhập sai
+        if (user == null || !validPassword) {
 
-        if (!validPassword) {
-            return null;
+            long failedAttempts =
+                    redisService.increment(failedKey);
+
+            // Lần sai đầu tiên: bộ đếm tồn tại tối đa 10 phút
+            if (failedAttempts == 1) {
+                redisService.expire(
+                        failedKey,
+                        ATTEMPT_TTL_SECONDS
+                );
+            }
+
+            // Sai lần thứ 5: khóa đủ 10 phút
+            if (failedAttempts >= MAX_LOGIN_ATTEMPTS) {
+
+                redisService.setWithTtl(
+                        lockedKey,
+                        "locked",
+                        LOCK_TTL_SECONDS
+                );
+
+                redisService.delete(failedKey);
+
+                return LoginResult.locked(
+                        LOCK_TTL_SECONDS
+                );
+            }
+
+            long remaining =
+                    MAX_LOGIN_ATTEMPTS - failedAttempts;
+
+            return LoginResult.failure(
+                    "Sai tài khoản hoặc mật khẩu. Bạn còn "
+                            + remaining
+                            + " lần thử"
+            );
         }
 
-        return user;
+        // Đăng nhập thành công thì xóa số lần sai
+        redisService.delete(failedKey);
+        redisService.delete(lockedKey);
+
+        return LoginResult.success(user);
     }
 
     public String updateCandidateProfile(int id, CandidateProfileDTO dto)
@@ -208,7 +270,7 @@ public class AuthService {
                 return "update thất bại";
             }
         }
-
+        cacheService.clearAdminStatistic();
         return null;
     }
 
@@ -249,7 +311,7 @@ public class AuthService {
 
 
             conn.commit(); //  thành công hết
-
+            cacheService.clearAdminStatistic();
             return null;
 
         } catch (Exception e) {

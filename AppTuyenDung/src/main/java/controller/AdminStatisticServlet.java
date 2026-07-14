@@ -25,8 +25,11 @@ public class AdminStatisticServlet extends BaseServlet {
         resp.setContentType("application/json;charset=UTF-8");
 
         try {
-            AdminStatisticDTO data =
-                    statisticService.getStatistic();
+            boolean cacheHit = statisticService.isCached(); // kiểm tra trước
+
+            AdminStatisticDTO data = statisticService.getStatistic(); // sau đó mới lấy dữ liệu
+
+            resp.setHeader("X-Cache", cacheHit ? "HIT" : "MISS");
 
             resp.setStatus(HttpServletResponse.SC_OK);
 
@@ -37,6 +40,8 @@ public class AdminStatisticServlet extends BaseServlet {
                             data
                     )
             ));
+
+
 
         } catch (Exception e) {
             e.printStackTrace();

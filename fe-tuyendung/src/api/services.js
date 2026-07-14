@@ -18,6 +18,7 @@ export const jobApi = {
   getById: (id) => api.get(`/jobs/${id}`),
   search: (params) => api.get('/jobs/search', { params }),
   getByCompany: (companyId) => api.get('/jobs/company', { params: { companyId } }),
+  getRecommended: (limit = 10) => api.get('/jobs/recommended', { params: { limit } }),
   create: (data) => api.post('/jobs', new URLSearchParams(data)),
   update: (data) => api.put('/jobs', new URLSearchParams(data)),
   delete: (id) => api.delete(`/jobs?id=${id}`),
@@ -37,6 +38,19 @@ export const jobSkillApi = {
     api.post('/job-skills', new URLSearchParams({ jobId, skillId })),
   remove: (jobId, skillId) =>
     api.delete(`/job-skills?jobId=${jobId}&skillId=${skillId}`),
+};
+
+export const candidateSkillApi = {
+  getByCandidate: (candidateId) => api.get(`/candidate-skills/candidate?id=${candidateId}`),
+  replaceBatch: (skillIds) =>
+    api.put('/candidate-skills/batch', { skillIds }, { headers: { 'Content-Type': 'application/json' } }),
+};
+
+export const favoriteJobApi = {
+  getByCandidate: (candidateId) => api.get(`/favorite-jobs/candidate?id=${candidateId}`),
+  check: (candidateId, jobId) => api.get('/favorite-jobs/check', { params: { candidateId, jobId } }),
+  add: (jobId) => api.post('/favorite-jobs', { jobId }, { headers: { 'Content-Type': 'application/json' } }),
+  remove: (jobId) => api.delete('/favorite-jobs', { data: { jobId }, headers: { 'Content-Type': 'application/json' } }),
 };
 
 export const cvApi = {
@@ -118,10 +132,57 @@ export const adminCompanyApi = {
   import: (formData) => api.post('/admin/company/import', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
 };
 
+export const adminSettingsApi = {
+  getAll: () => api.get('/admin/settings'),
+  update: (key, value) => api.put('/admin/settings', { key, value }, { headers: { 'Content-Type': 'application/json' } }),
+};
+
 export const jobPositionApi = {
   getAll: () => api.get('/admin/job-positions'),
   create: (data) => api.post('/admin/job-positions', data, { headers: { 'Content-Type': 'application/json' } }),
   update: (data) => api.put('/admin/job-positions', data, { headers: { 'Content-Type': 'application/json' } }),
   delete: (id) => api.delete(`/admin/job-positions?id=${id}`),
   import: (formData) => api.post('/admin/job-positions/import', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+};
+
+export const educationLevelApi = {
+  getAll: () => api.get('/education-level'),
+  create: (levelName) => api.post('/education-level', { levelName }, { headers: { 'Content-Type': 'application/json' } }),
+  update: (id, levelName) => api.put('/education-level', { id, levelName }, { headers: { 'Content-Type': 'application/json' } }),
+  delete: (id) => api.delete(`/education-level?id=${id}`),
+};
+
+export const candidateEducationApi = {
+  getByCandidate: (candidateId) => api.get(`/candidate-education/candidate?id=${candidateId}`),
+  create: (data) => api.post('/candidate-education', data, { headers: { 'Content-Type': 'application/json' } }),
+  update: (data) => api.put('/candidate-education', data, { headers: { 'Content-Type': 'application/json' } }),
+  delete: (id) => api.delete(`/candidate-education?id=${id}`),
+};
+
+export const jobEducationApi = {
+  getByJob: (jobId) => api.get(`/job-educations/job?id=${jobId}`),
+  add: (jobId, educationLevelId) =>
+    api.post('/job-educations', { jobId, educationLevelId }, { headers: { 'Content-Type': 'application/json' } }),
+  remove: (jobId, educationLevelId) =>
+    api.delete('/job-educations', { data: { jobId, educationLevelId }, headers: { 'Content-Type': 'application/json' } }),
+};
+
+export const jobCertificateApi = {
+  getByJob: (jobId) => api.get(`/job-certificates/job?id=${jobId}`),
+  add: (jobId, certificateId, requiredScore) =>
+    api.post('/job-certificates/single', { jobId, certificateId, requiredScore }, { headers: { 'Content-Type': 'application/json' } }),
+  remove: (jobId, certificateId) =>
+    api.delete('/job-certificates', { data: { jobId, certificateId }, headers: { 'Content-Type': 'application/json' } }),
+};
+
+export const cvCertificateApi = {
+  getByCv: (cvId) => api.get(`/cv-certificates?cvId=${cvId}`),
+  replaceForCv: (cvId, candidateCertificateIds) =>
+    api.put('/cv-certificates', { cvId, candidateCertificateIds }, { headers: { 'Content-Type': 'application/json' } }),
+};
+
+export const cvEducationApi = {
+  getByCv: (cvId) => api.get(`/cv-educations?cvId=${cvId}`),
+  replaceForCv: (cvId, candidateEducationIds) =>
+    api.put('/cv-educations', { cvId, candidateEducationIds }, { headers: { 'Content-Type': 'application/json' } }),
 };

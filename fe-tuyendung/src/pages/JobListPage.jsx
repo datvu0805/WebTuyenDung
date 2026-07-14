@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Input, Select, Spin, Empty, Tag, Typography, Pagination } from 'antd';
+import { Input, Select, Spin, Empty, Tag, Typography, Pagination, message } from 'antd';
 import {
   SearchOutlined, EnvironmentOutlined, DollarOutlined,
   TeamOutlined, ClockCircleOutlined, FireOutlined, BankOutlined,
-  SolutionOutlined,
+  SolutionOutlined, StarOutlined, StarFilled,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { jobApi } from '../api/services';
+import { jobApi, favoriteJobApi } from '../api/services';
+import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/AppLayout';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
@@ -40,7 +41,7 @@ function isExpired(job) {
   return false;
 }
 
-function JobCard({ job, onClick }) {
+function JobCard({ job, onClick, showFavorite, isFavorite, onToggleFavorite }) {
   const statusIdx = job.status ?? 1;
   const expired = isExpired(job);
   const ci = colorIdx(job.id);
@@ -57,6 +58,7 @@ function JobCard({ job, onClick }) {
         display: 'flex',
         gap: 16,
         alignItems: 'flex-start',
+        position: 'relative',
         opacity: expired ? 0.75 : 1,
         transition: 'box-shadow 0.15s, border-color 0.15s',
       }}
@@ -82,10 +84,19 @@ function JobCard({ job, onClick }) {
         {getCompanyInitials(job.companyName || job.title)}
       </div>
 
+      {showFavorite && (
+        <div
+          onClick={(e) => { e.stopPropagation(); onToggleFavorite(job.id); }}
+          style={{ position: 'absolute', top: 14, right: 14, fontSize: 18, cursor: 'pointer', color: isFavorite ? '#faad14' : '#ccc' }}
+        >
+          {isFavorite ? <StarFilled /> : <StarOutlined />}
+        </div>
+      )}
+
       <div style={{ flex: 1, minWidth: 0 }}>
         {/* Title + status badge */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8, flexWrap: 'wrap' }}>
-          <Text strong style={{ fontSize: 15, color: expired ? '#888' : '#1a1a1a', lineHeight: 1.4 }}>
+          <Text strong style={{ fontSize: 15, color: expired ? '#888' : '#1a1a1a', lineHeight: 1.4, paddingRight: showFavorite ? 24 : 0 }}>
             {job.title}
           </Text>
           <span style={{
@@ -192,6 +203,12 @@ export default function JobListPage() {
   const [totalItems, setTotalItems] = useState(0);
   const navigate = useNavigate();
   const debounceRef = useRef(null);
+  const { user } = useAuth();
+  const isCandidate = user?.role === 'CANDIDATE' && !!user?.candidateId;
+
+  const [favoriteIds, setFavoriteIds] = useState(new Set());
+  const [recommended, setRecommended] = useState([]);
+  const [recommendedLoading, setRecommendedLoading] = useState(false);
 
   useEffect(() => {
     fetch('https://provinces.open-api.vn/api/p/')
@@ -199,6 +216,34 @@ export default function JobListPage() {
       .then((data) => setProvinces(data || []))
       .catch(() => {});
   }, []);
+
+  useEffect(() => {
+    if (!isCandidate) return;
+    favoriteJobApi.getByCandidate(user.candidateId)
+      .then((res) => { if (res.data.success) setFavoriteIds(new Set((res.data.data || []).map(j => j.id))); })
+      .catch(() => {});
+    setRecommendedLoading(true);
+    jobApi.getRecommended()
+      .then((res) => { if (res.data.success) setRecommended(res.data.data || []); })
+      .catch(() => {})
+      .finally(() => setRecommendedLoading(false));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCandidate]);
+
+  const handleToggleFavorite = async (jobId) => {
+    const isFav = favoriteIds.has(jobId);
+    try {
+      if (isFav) await favoriteJobApi.remove(jobId);
+      else await favoriteJobApi.add(jobId);
+      setFavoriteIds((prev) => {
+        const next = new Set(prev);
+        if (isFav) next.delete(jobId); else next.add(jobId);
+        return next;
+      });
+    } catch {
+      message.error('Có lỗi khi cập nhật yêu thích');
+    }
+  };
 
   const fetchJobs = useCallback((p, t, loc, st) => {
     setFetching(true);
@@ -294,6 +339,30 @@ export default function JobListPage() {
       </div>
 
       <div style={{ maxWidth: 940, margin: '0 auto', padding: '28px 16px' }}>
+        {isCandidate && (recommendedLoading || recommended.length > 0) && (
+          <div style={{ marginBottom: 28 }}>
+            <Title level={5} style={{ marginBottom: 12 }}>
+              <FireOutlined style={{ marginRight: 6, color: GREEN }} />Gợi ý cho bạn
+            </Title>
+            {recommendedLoading ? (
+              <div style={{ textAlign: 'center', padding: 24 }}><Spin /></div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {recommended.map((job) => (
+                  <JobCard
+                    key={job.id}
+                    job={job}
+                    onClick={() => navigate(`/jobs/${job.id}`)}
+                    showFavorite={isCandidate}
+                    isFavorite={favoriteIds.has(job.id)}
+                    onToggleFavorite={handleToggleFavorite}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {loading ? (
           <div style={{ textAlign: 'center', padding: 80 }}><Spin size="large" /></div>
         ) : (
@@ -318,7 +387,14 @@ export default function JobListPage() {
               <>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 12, opacity: fetching ? 0.6 : 1, transition: 'opacity 0.2s' }}>
                   {jobs.map((job) => (
-                    <JobCard key={job.id} job={job} onClick={() => navigate(`/jobs/${job.id}`)} />
+                    <JobCard
+                      key={job.id}
+                      job={job}
+                      onClick={() => navigate(`/jobs/${job.id}`)}
+                      showFavorite={isCandidate}
+                      isFavorite={favoriteIds.has(job.id)}
+                      onToggleFavorite={handleToggleFavorite}
+                    />
                   ))}
                 </div>
                 <div style={{ marginTop: 24, textAlign: 'center' }}>

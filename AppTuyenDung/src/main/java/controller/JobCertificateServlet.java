@@ -6,9 +6,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dto.ApiResponse;
 import dto.JobCertificateBatchDTO;
 import dto.JobCertificateDTO;
+import dto.JobCertificateRequirementDTO;
 import mapper.JobCertificateBatchRequestMapper;
 import mapper.JobCertificateRequestMapper;
-import model.Certificate;
 import model.Job;
 import service.JobCertificateService;
 
@@ -36,14 +36,15 @@ public class JobCertificateServlet extends BaseServlet {
 
             String pathInfo = req.getPathInfo();
 
-            // GET /job-certificates/job?id=1
+            // GET /job-certificates/job?id=1 — trả kèm điểm/tiêu chuẩn tối thiểu yêu cầu (requiredScore)
             if ("/job".equals(pathInfo)) {
 
                 int jobId = Integer.parseInt(req.getParameter("id"));
 
-                List<Certificate> certificates = jobCertificateService.getCertificatesByJob(jobId);
+                List<JobCertificateRequirementDTO> requirements = jobCertificateService.getRequirementsByJob(jobId);
 
-                ApiResponse<List<Certificate>> response = new ApiResponse<>(true, "Lấy danh sách chứng chỉ thành công!", certificates);
+                ApiResponse<List<JobCertificateRequirementDTO>> response =
+                        new ApiResponse<>(true, "Lấy danh sách chứng chỉ thành công!", requirements);
 
                 resp.setStatus(HttpServletResponse.SC_OK);
 

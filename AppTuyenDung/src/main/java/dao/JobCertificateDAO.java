@@ -1,6 +1,7 @@
 package dao;
 
 import config.DatabaseConfig;
+import dto.JobCertificateRequirementDTO;
 import mapper.CertificateMapper;
 import mapper.JobMapper;
 import model.Certificate;
@@ -14,14 +15,15 @@ import java.util.List;
 
 public class JobCertificateDAO extends DatabaseConfig {
 
-    public void add(Job job, Certificate certificate) {
+    public void add(Job job, Certificate certificate, String requiredScore) {
 
-        String sql = "INSERT INTO job_certificates(job_id, certificate_id) VALUES (?, ?)";
+        String sql = "INSERT INTO job_certificates(job_id, certificate_id, required_score) VALUES (?, ?, ?)";
 
         try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, job.getId());
             ps.setInt(2, certificate.getId());
+            ps.setString(3, requiredScore);
 
             ps.executeUpdate();
 
@@ -109,6 +111,41 @@ public class JobCertificateDAO extends DatabaseConfig {
 
             while (rs.next()) {
                 list.add(CertificateMapper.map(rs));
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return list;
+    }
+
+    // Lấy danh sách chứng chỉ yêu cầu của job, kèm điểm/tiêu chuẩn tối thiểu (required_score)
+    public List<JobCertificateRequirementDTO> getRequirementsByJob(Job job) {
+
+        String sql = """
+                SELECT c.id AS certificate_id, c.certificate_name, c.score_type, jc.required_score
+                FROM certificates c
+                INNER JOIN job_certificates jc
+                    ON c.id = jc.certificate_id
+                WHERE jc.job_id = ?
+                """;
+
+        List<JobCertificateRequirementDTO> list = new ArrayList<>();
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, job.getId());
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                list.add(new JobCertificateRequirementDTO(
+                        rs.getInt("certificate_id"),
+                        rs.getString("certificate_name"),
+                        rs.getString("score_type"),
+                        rs.getString("required_score")
+                ));
             }
 
         } catch (Exception e) {

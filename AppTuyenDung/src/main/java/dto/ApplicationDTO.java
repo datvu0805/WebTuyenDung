@@ -5,6 +5,7 @@ import model.Candidates;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 // quản lý đơn ứng tuyển
 public class ApplicationDTO {
@@ -15,6 +16,8 @@ public class ApplicationDTO {
     private String fileUrl;
     private LocalDateTime applieAt;
     private int status;
+    private List<String> attachedCertificates; // tên chứng chỉ candidate gắn vào CV dùng ứng tuyển
+    private List<String> attachedEducations;   // tên học vấn candidate gắn vào CV dùng ứng tuyển
 
     public ApplicationDTO() {
     }
@@ -27,6 +30,22 @@ public class ApplicationDTO {
         this.fileUrl = fileUrl;
         this.applieAt = applieAt;
         this.status = status;
+    }
+
+    public List<String> getAttachedCertificates() {
+        return attachedCertificates;
+    }
+
+    public void setAttachedCertificates(List<String> attachedCertificates) {
+        this.attachedCertificates = attachedCertificates;
+    }
+
+    public List<String> getAttachedEducations() {
+        return attachedEducations;
+    }
+
+    public void setAttachedEducations(List<String> attachedEducations) {
+        this.attachedEducations = attachedEducations;
     }
 
     public Application getApplicationID() {

@@ -1,15 +1,18 @@
 package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dao.JobDAO;
 import dto.ApiResponse;
 import dto.JobSkillDTO;
 import mapper.JobSkillRequestMapper;
+import model.Job;
 import service.JobSkillService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
@@ -17,7 +20,30 @@ import java.util.List;
 public class JobSkillServlet extends BaseServlet {
 
     private final JobSkillService jobSkillService = new JobSkillService();
+    private final JobDAO jobDAO = new JobDAO();
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    // Kiểm tra employer đang đăng nhập có sở hữu job này không — chống việc employer A sửa job của employer B
+    private boolean isOwnerOfJob(HttpServletRequest req, Integer jobId) {
+
+        if (jobId == null) return false;
+
+        HttpSession session = req.getSession(false);
+
+        if (session == null) return false;
+
+        // ADMIN được thao tác trên mọi job
+        if ("ADMIN".equals(session.getAttribute("role"))) return true;
+
+        Object employerId = session.getAttribute("employerId");
+
+        if (employerId == null) return false;
+
+        Job job = jobDAO.getById(jobId);
+
+        return job != null && job.getEmployerID() != null
+                && job.getEmployerID().getId() == (int) employerId;
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -29,6 +55,13 @@ public class JobSkillServlet extends BaseServlet {
         try {
 
             JobSkillDTO dto = JobSkillRequestMapper.toDTO(req);
+
+            if (!isOwnerOfJob(req, dto.getJobId())) {
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                resp.getWriter().print(objectMapper.writeValueAsString(
+                        new ApiResponse<>(false, "Bạn không có quyền chỉnh sửa kỹ năng của công việc này.", null)));
+                return;
+            }
 
             jobSkillService.add(dto);
 
@@ -65,6 +98,13 @@ public class JobSkillServlet extends BaseServlet {
         try {
 
             JobSkillDTO dto = JobSkillRequestMapper.toDTO(req);
+
+            if (!isOwnerOfJob(req, dto.getJobId())) {
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                resp.getWriter().print(objectMapper.writeValueAsString(
+                        new ApiResponse<>(false, "Bạn không có quyền chỉnh sửa kỹ năng của công việc này.", null)));
+                return;
+            }
 
             jobSkillService.delete(dto);
 

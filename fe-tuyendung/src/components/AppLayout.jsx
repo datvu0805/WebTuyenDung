@@ -1,14 +1,14 @@
 import React, { useState, useRef } from 'react';
-import { Layout, Menu, Avatar, Dropdown, Button, Typography, Drawer, Modal, Form, Input, DatePicker, message, Spin, Descriptions, Upload } from 'antd';
+import { Layout, Menu, Avatar, Dropdown, Button, Typography, Drawer, Modal, Form, Input, DatePicker, message, Spin, Descriptions, Upload, Empty, Tag } from 'antd';
 import {
   BankOutlined, UserOutlined, LogoutOutlined, FileTextOutlined,
-  UnorderedListOutlined, MenuOutlined, TeamOutlined, BulbOutlined,
+  UnorderedListOutlined, MenuOutlined, TeamOutlined,
   CaretDownOutlined, EditOutlined, MailOutlined, PhoneOutlined, EnvironmentOutlined, CalendarOutlined, CameraOutlined,
-  MessageOutlined,
+  MessageOutlined, StarFilled, DollarOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { candidateApi, employerApi } from '../api/services';
+import { candidateApi, employerApi, favoriteJobApi } from '../api/services';
 import dayjs from 'dayjs';
 
 const { Header, Content, Footer } = Layout;
@@ -28,6 +28,10 @@ export default function AppLayout({ children }) {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const avatarInputRef = useRef(null);
   const [form] = Form.useForm();
+
+  const [favoriteOpen, setFavoriteOpen] = useState(false);
+  const [favoriteJobs, setFavoriteJobs] = useState([]);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
 
   const handleLogout = () => { logout(); navigate('/login'); };
 
@@ -79,6 +83,20 @@ export default function AppLayout({ children }) {
     }
   };
 
+  const openFavoriteJobs = () => {
+    if (!user?.candidateId) return;
+    setFavoriteOpen(true);
+    setFavoriteLoading(true);
+    favoriteJobApi.getByCandidate(user.candidateId)
+      .then((res) => { if (res.data.success) setFavoriteJobs(res.data.data || []); })
+      .catch(() => message.error('Không thể tải danh sách việc làm yêu thích'))
+      .finally(() => setFavoriteLoading(false));
+  };
+
+  const formatSalary = (job) => (job.minSalary || job.maxSalary)
+    ? `${(job.minSalary || 0).toLocaleString('vi-VN')}${job.maxSalary ? ' – ' + job.maxSalary.toLocaleString('vi-VN') : ''} ${job.currency || 'VNĐ'}`
+    : 'Thỏa thuận';
+
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -111,20 +129,22 @@ export default function AppLayout({ children }) {
   const employerNav = [
     { key: '/employer/dashboard', icon: <TeamOutlined />, label: 'Tin tuyển dụng' },
     { key: '/employer/applications', icon: <UnorderedListOutlined />, label: 'Đơn ứng tuyển' },
-    { key: '/employer/skills', icon: <BulbOutlined />, label: 'Kỹ năng' },
     { key: '/messages', icon: <MessageOutlined />, label: 'Tin nhắn' },
   ];
   const navItems = user?.role === 'ADMIN' ? adminNav : user?.role === 'EMPLOYER' ? employerNav : candidateNav;
   const homeRoute = user?.role === 'ADMIN' ? '/admin' : user?.role === 'EMPLOYER' ? '/employer/dashboard' : '/jobs';
 
   const userMenuItems = [
-    ...(user?.role !== 'ADMIN' ? [{ key: 'profile', icon: <UserOutlined />, label: 'Thông tin cá nhân' }, { type: 'divider' }] : []),
+    ...(user?.role !== 'ADMIN' ? [{ key: 'profile', icon: <UserOutlined />, label: 'Thông tin cá nhân' }] : []),
+    ...(user?.role === 'CANDIDATE' ? [{ key: 'favorite', icon: <StarFilled style={{ color: '#faad14' }} />, label: 'Việc làm yêu thích' }] : []),
+    { type: 'divider' },
     { key: 'logout', icon: <LogoutOutlined />, label: 'Đăng xuất' },
   ];
 
   const handleUserMenuClick = ({ key }) => {
     if (key === 'logout') handleLogout();
     if (key === 'profile') openProfile();
+    if (key === 'favorite') openFavoriteJobs();
   };
 
   return (
@@ -281,6 +301,50 @@ export default function AppLayout({ children }) {
             <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" placeholder="Chọn ngày sinh" />
           </Form.Item>
         </Form>
+      </Modal>
+
+      {/* Modal việc làm yêu thích */}
+      <Modal
+        title={<span><StarFilled style={{ color: '#faad14', marginRight: 6 }} />Việc làm yêu thích</span>}
+        open={favoriteOpen}
+        onCancel={() => setFavoriteOpen(false)}
+        footer={<Button onClick={() => setFavoriteOpen(false)}>Đóng</Button>}
+        width={560}
+      >
+        {favoriteLoading ? (
+          <div style={{ textAlign: 'center', padding: 32 }}><Spin /></div>
+        ) : favoriteJobs.length === 0 ? (
+          <Empty description="Bạn chưa lưu công việc nào" style={{ padding: 24 }} />
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, maxHeight: 420, overflowY: 'auto' }}>
+            {favoriteJobs.map((job) => (
+              <div
+                key={job.id}
+                onClick={() => { setFavoriteOpen(false); navigate(`/jobs/${job.id}`); }}
+                style={{ padding: '12px 14px', borderRadius: 8, border: '1px solid #eee', cursor: 'pointer' }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#b7ebd0'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#eee'; }}
+              >
+                <Text strong style={{ fontSize: 14 }}>{job.title}</Text>
+                {job.companyName && (
+                  <div style={{ marginTop: 4 }}>
+                    <Text style={{ fontSize: 12, color: LOGO_GREEN }}>
+                      <BankOutlined style={{ marginRight: 4 }} />{job.companyName}
+                    </Text>
+                  </div>
+                )}
+                <div style={{ marginTop: 6, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                  <Tag color="green" style={{ borderRadius: 4, fontSize: 12 }}>
+                    <DollarOutlined style={{ marginRight: 4 }} />{formatSalary(job)}
+                  </Tag>
+                  {job.location && (
+                    <Tag style={{ borderRadius: 4, fontSize: 12 }}>{job.location}</Tag>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </Modal>
     </Layout>
   );

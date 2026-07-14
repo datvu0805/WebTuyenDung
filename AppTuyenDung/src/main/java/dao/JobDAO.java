@@ -193,6 +193,29 @@ public class JobDAO extends DatabaseConfig implements TDAO<Job> {
         return list;
     }
 
+    // Chỉ lấy job đang tuyển (status = 1) — dùng cho gợi ý việc làm, tránh load job hết hạn/đóng
+    public List<Job> getAllActive() {
+
+        String sql = "SELECT j.*, c.company_name FROM jobs j LEFT JOIN companies c ON j.company_id = c.id WHERE j.status = 1";
+
+        List<Job> list = new ArrayList<>();
+
+        try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Job job = JobMapper.map(rs);
+                String companyName = rs.getString("company_name");
+                if (!rs.wasNull()) job.setCompanyName(companyName);
+                list.add(job);
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return list;
+    }
+
     public List<Job> search(JobSearchDTO search) {
 
         StringBuilder sql = new StringBuilder(

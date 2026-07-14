@@ -18,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,6 +32,13 @@ public class FavoriteJobServlet extends BaseServlet {
 
 
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+    // Lấy candidateId của user đang đăng nhập từ session — chống IDOR (không tin candidateId client gửi lên)
+    private Integer getSessionCandidateId(HttpServletRequest req) {
+        HttpSession session = req.getSession(false);
+        if (session == null) return null;
+        return (Integer) session.getAttribute("candidateId");
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -198,9 +206,17 @@ public class FavoriteJobServlet extends BaseServlet {
 
         try {
 
+            Integer sessionCandidateId = getSessionCandidateId(req);
+
+            if (sessionCandidateId == null) {
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                resp.getWriter().print(objectMapper.writeValueAsString(
+                        new ApiResponse<>(false, "Chỉ ứng viên mới có thể thực hiện hành động này.", null)));
+                return;
+            }
 
             FavoriteJobDTO dto = objectMapper.readValue(req.getReader(), FavoriteJobDTO.class);
-
+            dto.setCandidateId(sessionCandidateId);
 
             favoriteJobService.add(dto);
 
@@ -250,9 +266,17 @@ public class FavoriteJobServlet extends BaseServlet {
 
         try {
 
+            Integer sessionCandidateId = getSessionCandidateId(req);
+
+            if (sessionCandidateId == null) {
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                resp.getWriter().print(objectMapper.writeValueAsString(
+                        new ApiResponse<>(false, "Chỉ ứng viên mới có thể thực hiện hành động này.", null)));
+                return;
+            }
 
             FavoriteJobDTO dto = objectMapper.readValue(req.getReader(), FavoriteJobDTO.class);
-
+            dto.setCandidateId(sessionCandidateId);
 
             favoriteJobService.delete(dto);
 

@@ -12,7 +12,10 @@ import model.Users;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> {
 
@@ -103,6 +106,24 @@ public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> 
         return null;
     }
 
+    // Lấy danh sách jobId mà candidate đã ứng tuyển — dùng để loại khỏi danh sách gợi ý
+    public Set<Integer> getAppliedJobIds(int candidateID) {
+        String sql = "SELECT job_id FROM applications WHERE candidate_id = ?";
+        Set<Integer> result = new HashSet<>();
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, candidateID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    result.add(rs.getInt("job_id"));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Lỗi lấy danh sách job đã ứng tuyển: " + e.getMessage());
+        }
+        return result;
+    }
+
     // đếm số đơn ứng tuyển
     public int countApplications(int candidateID, int jobID) {
         String sql = "SELECT COUNT(*) FROM applications WHERE candidate_id = ? AND job_id = ?";
@@ -125,9 +146,18 @@ public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> 
     public List<ApplicationDTO> getApplicationsForRecruiter(int recruiterId) {
         List<ApplicationDTO> list = new ArrayList<>();
         // recruiterId = users.id — join qua employers để lấy jobs của nhà tuyển dụng này
+        // LEFT JOIN qua cv_certificates/cv_educations để lấy tên chứng chỉ/học vấn candidate gắn vào CV ứng tuyển
         String sql = "SELECT a.id AS app_id, a.cover_letter, a.description, " +
                 "c.id AS candidate_id, u.full_name AS candidate_full_name, " +
-                "j.title AS job_title, cv.cv_title AS cv_title, cv.file_url, a.status, a.applied_at " +
+                "j.title AS job_title, cv.cv_title AS cv_title, cv.file_url, a.status, a.applied_at, " +
+                "(SELECT string_agg(cert.certificate_name, ', ') FROM cv_certificates cvc " +
+                "   JOIN candidate_certificates cc ON cvc.candidate_certificate_id = cc.id " +
+                "   JOIN certificates cert ON cc.certificate_id = cert.id " +
+                "   WHERE cvc.cv_id = cv.id) AS attached_certificates, " +
+                "(SELECT string_agg(el.level_name, ', ') FROM cv_educations cve " +
+                "   JOIN candidate_educations ce ON cve.candidate_education_id = ce.id " +
+                "   JOIN education_levels el ON ce.education_level_id = el.id " +
+                "   WHERE cve.cv_id = cv.id) AS attached_educations " +
                 "FROM applications a " +
                 "JOIN candidates c ON a.candidate_id = c.id " +
                 "JOIN users u ON c.user_id = u.id " +
@@ -162,6 +192,9 @@ public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> 
                     dto.setApplieAt(rs.getObject("applied_at", LocalDateTime.class));
                     dto.setStatus(rs.getInt("status"));
 
+                    dto.setAttachedCertificates(splitCommaList(rs.getString("attached_certificates")));
+                    dto.setAttachedEducations(splitCommaList(rs.getString("attached_educations")));
+
                     list.add(dto);
                 }
             }
@@ -169,6 +202,13 @@ public class ApplicationDAO extends DatabaseConfig implements IDAO<Application> 
             throw new RuntimeException("Lỗi SQL khi lấy danh sách DTO: " + e.getMessage(), e);
         }
         return list;
+    }
+
+    private List<String> splitCommaList(String value) {
+        if (value == null || value.isBlank()) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(Arrays.asList(value.split(",\\s*")));
     }
 
     @Override

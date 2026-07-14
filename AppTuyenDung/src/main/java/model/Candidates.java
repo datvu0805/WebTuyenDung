@@ -3,6 +3,8 @@ package model;
 public class Candidates extends BaseEntity {
 
     private Users user;
+    private Double desiredMinSalary;
+    private Double desiredMaxSalary;
 
     public Candidates() {
     }
@@ -22,5 +24,21 @@ public class Candidates extends BaseEntity {
 
     public void setUser(Users user) {
         this.user = user;
+    }
+
+    public Double getDesiredMinSalary() {
+        return desiredMinSalary;
+    }
+
+    public void setDesiredMinSalary(Double desiredMinSalary) {
+        this.desiredMinSalary = desiredMinSalary;
+    }
+
+    public Double getDesiredMaxSalary() {
+        return desiredMaxSalary;
+    }
+
+    public void setDesiredMaxSalary(Double desiredMaxSalary) {
+        this.desiredMaxSalary = desiredMaxSalary;
     }
 }

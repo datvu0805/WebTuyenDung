@@ -1,24 +1,28 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   Form, Input, Button, Upload, Typography, message,
-  Popconfirm, Empty, Spin, Modal,
+  Popconfirm, Empty, Spin, Modal, Select, Tag,
 } from 'antd';
 import {
   UploadOutlined, FilePdfOutlined, DeleteOutlined,
   PlusOutlined, EyeOutlined, CalendarOutlined,
-  FileTextOutlined, CloudUploadOutlined,
+  FileTextOutlined, CloudUploadOutlined, SafetyCertificateOutlined, ReadOutlined,
 } from '@ant-design/icons';
 import { Worker, Viewer } from '@react-pdf-viewer/core';
 import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
-import { cvApi } from '../api/services';
+import {
+  cvApi, candidateCertificateApi, certificateApi, candidateEducationApi, educationLevelApi,
+  cvCertificateApi, cvEducationApi,
+} from '../api/services';
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/AppLayout';
 import dayjs from 'dayjs';
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.js?url';
 
 const { Title, Text } = Typography;
+const { Option } = Select;
 const GREEN = '#00b14f';
 const PDFJS_WORKER_URL = pdfjsWorkerUrl;
 
@@ -31,6 +35,12 @@ export default function UploadCVPage() {
   const [viewingCV, setViewingCV]     = useState(null);
   const { user } = useAuth();
   const [form] = Form.useForm();
+
+  // Danh mục chứng chỉ/học vấn candidate đã khai ở hồ sơ, để chọn gắn vào CV đang tạo
+  const [myCertificates, setMyCertificates] = useState([]);
+  const [myEducations, setMyEducations]     = useState([]);
+  const [allCertNames, setAllCertNames]     = useState([]);
+  const [allEduLevels, setAllEduLevels]     = useState([]);
 
   const loadCVs = useCallback(() => {
     if (!user?.candidateId) return;
@@ -45,6 +55,32 @@ export default function UploadCVPage() {
 
   useEffect(() => { loadCVs(); }, [loadCVs]);
 
+  useEffect(() => {
+    if (!user?.candidateId) return;
+    Promise.all([
+      candidateCertificateApi.getAll(),
+      certificateApi.getAll(),
+      candidateEducationApi.getByCandidate(user.candidateId),
+      educationLevelApi.getAll(),
+    ]).then(([myCertRes, allCertRes, myEduRes, allEduRes]) => {
+      if (myCertRes.data.success) {
+        setMyCertificates((myCertRes.data.data || []).filter(c => String(c.candidateId) === String(user.candidateId)));
+      }
+      if (allCertRes.data.success) setAllCertNames(allCertRes.data.data || []);
+      if (myEduRes.data.success) setMyEducations(myEduRes.data.data || []);
+      if (allEduRes.data.success) setAllEduLevels(allEduRes.data.data || []);
+    }).catch(() => {});
+  }, [user?.candidateId]);
+
+  const getCertLabel = (c) => {
+    const name = allCertNames.find(n => n.id === c.certificateId)?.certificateName || `Chứng chỉ #${c.certificateId}`;
+    return c.score ? `${name} (${c.score})` : name;
+  };
+  const getEduLabel = (e) => {
+    const level = allEduLevels.find(l => l.id === e.educationLevelId)?.levelName || `Trình độ #${e.educationLevelId}`;
+    return e.schoolName ? `${level} — ${e.schoolName}` : level;
+  };
+
   const onFinish = async (values) => {
     if (!cvFile) { message.error('Vui lòng chọn file CV (PDF)'); return; }
     setUploading(true);
@@ -57,6 +93,17 @@ export default function UploadCVPage() {
     try {
       const res = await cvApi.upload(fd);
       if (res.data.success) {
+        const cvId = res.data.data?.id;
+        if (cvId) {
+          await Promise.all([
+            values.certificateIds?.length
+              ? cvCertificateApi.replaceForCv(cvId, values.certificateIds)
+              : Promise.resolve(),
+            values.educationIds?.length
+              ? cvEducationApi.replaceForCv(cvId, values.educationIds)
+              : Promise.resolve(),
+          ]).catch(() => message.warning('Đã lưu CV nhưng gắn chứng chỉ/học vấn thất bại'));
+        }
         message.success('Tải lên CV thành công');
         form.resetFields();
         setCvFile(null);
@@ -224,6 +271,24 @@ export default function UploadCVPage() {
                     Chọn file PDF
                   </Button>
                 </Upload>
+              </Form.Item>
+              <Form.Item
+                name="certificateIds"
+                label={<span style={{ fontWeight: 600 }}><SafetyCertificateOutlined style={{ marginRight: 4 }} />Chứng chỉ đính kèm</span>}
+              >
+                <Select mode="multiple" allowClear placeholder="Chọn chứng chỉ muốn hiển thị trên CV này..."
+                  style={{ borderRadius: 8 }} optionFilterProp="children">
+                  {myCertificates.map(c => <Option key={c.id} value={c.id}>{getCertLabel(c)}</Option>)}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                name="educationIds"
+                label={<span style={{ fontWeight: 600 }}><ReadOutlined style={{ marginRight: 4 }} />Học vấn đính kèm</span>}
+              >
+                <Select mode="multiple" allowClear placeholder="Chọn học vấn muốn hiển thị trên CV này..."
+                  style={{ borderRadius: 8 }} optionFilterProp="children">
+                  {myEducations.map(e => <Option key={e.id} value={e.id}>{getEduLabel(e)}</Option>)}
+                </Select>
               </Form.Item>
               <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
                 <Button onClick={() => { setShowForm(false); form.resetFields(); setCvFile(null); }} style={{ borderRadius: 8 }}>

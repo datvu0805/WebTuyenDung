@@ -3,8 +3,8 @@ import {
   Table, Button, Modal, Form, Input, Select, InputNumber,
   DatePicker, Switch, Space, Tag, message, Popconfirm, Typography, Row, Col, Tooltip, Upload
 } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, FileTextOutlined, CheckCircleOutlined, ClockCircleOutlined, TagsOutlined, CloseOutlined, UploadOutlined, DownloadOutlined } from '@ant-design/icons';
-import { jobApi, jobSkillApi, skillApi, jobPositionApi, employerApi, adminCompanyApi } from '../api/services';
+import { PlusOutlined, EditOutlined, DeleteOutlined, FileTextOutlined, CheckCircleOutlined, ClockCircleOutlined, TagsOutlined, CloseOutlined, UploadOutlined, DownloadOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
+import { jobApi, jobSkillApi, skillApi, jobPositionApi, employerApi, adminCompanyApi, jobCertificateApi, jobEducationApi, certificateApi, educationLevelApi } from '../api/services';
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/AppLayout';
 import dayjs from 'dayjs';
@@ -32,6 +32,18 @@ export default function EmployerDashboardPage() {
   const [allSkills, setAllSkills] = useState([]);
   const [skillsLoading, setSkillsLoading] = useState(false);
   const [addingSkillId, setAddingSkillId] = useState(null);
+
+  // Job certificate/education requirement modal state
+  const [reqModalOpen, setReqModalOpen] = useState(false);
+  const [reqModalJob, setReqModalJob] = useState(null);
+  const [jobCertificates, setJobCertificates] = useState([]);
+  const [jobEducations, setJobEducations] = useState([]);
+  const [allCertificates, setAllCertificates] = useState([]);
+  const [allEducationLevels, setAllEducationLevels] = useState([]);
+  const [reqLoading, setReqLoading] = useState(false);
+  const [addingCertId, setAddingCertId] = useState(null);
+  const [addingCertScore, setAddingCertScore] = useState('');
+  const [addingEduId, setAddingEduId] = useState(null);
 
   const [importing, setImporting] = useState(false);
   const [jobPositions, setJobPositions] = useState([]);
@@ -185,6 +197,79 @@ export default function EmployerDashboardPage() {
     }
   };
 
+  const openRequirementModal = async (job) => {
+    setReqModalJob(job);
+    setReqModalOpen(true);
+    setReqLoading(true);
+    try {
+      const [jobCertRes, jobEduRes, allCertRes, allEduRes] = await Promise.all([
+        jobCertificateApi.getByJob(job.id),
+        jobEducationApi.getByJob(job.id),
+        certificateApi.getAll(),
+        educationLevelApi.getAll(),
+      ]);
+      if (jobCertRes.data.success) setJobCertificates(jobCertRes.data.data || []);
+      if (jobEduRes.data.success) setJobEducations(jobEduRes.data.data || []);
+      if (allCertRes.data.success) setAllCertificates(allCertRes.data.data || []);
+      if (allEduRes.data.success) setAllEducationLevels(allEduRes.data.data || []);
+    } catch {
+      message.error('Không thể tải yêu cầu chứng chỉ/học vấn');
+    } finally {
+      setReqLoading(false);
+    }
+  };
+
+  const handleAddCertificate = async (certificateId) => {
+    if (!certificateId) return;
+    try {
+      const res = await jobCertificateApi.add(reqModalJob.id, certificateId, addingCertScore || null);
+      if (res.data.success) {
+        const refreshed = await jobCertificateApi.getByJob(reqModalJob.id);
+        if (refreshed.data.success) setJobCertificates(refreshed.data.data || []);
+        setAddingCertId(null);
+        setAddingCertScore('');
+      } else {
+        message.error(res.data.message);
+      }
+    } catch {
+      message.error('Thêm chứng chỉ thất bại');
+    }
+  };
+
+  const handleRemoveCertificate = async (certificateId) => {
+    try {
+      await jobCertificateApi.remove(reqModalJob.id, certificateId);
+      setJobCertificates(prev => prev.filter(c => c.certificateId !== certificateId));
+    } catch {
+      message.error('Xóa chứng chỉ thất bại');
+    }
+  };
+
+  const handleAddEducation = async (educationLevelId) => {
+    if (!educationLevelId) return;
+    try {
+      const res = await jobEducationApi.add(reqModalJob.id, educationLevelId);
+      if (res.data.success) {
+        const refreshed = await jobEducationApi.getByJob(reqModalJob.id);
+        if (refreshed.data.success) setJobEducations(refreshed.data.data || []);
+        setAddingEduId(null);
+      } else {
+        message.error(res.data.message);
+      }
+    } catch {
+      message.error('Thêm học vấn thất bại');
+    }
+  };
+
+  const handleRemoveEducation = async (educationLevelId) => {
+    try {
+      await jobEducationApi.remove(reqModalJob.id, educationLevelId);
+      setJobEducations(prev => prev.filter(e => e.id !== educationLevelId));
+    } catch {
+      message.error('Xóa học vấn thất bại');
+    }
+  };
+
   const activeCount = jobs.filter(j => j.status === 1).length;
 
   const columns = [
@@ -217,6 +302,9 @@ export default function EmployerDashboardPage() {
         <Space size={4}>
           <Tooltip title="Kỹ năng">
             <Button icon={<TagsOutlined />} size="small" onClick={() => openSkillModal(record)} style={{ borderRadius: 6 }} />
+          </Tooltip>
+          <Tooltip title="Chứng chỉ & học vấn yêu cầu">
+            <Button icon={<SafetyCertificateOutlined />} size="small" onClick={() => openRequirementModal(record)} style={{ borderRadius: 6 }} />
           </Tooltip>
           <Button icon={<EditOutlined />} size="small" onClick={() => openEdit(record)} style={{ borderRadius: 6 }} />
           <Popconfirm title="Xóa tin này?" onConfirm={() => onDelete(record.id)} okText="Xóa" cancelText="Hủy">
@@ -464,6 +552,103 @@ export default function EmployerDashboardPage() {
             })}
           </div>
         )}
+      </Modal>
+
+      {/* Modal chứng chỉ & học vấn yêu cầu cho job */}
+      <Modal
+        title={<span style={{ fontWeight: 700 }}>Chứng chỉ & học vấn yêu cầu — {reqModalJob?.title}</span>}
+        open={reqModalOpen}
+        onCancel={() => { setReqModalOpen(false); setAddingCertId(null); setAddingCertScore(''); setAddingEduId(null); }}
+        footer={<Button onClick={() => { setReqModalOpen(false); setAddingCertId(null); setAddingCertScore(''); setAddingEduId(null); }}>Đóng</Button>}
+        width={520}
+      >
+        <div style={{ marginBottom: 20 }}>
+          <div style={{ fontWeight: 600, marginBottom: 8, color: '#555' }}>Chứng chỉ yêu cầu</div>
+          <Space.Compact style={{ width: '100%', marginBottom: 12 }}>
+            <Select
+              placeholder="Chọn chứng chỉ..."
+              style={{ flex: 1.4 }}
+              value={addingCertId}
+              onChange={setAddingCertId}
+              showSearch
+              filterOption={(input, opt) => (opt?.children ?? '').toLowerCase().includes(input.toLowerCase())}
+            >
+              {allCertificates
+                .filter(c => !jobCertificates.some(jc => jc.certificateId === c.id))
+                .map(c => <Option key={c.id} value={c.id}>{c.certificatesName ?? c.certificateName}</Option>)}
+            </Select>
+            <Input
+              placeholder="Điểm tối thiểu (VD: 750)"
+              style={{ flex: 1 }}
+              value={addingCertScore}
+              onChange={(e) => setAddingCertScore(e.target.value)}
+            />
+            <Button type="primary" style={{ background: GREEN, borderColor: GREEN }}
+              onClick={() => handleAddCertificate(addingCertId)} disabled={!addingCertId}>
+              Thêm
+            </Button>
+          </Space.Compact>
+          {reqLoading ? (
+            <div style={{ color: '#aaa', textAlign: 'center', padding: '12px 0' }}>Đang tải...</div>
+          ) : jobCertificates.length === 0 ? (
+            <div style={{ color: '#aaa', textAlign: 'center', padding: '12px 0' }}>Chưa có chứng chỉ nào</div>
+          ) : (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {jobCertificates.map(c => (
+                <Tag
+                  key={c.certificateId}
+                  closable
+                  onClose={() => handleRemoveCertificate(c.certificateId)}
+                  closeIcon={<CloseOutlined />}
+                  style={{ borderRadius: 20, padding: '4px 10px', fontSize: 13, background: '#fff7e6', borderColor: '#ffd591', color: '#ad6800' }}
+                >
+                  {c.certificateName}{c.requiredScore ? ` (tối thiểu ${c.requiredScore})` : ''}
+                </Tag>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div>
+          <div style={{ fontWeight: 600, marginBottom: 8, color: '#555' }}>Trình độ học vấn yêu cầu</div>
+          <Space.Compact style={{ width: '100%', marginBottom: 12 }}>
+            <Select
+              placeholder="Chọn trình độ..."
+              style={{ flex: 1 }}
+              value={addingEduId}
+              onChange={setAddingEduId}
+              showSearch
+              filterOption={(input, opt) => (opt?.children ?? '').toLowerCase().includes(input.toLowerCase())}
+            >
+              {allEducationLevels
+                .filter(e => !jobEducations.some(je => je.id === e.id))
+                .map(e => <Option key={e.id} value={e.id}>{e.levelName}</Option>)}
+            </Select>
+            <Button type="primary" style={{ background: GREEN, borderColor: GREEN }}
+              onClick={() => handleAddEducation(addingEduId)} disabled={!addingEduId}>
+              Thêm
+            </Button>
+          </Space.Compact>
+          {reqLoading ? (
+            <div style={{ color: '#aaa', textAlign: 'center', padding: '12px 0' }}>Đang tải...</div>
+          ) : jobEducations.length === 0 ? (
+            <div style={{ color: '#aaa', textAlign: 'center', padding: '12px 0' }}>Chưa có yêu cầu học vấn nào</div>
+          ) : (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {jobEducations.map(e => (
+                <Tag
+                  key={e.id}
+                  closable
+                  onClose={() => handleRemoveEducation(e.id)}
+                  closeIcon={<CloseOutlined />}
+                  style={{ borderRadius: 20, padding: '4px 10px', fontSize: 13, background: '#e6f4ff', borderColor: '#91caff', color: '#0958d9' }}
+                >
+                  {e.levelName}
+                </Tag>
+              ))}
+            </div>
+          )}
+        </div>
       </Modal>
     </AppLayout>
   );

@@ -20,6 +20,8 @@ public class CandidateProfileDTO {
 
     private String address;
     private String dateOfBirth;
+    private Double desiredMinSalary;
+    private Double desiredMaxSalary;
 
     public int getCandidateId() {
         return candidateId;
@@ -91,5 +93,21 @@ public class CandidateProfileDTO {
 
     public void setDateOfBirth(String dateOfBirth) {
         this.dateOfBirth = dateOfBirth;
+    }
+
+    public Double getDesiredMinSalary() {
+        return desiredMinSalary;
+    }
+
+    public void setDesiredMinSalary(Double desiredMinSalary) {
+        this.desiredMinSalary = desiredMinSalary;
+    }
+
+    public Double getDesiredMaxSalary() {
+        return desiredMaxSalary;
+    }
+
+    public void setDesiredMaxSalary(Double desiredMaxSalary) {
+        this.desiredMaxSalary = desiredMaxSalary;
     }
 }

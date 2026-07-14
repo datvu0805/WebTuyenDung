@@ -10,6 +10,7 @@ import dto.PageResponse;
 import mapper.JobRequestMapper;
 import mapper.JobSearchRequestMapper;
 import service.JobService;
+import service.RecommendationService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -22,6 +23,7 @@ import java.util.List;
 @WebServlet(urlPatterns = {"/jobs/*"})
 public class JobSevrlet extends BaseServlet {
     private final JobService jobService = new JobService();
+    private final RecommendationService recommendationService = new RecommendationService();
     // chuyển đổi để json đọc được data từ kiểu localdatetime
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
@@ -46,6 +48,37 @@ public class JobSevrlet extends BaseServlet {
 
                 ApiResponse<PageResponse<JobDTO>> response =
                         new ApiResponse<>(true, "Tìm kiếm thành công", jobs);
+
+                resp.setStatus(HttpServletResponse.SC_OK);
+
+                resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+                return;
+            }
+
+            // GET /jobs/recommended?limit=10 — gợi ý việc làm cho ứng viên đang đăng nhập
+            if ("/recommended".equals(pathInfo)) {
+
+                HttpSession session = req.getSession(false);
+                Integer candidateId = session == null ? null : (Integer) session.getAttribute("candidateId");
+
+                if (candidateId == null) {
+                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    resp.getWriter().print(objectMapper.writeValueAsString(
+                            new ApiResponse<>(false, "Chỉ ứng viên mới có thể xem gợi ý việc làm.", null)));
+                    return;
+                }
+
+                String limitParam = req.getParameter("limit");
+                int limit = 10;
+                if (limitParam != null && !limitParam.isBlank()) {
+                    limit = Integer.parseInt(limitParam);
+                }
+
+                List<JobDTO> jobs = recommendationService.recommend(candidateId, limit);
+
+                ApiResponse<List<JobDTO>> response =
+                        new ApiResponse<>(true, "Lấy gợi ý việc làm thành công", jobs);
 
                 resp.setStatus(HttpServletResponse.SC_OK);
 

@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
@@ -27,6 +28,13 @@ public class CandidateSkillServlet extends BaseServlet {
     private final ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+    // Lấy candidateId của user đang đăng nhập từ session — chống IDOR (không tin candidateId client gửi lên)
+    private Integer getSessionCandidateId(HttpServletRequest req) {
+        HttpSession session = req.getSession(false);
+        if (session == null) return null;
+        return (Integer) session.getAttribute("candidateId");
+    }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -117,7 +125,17 @@ public class CandidateSkillServlet extends BaseServlet {
 
         try {
 
+            Integer sessionCandidateId = getSessionCandidateId(req);
+
+            if (sessionCandidateId == null) {
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                resp.getWriter().print(objectMapper.writeValueAsString(
+                        new ApiResponse<>(false, "Chỉ ứng viên mới có thể thực hiện hành động này.", null)));
+                return;
+            }
+
             CandidateSkillDTO dto = CandidateSkillRequestMapper.toDTO(req);
+            dto.setCandidateId(sessionCandidateId); // luôn dùng candidateId của chính người đang đăng nhập
 
             candidateSkillService.add(dto);
 
@@ -161,54 +179,74 @@ public class CandidateSkillServlet extends BaseServlet {
         }
     }
 
-//    @Override
-//    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//
-//        req.setCharacterEncoding("UTF-8");
-//        resp.setContentType("application/json");
-//        resp.setCharacterEncoding("UTF-8");
-//
-//        try {
-//
-//            CandidateSkillBatchDTO dto = CandidateSkillBatchRequestMapper.toDTO(req);
-//
-//            candidateSkillService.update(dto);
-//
-//            ApiResponse<CandidateSkillBatchDTO> response =
-//                    new ApiResponse<>(true, "Cập nhật kỹ năng thành công!", dto);
-//
-//            resp.setStatus(HttpServletResponse.SC_OK);
-//
-//            resp.getWriter().print(objectMapper.writeValueAsString(response));
-//
-//        } catch (NumberFormatException e) {
-//
-//            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//
-//            ApiResponse<Object> response =
-//                    new ApiResponse<>(false, "Dữ liệu số không hợp lệ!", null);
-//
-//            resp.getWriter().print(objectMapper.writeValueAsString(response));
-//
-//        } catch (IllegalArgumentException e) {
-//
-//            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-//
-//            ApiResponse<Object> response =
-//                    new ApiResponse<>(false, e.getMessage(), null);
-//
-//            resp.getWriter().print(objectMapper.writeValueAsString(response));
-//
-//        } catch (Exception e) {
-//
-//            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-//
-//            ApiResponse<Object> response =
-//                    new ApiResponse<>(false, e.getMessage(), null);
-//
-//            resp.getWriter().print(objectMapper.writeValueAsString(response));
-//        }
-//    }
+    // PUT /candidate-skills/batch — thay toàn bộ danh sách kỹ năng của ứng viên đang đăng nhập
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json");
+        resp.setCharacterEncoding("UTF-8");
+
+        try {
+
+            String pathInfo = req.getPathInfo();
+
+            if (!"/batch".equals(pathInfo)) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().print(objectMapper.writeValueAsString(
+                        new ApiResponse<>(false, "Đường dẫn không hợp lệ", null)));
+                return;
+            }
+
+            Integer sessionCandidateId = getSessionCandidateId(req);
+
+            if (sessionCandidateId == null) {
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                resp.getWriter().print(objectMapper.writeValueAsString(
+                        new ApiResponse<>(false, "Chỉ ứng viên mới có thể thực hiện hành động này.", null)));
+                return;
+            }
+
+            CandidateSkillBatchDTO dto = CandidateSkillBatchRequestMapper.toDTO(req);
+            dto.setCandidateId(sessionCandidateId);
+
+            candidateSkillService.replaceSkills(dto);
+
+            ApiResponse<CandidateSkillBatchDTO> response =
+                    new ApiResponse<>(true, "Cập nhật kỹ năng thành công!", dto);
+
+            resp.setStatus(HttpServletResponse.SC_OK);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+        } catch (NumberFormatException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            ApiResponse<Object> response =
+                    new ApiResponse<>(false, "Dữ liệu số không hợp lệ!", null);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+        } catch (IllegalArgumentException e) {
+
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+
+            ApiResponse<Object> response =
+                    new ApiResponse<>(false, e.getMessage(), null);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+
+        } catch (Exception e) {
+
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+            ApiResponse<Object> response =
+                    new ApiResponse<>(false, e.getMessage(), null);
+
+            resp.getWriter().print(objectMapper.writeValueAsString(response));
+        }
+    }
 
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -219,7 +257,17 @@ public class CandidateSkillServlet extends BaseServlet {
 
         try {
 
+            Integer sessionCandidateId = getSessionCandidateId(req);
+
+            if (sessionCandidateId == null) {
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                resp.getWriter().print(objectMapper.writeValueAsString(
+                        new ApiResponse<>(false, "Chỉ ứng viên mới có thể thực hiện hành động này.", null)));
+                return;
+            }
+
             CandidateSkillDTO dto = CandidateSkillRequestMapper.toDTO(req);
+            dto.setCandidateId(sessionCandidateId);
 
             candidateSkillService.delete(dto);
 

@@ -16,11 +16,9 @@ import JobListPage from './pages/JobListPage';
 import JobDetailPage from './pages/JobDetailPage';
 import EmployerDashboardPage from './pages/EmployerDashboardPage';
 import ApplicationManagePage from './pages/ApplicationManagePage';
-import SkillManagePage from './pages/SkillManagePage';
 import UploadCVPage from './pages/UploadCVPage';
 import CandidateProfilePage from './pages/CandidateProfilePage';
 import CandidateListPage from './pages/CandidateListPage';
-import CertificateManagePage from './pages/CertificateManagePage';
 import AdminPage from './pages/AdminPage';
 import ChatPage from './pages/ChatPage';
 
@@ -66,16 +64,9 @@ export default function App() {
             <Route path="/employer/applications" element={
               <PrivateRoute roles={['EMPLOYER']}><ApplicationManagePage /></PrivateRoute>
             } />
-            <Route path="/employer/skills" element={
-              <PrivateRoute roles={['EMPLOYER']}><SkillManagePage /></PrivateRoute>
-            } />
             <Route path="/employer/candidates" element={
               <PrivateRoute roles={['EMPLOYER']}><CandidateListPage /></PrivateRoute>
             } />
-            <Route path="/employer/certificates" element={
-              <PrivateRoute roles={['EMPLOYER', 'ADMIN']}><CertificateManagePage /></PrivateRoute>
-            } />
-
             <Route path="/messages" element={
               <PrivateRoute roles={['CANDIDATE', 'EMPLOYER']}><ChatPage /></PrivateRoute>
             } />

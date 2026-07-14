@@ -2,7 +2,10 @@ package validator;
 
 import dto.FavoriteJobDTO;
 
+import java.util.HashMap;
+
 public class FavoriteJobValidator {
+
 
     public static void validate(FavoriteJobDTO dto) {
 

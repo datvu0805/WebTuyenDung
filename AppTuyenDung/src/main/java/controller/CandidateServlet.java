@@ -66,6 +66,8 @@ public class CandidateServlet extends BaseServlet {
         }
 
         dto.setRole(candidate.getUser().getRole().getRoleName());
+        dto.setDesiredMinSalary(candidate.getDesiredMinSalary());
+        dto.setDesiredMaxSalary(candidate.getDesiredMaxSalary());
 
         ApiResponse<CandidateDTO> result =
                 new ApiResponse<>(
@@ -113,6 +115,14 @@ public class CandidateServlet extends BaseServlet {
                     new ApiResponse<>(false, "Lỗi update", null)
             ));
             return;
+        }
+
+        // Cập nhật mức lương mong muốn (nếu client có gửi lên)
+        if (dto.getDesiredMinSalary() != null || dto.getDesiredMaxSalary() != null) {
+            Candidates candidate = candicateDAO.findByUserId(userId);
+            if (candidate != null) {
+                candicateDAO.updateDesiredSalary(candidate.getId(), dto.getDesiredMinSalary(), dto.getDesiredMaxSalary());
+            }
         }
 
         resp.getWriter().write(gson.toJson(

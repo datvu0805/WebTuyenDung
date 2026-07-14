@@ -35,6 +35,8 @@ public class CandidateDAO extends DatabaseConfig {
         String sql = """
                     SELECT
                         c.id AS candidate_id,
+                        c.desired_min_salary,
+                        c.desired_max_salary,
                         u.id AS user_id,
                         u.username,
                         u.password,
@@ -94,6 +96,12 @@ public class CandidateDAO extends DatabaseConfig {
         Candidates candidate = new Candidates(rs.getInt("candidate_id"));
         candidate.setUser(user);
 
+        double minSalary = rs.getDouble("desired_min_salary");
+        if (!rs.wasNull()) candidate.setDesiredMinSalary(minSalary);
+
+        double maxSalary = rs.getDouble("desired_max_salary");
+        if (!rs.wasNull()) candidate.setDesiredMaxSalary(maxSalary);
+
         return candidate;
     }
 
@@ -101,6 +109,8 @@ public class CandidateDAO extends DatabaseConfig {
         String sql = """
                     SELECT
                         c.id AS candidate_id,
+                        c.desired_min_salary,
+                        c.desired_max_salary,
                         u.id AS user_id,
                         u.username,
                         u.password,
@@ -141,6 +151,8 @@ public class CandidateDAO extends DatabaseConfig {
         String sql = """
                     SELECT
                         c.id AS candidate_id,
+                        c.desired_min_salary,
+                        c.desired_max_salary,
                         u.id AS user_id,
                         u.username,
                         u.password,
@@ -177,6 +189,30 @@ public class CandidateDAO extends DatabaseConfig {
         return null;
     }
 
+    public boolean updateDesiredSalary(int candidateId, Double minSalary, Double maxSalary) {
+        String sql = "UPDATE candidates SET desired_min_salary = ?, desired_max_salary = ? WHERE id = ?";
+
+        try (
+                Connection conn = getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)
+        ) {
+            if (minSalary != null) ps.setDouble(1, minSalary);
+            else ps.setNull(1, java.sql.Types.NUMERIC);
+
+            if (maxSalary != null) ps.setDouble(2, maxSalary);
+            else ps.setNull(2, java.sql.Types.NUMERIC);
+
+            ps.setInt(3, candidateId);
+
+            return ps.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
     public boolean deleteById(int id) {
         String sql = "DELETE FROM candidates WHERE id = ?";
 
@@ -195,7 +231,7 @@ public class CandidateDAO extends DatabaseConfig {
     }
 
     public Candidates getByID(int id) {
-        String sql = "SELECT c.id as candidate_id, u.full_name, u.email " +
+        String sql = "SELECT c.id as candidate_id, c.desired_min_salary, c.desired_max_salary, u.full_name, u.email " +
                 "FROM candidates c " +
                 "JOIN users u ON c.user_id = u.id WHERE c.id = ?";
         try (Connection conn = getConnection()) {
@@ -213,6 +249,12 @@ public class CandidateDAO extends DatabaseConfig {
                         users.setFullName(rs.getString("full_name"));
                         users.setEmail(rs.getString("email"));
                         candidates.setUser(users);
+
+                        double minSalary = rs.getDouble("desired_min_salary");
+                        if (!rs.wasNull()) candidates.setDesiredMinSalary(minSalary);
+
+                        double maxSalary = rs.getDouble("desired_max_salary");
+                        if (!rs.wasNull()) candidates.setDesiredMaxSalary(maxSalary);
                     }
                 }
             }

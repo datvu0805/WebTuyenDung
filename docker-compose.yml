@@ -1,4 +1,15 @@
 services:
+  ai-service:
+    build:
+      context: ./ai-service
+      dockerfile: Dockerfile
+    container_name: webtuyendung-ai
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    networks:
+      - webtuyendung-net
+
   backend:
     build:
       context: ./AppTuyenDung
@@ -6,6 +17,8 @@ services:
     container_name: webtuyendung-be
     ports:
       - "8080:8080"
+    depends_on:
+      - ai-service
     restart: unless-stopped
     networks:
       - webtuyendung-net

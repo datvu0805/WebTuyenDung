@@ -5,6 +5,7 @@ import dao.JobCertificateDAO;
 import dao.JobDAO;
 import dto.JobCertificateBatchDTO;
 import dto.JobCertificateDTO;
+import dto.JobCertificateRequirementDTO;
 import model.Certificate;
 import model.Job;
 import validator.JobCertificateValidator;
@@ -19,7 +20,7 @@ public class JobCertificateService {
     private final CertificateDAO certificateDAO = new CertificateDAO();
 
     /**
-     * Thêm một chứng chỉ cho Job
+     * Thêm một chứng chỉ cho Job, kèm điểm/tiêu chuẩn tối thiểu yêu cầu (ví dụ TOEIC 750)
      */
     public void add(JobCertificateDTO dto) {
 
@@ -39,7 +40,7 @@ public class JobCertificateService {
             throw new IllegalArgumentException("Job đã yêu cầu chứng chỉ này.");
         }
 
-        jobCertificateDAO.add(job, certificate);
+        jobCertificateDAO.add(job, certificate, dto.getRequiredScore());
     }
 
     /**
@@ -103,6 +104,20 @@ public class JobCertificateService {
         }
 
         return jobCertificateDAO.getCertificatesByJob(job);
+    }
+
+    /**
+     * Lấy danh sách chứng chỉ yêu cầu của Job, kèm điểm/tiêu chuẩn tối thiểu
+     */
+    public List<JobCertificateRequirementDTO> getRequirementsByJob(int jobId) {
+
+        Job job = jobDAO.getById(jobId);
+
+        if (job == null) {
+            throw new IllegalArgumentException("Công việc không tồn tại.");
+        }
+
+        return jobCertificateDAO.getRequirementsByJob(job);
     }
 
     /**

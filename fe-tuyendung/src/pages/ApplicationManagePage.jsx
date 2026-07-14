@@ -34,6 +34,8 @@ function flattenApp(dto) {
     fileUrl:      dto.fileUrl || '',
     appliedAt:    dto.applieAt,
     status:       dto.status ?? 0,
+    attachedCertificates: dto.attachedCertificates || [],
+    attachedEducations:   dto.attachedEducations || [],
   };
 }
 
@@ -218,6 +220,16 @@ function ApplicationRow({ app, onUpdateStatus, onViewCover }) {
               overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>
               {app.cvTitle}
             </Text>
+          )}
+          {(app.attachedCertificates?.length > 0 || app.attachedEducations?.length > 0) && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+              {app.attachedCertificates?.map((name, i) => (
+                <Tag key={`cert-${i}`} color="orange" style={{ margin: 0, fontSize: 10, lineHeight: '16px', padding: '0 6px' }}>{name}</Tag>
+              ))}
+              {app.attachedEducations?.map((name, i) => (
+                <Tag key={`edu-${i}`} color="blue" style={{ margin: 0, fontSize: 10, lineHeight: '16px', padding: '0 6px' }}>{name}</Tag>
+              ))}
+            </div>
           )}
         </div>
       </div>

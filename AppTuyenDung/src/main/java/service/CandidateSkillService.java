@@ -73,6 +73,35 @@ public class CandidateSkillService {
 
 
     /**
+     * Thay toàn bộ danh sách kỹ năng của ứng viên (xóa hết rồi thêm lại danh sách mới)
+     */
+    public void replaceSkills(CandidateSkillBatchDTO dto) {
+
+        CandidateSkillValidator.validate(dto);
+
+        Candidates candidate = candidateDAO.getByID(dto.getCandidateId());
+        if (candidate == null) {
+            throw new IllegalArgumentException("Ứng viên không tồn tại.");
+        }
+
+        List<Skill> skills = new ArrayList<>();
+
+        for (Integer id : dto.getSkillIds()) {
+
+            Skill skill = skillDAO.getById(id);
+
+            if (skill == null) {
+                throw new IllegalArgumentException("Kỹ năng không tồn tại. ID = " + id);
+            }
+
+            skills.add(skill);
+        }
+
+        candidateSkillDAO.deleteByCandidateId(candidate);
+        candidateSkillDAO.addBatch(candidate, skills);
+    }
+
+    /**
      * Xóa một kỹ năng
      */
     public void delete(CandidateSkillDTO dto) {

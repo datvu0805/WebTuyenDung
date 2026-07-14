@@ -53,6 +53,46 @@ public class AuthFilter implements Filter {
         // Chỉ CANDIDATE mới upload CV
         ROLE_REQUIRED.put("POST:/UploadCV", setOf("CANDIDATE"));
 
+        // Chỉ CANDIDATE mới được quản lý kỹ năng của chính mình và yêu thích job
+        ROLE_REQUIRED.put("POST:/candidate-skills", setOf("CANDIDATE"));
+        ROLE_REQUIRED.put("PUT:/candidate-skills", setOf("CANDIDATE"));
+        ROLE_REQUIRED.put("DELETE:/candidate-skills", setOf("CANDIDATE"));
+        ROLE_REQUIRED.put("POST:/favorite-jobs", setOf("CANDIDATE"));
+        ROLE_REQUIRED.put("DELETE:/favorite-jobs", setOf("CANDIDATE"));
+
+        // Danh mục kỹ năng (catalog) — chỉ ADMIN mới được tạo/sửa/xóa.
+        // EMPLOYER và CANDIDATE chỉ được xem (GET) để chọn kỹ năng cho job/hồ sơ.
+        ROLE_REQUIRED.put("POST:/skill", setOf("ADMIN"));
+        ROLE_REQUIRED.put("PUT:/skill", setOf("ADMIN"));
+        ROLE_REQUIRED.put("DELETE:/skill", setOf("ADMIN"));
+
+        // Danh mục chứng chỉ (catalog) — chỉ ADMIN mới được tạo/sửa/xóa, mọi role đã login xem được.
+        ROLE_REQUIRED.put("POST:/certificate", setOf("ADMIN"));
+        ROLE_REQUIRED.put("PUT:/certificate", setOf("ADMIN"));
+        ROLE_REQUIRED.put("DELETE:/certificate", setOf("ADMIN"));
+
+        // Danh mục trình độ học vấn (catalog) — chỉ ADMIN mới được tạo/sửa/xóa.
+        ROLE_REQUIRED.put("POST:/education-level", setOf("ADMIN"));
+        ROLE_REQUIRED.put("PUT:/education-level", setOf("ADMIN"));
+        ROLE_REQUIRED.put("DELETE:/education-level", setOf("ADMIN"));
+
+        // Chỉ CANDIDATE mới được quản lý học vấn của chính mình
+        ROLE_REQUIRED.put("POST:/candidate-education", setOf("CANDIDATE"));
+        ROLE_REQUIRED.put("PUT:/candidate-education", setOf("CANDIDATE"));
+        ROLE_REQUIRED.put("DELETE:/candidate-education", setOf("CANDIDATE"));
+
+        // Chỉ EMPLOYER mới được gắn/xóa yêu cầu học vấn cho job (ownership check trong servlet)
+        ROLE_REQUIRED.put("POST:/job-educations", setOf("EMPLOYER"));
+        ROLE_REQUIRED.put("DELETE:/job-educations", setOf("EMPLOYER"));
+
+        // Chỉ CANDIDATE mới được gắn chứng chỉ/học vấn vào CV của chính mình (ownership check trong servlet)
+        ROLE_REQUIRED.put("PUT:/cv-certificates", setOf("CANDIDATE"));
+        ROLE_REQUIRED.put("PUT:/cv-educations", setOf("CANDIDATE"));
+
+        // Cấu hình hệ thống (bật/tắt AI gợi ý...) — chỉ ADMIN được xem và sửa.
+        ROLE_REQUIRED.put("GET:/admin/settings", setOf("ADMIN"));
+        ROLE_REQUIRED.put("PUT:/admin/settings", setOf("ADMIN"));
+
 
         // Upload avatar — cả CANDIDATE lẫn EMPLOYER đều được
         // (không cần entry trong ROLE_REQUIRED — mọi user đã đăng nhập đều qua được)

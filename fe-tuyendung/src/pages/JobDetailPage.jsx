@@ -11,7 +11,7 @@ import {
   StarOutlined, MessageOutlined,
 } from '@ant-design/icons';
 import { useParams, useNavigate } from 'react-router-dom';
-import { jobApi, applicationApi, cvApi, adminCompanyApi } from '../api/services';
+import { jobApi, applicationApi, cvApi, adminCompanyApi, favoriteJobApi } from '../api/services';
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/AppLayout';
 import dayjs from 'dayjs';
@@ -171,6 +171,8 @@ export default function JobDetailPage() {
   const [submitting, setSubmitting]   = useState(false);
   const [cvList, setCvList]           = useState([]);
   const [cvLoading, setCvLoading]     = useState(false);
+  const [isFavorite, setIsFavorite]   = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
 
   const [companyModal, setCompanyModal] = useState(false);
   const [company, setCompany]           = useState(null);
@@ -191,6 +193,26 @@ export default function JobDetailPage() {
       .catch(() => message.error('Không tìm thấy tin tuyển dụng'))
       .finally(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => {
+    if (user?.role !== 'CANDIDATE' || !user?.candidateId) return;
+    favoriteJobApi.check(user.candidateId, id)
+      .then((res) => { if (res.data.success) setIsFavorite(!!res.data.data); })
+      .catch(() => {});
+  }, [id, user]);
+
+  const handleToggleFavorite = async () => {
+    setFavoriteLoading(true);
+    try {
+      if (isFavorite) await favoriteJobApi.remove(id);
+      else await favoriteJobApi.add(id);
+      setIsFavorite(!isFavorite);
+    } catch {
+      message.error('Có lỗi khi cập nhật yêu thích');
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
 
   const openCompanyModal = async () => {
     if (!job?.companyId) return;
@@ -337,6 +359,11 @@ export default function JobDetailPage() {
                 <Button type="primary" icon={<SendOutlined />} size="large" onClick={openApplyModal}
                   style={{ background: GREEN, borderColor: GREEN, borderRadius: 8, fontWeight: 600, height: 44 }}>
                   Ứng tuyển ngay
+                </Button>
+                <Button icon={<StarOutlined style={{ color: isFavorite ? '#faad14' : undefined }} />} size="large"
+                  loading={favoriteLoading} onClick={handleToggleFavorite}
+                  style={{ borderRadius: 8, height: 44 }}>
+                  {isFavorite ? 'Đã lưu' : 'Lưu'}
                 </Button>
                 {job.employerUserId && (
                   <Button icon={<MessageOutlined />} size="large"

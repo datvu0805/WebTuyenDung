@@ -6,16 +6,13 @@ import exception.BusinessException;
 public class PaymentValidator {
     public static void vadidatePurchaseInput(PurchaseRequestDTO dto){
         if (dto == null){
-            throw new BusinessException.ValidationException("Dữ liwwuj yêu cầu không được để trống!");
-
+            throw new BusinessException.ValidationException("Dữ liệu yêu cầu không được để trống!");
         }
-        if(dto.getUserID() == null){
-            throw new BusinessException.ValidationException("Mã người dùng không được để trống!");
+        // userID có thể null ở request body — servlet sẽ set từ session
+        if (dto.getUserID() != null && dto.getUserID() <= 0){
+            throw new BusinessException.ValidationException("Mã người dùng phải là số nguyên dương!");
         }
-        if (dto.getUserID() <= 0){
-            throw new BusinessException.ValidationException("mã người dùng phải la số nguyên dương!");
-        }
-        if(dto.getPackageID() <= 0){
+        if (dto.getPackageID() == null || dto.getPackageID() <= 0){
             throw new BusinessException.ValidationException("Mã gói dịch vụ phải là số nguyên dương");
         }
     }

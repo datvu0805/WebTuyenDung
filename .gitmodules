@@ -1,0 +1,3 @@
+[submodule "fake-bank"]
+	path = fake-bank
+	url = https://github.com/nick-roust/fake-bank.git

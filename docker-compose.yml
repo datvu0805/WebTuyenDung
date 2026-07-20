@@ -10,6 +10,90 @@ services:
     networks:
       - webtuyendung-net
 
+  fake-bank-postgres:
+    image: postgres:17-alpine
+    container_name: webtuyendung-fake-bank-db
+    environment:
+      POSTGRES_DB: ${FAKE_BANK_DB_NAME:-fake_bank}
+      POSTGRES_USER: ${FAKE_BANK_DB_USER:-fake_bank}
+      POSTGRES_PASSWORD: ${FAKE_BANK_DB_PASSWORD:-fake_bank}
+    volumes:
+      - fake-bank-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - webtuyendung-net
+
+  fake-bank-migrate:
+    build:
+      context: ./fake-bank
+      dockerfile: docker/Dockerfile.api
+    image: webtuyendung-fake-bank-api:local
+    container_name: webtuyendung-fake-bank-migrate
+    environment:
+      DATABASE_URL: postgres://${FAKE_BANK_DB_USER:-fake_bank}:${FAKE_BANK_DB_PASSWORD:-fake_bank}@fake-bank-postgres:5432/${FAKE_BANK_DB_NAME:-fake_bank}
+    command: ["pnpm", "--filter", "@fake-bank/api", "db:migrate"]
+    depends_on:
+      fake-bank-postgres:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - webtuyendung-net
+
+  fake-bank-api:
+    build:
+      context: ./fake-bank
+      dockerfile: docker/Dockerfile.api
+    image: webtuyendung-fake-bank-api:local
+    container_name: webtuyendung-fake-bank-api
+    environment:
+      API_HOST: 0.0.0.0
+      API_PORT: 8080
+      API_PUBLIC_BASE_URL: http://fake-bank-api:8080
+      CHECKOUT_PUBLIC_BASE_URL: ${FAKE_BANK_CHECKOUT_URL:-http://localhost:5173}
+      DATABASE_URL: postgres://${FAKE_BANK_DB_USER:-fake_bank}:${FAKE_BANK_DB_PASSWORD:-fake_bank}@fake-bank-postgres:5432/${FAKE_BANK_DB_NAME:-fake_bank}
+    ports:
+      - "8081:8080"
+    depends_on:
+      fake-bank-migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/health').then((response)=>{if(!response.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      webtuyendung-net:
+        aliases:
+          - api
+
+  fake-bank-checkout-ui:
+    build:
+      context: ./fake-bank
+      dockerfile: docker/Dockerfile.checkout-ui
+    image: webtuyendung-fake-bank-checkout:local
+    container_name: webtuyendung-fake-bank-checkout
+    ports:
+      - "5173:5173"
+    depends_on:
+      fake-bank-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--output-document=-", "http://127.0.0.1:5173/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - webtuyendung-net
+
   backend:
     build:
       context: ./AppTuyenDung
@@ -17,8 +101,16 @@ services:
     container_name: webtuyendung-be
     ports:
       - "8080:8080"
+    environment:
+      - FAKE_BANK_API_URL=http://fake-bank-api:8080
+      # This address is resolved inside the shared Docker network by fake-bank.
+      - FAKE_BANK_WEBHOOK_URL=http://backend:8080/AppTuyenDung/api/payment/fake-bank/webhook
+      - FE_BASE_URL=${FE_BASE_URL:-http://localhost:3000}
     depends_on:
-      - ai-service
+      ai-service:
+        condition: service_started
+      fake-bank-api:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - webtuyendung-net
@@ -35,6 +127,9 @@ services:
     restart: unless-stopped
     networks:
       - webtuyendung-net
+
+volumes:
+  fake-bank-postgres-data:
 
 networks:
   webtuyendung-net:

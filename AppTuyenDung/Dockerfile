@@ -4,7 +4,7 @@ WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline -q
 COPY src ./src
-RUN mvn clean package -DskipTests -q
+RUN mvn clean package -q
 
 # Stage 2: Deploy on Tomcat 9 (tương thích javax.servlet-api 4.x)
 FROM tomcat:9.0-jdk17

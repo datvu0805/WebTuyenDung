@@ -1,19 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import {
-  Table, Button, Modal, Form, Input, Space, message, Popconfirm, Typography, Upload, Tooltip, Tabs, Tag, Switch
+  Table, Button, Modal, Form, Input, Space, message, Popconfirm, Typography, Upload, Tooltip, Tabs, Tag, Switch,
+  Card, Col, Row, Statistic, Progress, Spin, Empty, Divider,
 } from 'antd';
 import {
   PlusOutlined, EditOutlined, DeleteOutlined, BankOutlined,
   UploadOutlined, DownloadOutlined, ApartmentOutlined, BulbOutlined, RobotOutlined,
-  SafetyCertificateOutlined, ReadOutlined,
+  SafetyCertificateOutlined, ReadOutlined, BarChartOutlined, UserOutlined, TeamOutlined,
+  FileTextOutlined, SolutionOutlined, CrownOutlined, DollarOutlined, ReloadOutlined,
+  MessageOutlined, ProfileOutlined, CheckCircleOutlined, ClockCircleOutlined, CloseCircleOutlined,
 } from '@ant-design/icons';
-import { adminCompanyApi, jobPositionApi, skillApi, adminSettingsApi, certificateApi, educationLevelApi } from '../api/services';
+import { adminCompanyApi, jobPositionApi, skillApi, adminSettingsApi, certificateApi, educationLevelApi, adminStatisticApi } from '../api/services';
 import AppLayout from '../components/AppLayout';
+import AdminStatisticsPanel from './AdminStatisticsPanel';
 import { downloadCompanyTemplate, downloadPositionTemplate } from '../utils/excelTemplates';
 
 const { Title, Text } = Typography;
 const GREEN = '#00b14f';
 const BLUE = '#1677ff';
+const GOLD = '#faad14';
+const PURPLE = '#722ed1';
+const ORANGE = '#fa8c16';
 
 const tableHeaderStyle = {
   background: GREEN,
@@ -581,6 +588,105 @@ function EducationLevelTab() {
   );
 }
 
+// ===================== TAB STATISTICS =====================
+function StatCard({ title, value, icon, color, suffix, precision }) {
+  return (
+    <Card
+      size="small"
+      style={{ borderRadius: 12, height: '100%', border: '1px solid #f0f0f0' }}
+      styles={{ body: { padding: 16 } }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
+        <Statistic
+          title={<Text type="secondary" style={{ fontSize: 13 }}>{title}</Text>}
+          value={value ?? 0}
+          precision={precision}
+          suffix={suffix}
+          valueStyle={{ fontWeight: 700, fontSize: 24, color: '#1f1f1f' }}
+        />
+        <div style={{
+          width: 42, height: 42, borderRadius: 10, background: `${color}15`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+        }}>
+          {icon}
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function SimpleBarChart({ data = [], valueKey = 'count', labelKey = 'month', color = GREEN, formatValue }) {
+  if (!data.length) {
+    return <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Chưa có dữ liệu" />;
+  }
+  const max = Math.max(...data.map((d) => Number(d[valueKey] || 0)), 1);
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {data.map((item) => {
+        const val = Number(item[valueKey] || 0);
+        const pct = Math.round((val / max) * 100);
+        return (
+          <div key={item[labelKey]}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+              <Text style={{ fontSize: 13 }}>{item[labelKey]}</Text>
+              <Text strong style={{ fontSize: 13 }}>
+                {formatValue ? formatValue(val) : val.toLocaleString('vi-VN')}
+              </Text>
+            </div>
+            <Progress
+              percent={pct}
+              showInfo={false}
+              strokeColor={color}
+              trailColor="#f5f5f5"
+              size={['100%', 10]}
+            />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function StatusBreakdown({ title, data = {}, colors = [] }) {
+  const entries = Object.entries(data || {});
+  const total = entries.reduce((s, [, v]) => s + Number(v || 0), 0) || 1;
+  return (
+    <Card
+      title={<Text strong>{title}</Text>}
+      size="small"
+      style={{ borderRadius: 12, height: '100%' }}
+      styles={{ body: { padding: 16 } }}
+    >
+      {!entries.length ? (
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Chưa có dữ liệu" />
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          {entries.map(([label, value], idx) => {
+            const num = Number(value || 0);
+            const pct = Math.round((num / total) * 100);
+            const color = colors[idx % colors.length] || GREEN;
+            return (
+              <div key={label}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <Space size={6}>
+                    <Tag color={color} style={{ margin: 0 }}>{label}</Tag>
+                  </Space>
+                  <Text type="secondary">{num.toLocaleString('vi-VN')} ({pct}%)</Text>
+                </div>
+                <Progress percent={pct} showInfo={false} strokeColor={color} size={['100%', 8]} />
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function StatisticTab() {
+  return <AdminStatisticsPanel />;
+}
+
 // ===================== TAB SETTINGS =====================
 function SettingsTab() {
   const [aiEnabled, setAiEnabled] = useState(false);
@@ -647,6 +753,11 @@ function SettingsTab() {
 export default function AdminPage() {
   const tabItems = [
     {
+      key: 'statistics',
+      label: <span><BarChartOutlined /> Thống kê</span>,
+      children: <StatisticTab />,
+    },
+    {
       key: 'companies',
       label: <span><BankOutlined /> Công ty</span>,
       children: <CompanyTab />,
@@ -685,12 +796,12 @@ export default function AdminPage() {
           <Title level={3} style={{ color: '#fff', marginBottom: 4 }}>
             <BankOutlined style={{ marginRight: 8 }} />Quản trị hệ thống
           </Title>
-          <Text style={{ color: 'rgba(255,255,255,0.8)' }}>Quản lý dữ liệu danh mục</Text>
+          <Text style={{ color: 'rgba(255,255,255,0.8)' }}>Thống kê tổng quan & quản lý dữ liệu danh mục</Text>
         </div>
       </div>
       <div style={{ maxWidth: 1100, margin: '-32px auto 0', padding: '0 16px 32px' }}>
         <div style={{ background: '#fff', borderRadius: 14, padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}>
-          <Tabs defaultActiveKey="companies" items={tabItems} />
+          <Tabs defaultActiveKey="statistics" items={tabItems} />
         </div>
       </div>
     </AppLayout>

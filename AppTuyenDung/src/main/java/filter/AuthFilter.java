@@ -31,7 +31,9 @@ public class AuthFilter implements Filter {
 
     // Các path không cần đăng nhập
     private static final Set<String> PUBLIC_PATHS = new HashSet<>(Arrays.asList(
-            "/login", "/register-candidate", "/register-employer"
+            "/login", "/register-candidate", "/register-employer",
+            // Fake-bank callback is public because the local simulator has no user session.
+            "/api/payment/fake-bank/webhook"
     ));
 
     // Phân quyền theo role: path prefix -> danh sách role được phép
@@ -110,6 +112,9 @@ public class AuthFilter implements Filter {
         ROLE_REQUIRED.put("GET:/admin/job-positions", setOf("ADMIN", "EMPLOYER", "CANDIDATE"));
         ROLE_REQUIRED.put("POST:/admin/job-positions/import", setOf("ADMIN"));
         ROLE_REQUIRED.put("GET:/admin/statistics", setOf("ADMIN"));
+        ROLE_REQUIRED.put("GET:/admin/statistic", setOf("ADMIN"));
+        ROLE_REQUIRED.put("GET:/admin/statistics/export", setOf("ADMIN"));
+        ROLE_REQUIRED.put("GET:/admin/statistic/export", setOf("ADMIN"));
 
     }
 

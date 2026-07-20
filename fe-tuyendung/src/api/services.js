@@ -96,10 +96,14 @@ export const applicationApi = {
 };
 
 export const paymentApi = {
-  purchase: (userID, packageID) =>
-    api.post('/api/payment/purchase', { userID, packageID }, {
+  getPackages: () => api.get('/api/payment/packages'),
+  getVipStatus: () => api.get('/api/payment/vip-status'),
+  createPayment: (packageID) =>
+    api.post('/api/payment/create', { packageID }, {
       headers: { 'Content-Type': 'application/json' },
     }),
+  getTransactionStatus: (txnRef) =>
+    api.get('/api/payment/transaction-status', { params: { txnRef } }),
 };
 
 export const certificateApi = {
@@ -135,6 +139,15 @@ export const adminCompanyApi = {
 export const adminSettingsApi = {
   getAll: () => api.get('/admin/settings'),
   update: (key, value) => api.put('/admin/settings', { key, value }, { headers: { 'Content-Type': 'application/json' } }),
+};
+
+export const adminStatisticApi = {
+  get: (params = {}) => api.get('/admin/statistic', { params }),
+  getReport: (report, params = {}) => api.get('/admin/statistic', { params: { ...params, report } }),
+  export: (format, params = {}) => api.get('/admin/statistic/export', {
+    params: { ...params, format },
+    responseType: 'blob',
+  }),
 };
 
 export const jobPositionApi = {

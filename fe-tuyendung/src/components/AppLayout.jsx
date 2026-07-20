@@ -4,7 +4,7 @@ import {
   BankOutlined, UserOutlined, LogoutOutlined, FileTextOutlined,
   UnorderedListOutlined, MenuOutlined, TeamOutlined,
   CaretDownOutlined, EditOutlined, MailOutlined, PhoneOutlined, EnvironmentOutlined, CalendarOutlined, CameraOutlined,
-  MessageOutlined, StarFilled, DollarOutlined,
+  MessageOutlined, StarFilled, DollarOutlined, CrownOutlined,
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -124,11 +124,13 @@ export default function AppLayout({ children }) {
   const candidateNav = [
     { key: '/jobs', icon: <UnorderedListOutlined />, label: 'Việc làm' },
     { key: '/cv/upload', icon: <FileTextOutlined />, label: 'Hồ sơ CV' },
+    { key: '/vip', icon: <CrownOutlined />, label: 'Gói VIP' },
     { key: '/messages', icon: <MessageOutlined />, label: 'Tin nhắn' },
   ];
   const employerNav = [
     { key: '/employer/dashboard', icon: <TeamOutlined />, label: 'Tin tuyển dụng' },
     { key: '/employer/applications', icon: <UnorderedListOutlined />, label: 'Đơn ứng tuyển' },
+    { key: '/vip', icon: <CrownOutlined />, label: 'Gói VIP' },
     { key: '/messages', icon: <MessageOutlined />, label: 'Tin nhắn' },
   ];
   const navItems = user?.role === 'ADMIN' ? adminNav : user?.role === 'EMPLOYER' ? employerNav : candidateNav;

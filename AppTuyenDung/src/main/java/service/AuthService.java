@@ -181,13 +181,13 @@ public class AuthService {
             );
         }
 
-        // Đăng nhập sai
+        // Đăng nhập sai hay không
         if (user == null || !validPassword) {
 
             long failedAttempts =
                     redisService.increment(failedKey);
 
-            // Lần sai đầu tiên: bộ đếm tồn tại tối đa 10 phút
+            // Lần sai đầu tiên: bộ đếm bắt đầu đếm  10 phút
             if (failedAttempts == 1) {
                 redisService.expire(
                         failedKey,

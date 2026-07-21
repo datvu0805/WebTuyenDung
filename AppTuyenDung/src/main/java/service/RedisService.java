@@ -14,7 +14,7 @@ public class RedisService {
     public void set(String key, String value) {
         redis.set(key, value);
     }
-
+// ttl : Time to live
     public void set(String key, String value, long ttlSeconds) {
         redis.setex(key, ttlSeconds, value);
     }

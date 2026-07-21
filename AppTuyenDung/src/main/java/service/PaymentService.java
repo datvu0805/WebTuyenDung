@@ -338,6 +338,28 @@ public class PaymentService {
         }
     }
 
+    public List<Map<String, Object>> getTransactionHistory(int userId) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Transactions trans : transactionDAO.findByUserId(userId)) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("txnRef", trans.getTxnRef());
+            item.put("status", statusName(trans));
+            item.put("amount", trans.getAmount());
+            item.put("paymentProvider", trans.getPaymentProvider());
+            item.put("createdAt", trans.getCreatedAt() == null ? null : trans.getCreatedAt().toString());
+            item.put("updatedAt", trans.getUpdatedAt() == null ? null : trans.getUpdatedAt().toString());
+            if (trans.getPackageId() != null) {
+                item.put("packageId", trans.getPackageId());
+                ServicePackages pkg = packagesDAO.getPackageById(trans.getPackageId());
+                if (pkg != null) {
+                    item.put("packageName", pkg.getPackageName());
+                }
+            }
+            result.add(item);
+        }
+        return result;
+    }
+
     public Map<String, Object> getTransactionStatus(int userId, String txnRef) {
         if (txnRef == null || txnRef.isBlank()) {
             return null;

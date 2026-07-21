@@ -53,7 +53,7 @@ public class TransactionDAO extends DatabaseConfig implements IDAO<Transactions>
     public Transactions findByTxnRef(Connection conn, String txnRef) {
         String sql = """
             SELECT id, user_id, transaction_type, amount, status, payment_status, content, package_id, txn_ref,
-                   payment_provider, provider_transaction_id
+                   payment_provider, provider_transaction_id, created_at, updated_at
             FROM transactions
             WHERE txn_ref = ?
             """;
@@ -73,7 +73,7 @@ public class TransactionDAO extends DatabaseConfig implements IDAO<Transactions>
     public Transactions findByTxnRefAndUserId(String txnRef, int userId) {
         String sql = """
             SELECT id, user_id, transaction_type, amount, status, payment_status, content, package_id, txn_ref,
-                   payment_provider, provider_transaction_id
+                   payment_provider, provider_transaction_id, created_at, updated_at
             FROM transactions
             WHERE txn_ref = ? AND user_id = ?
             """;
@@ -147,7 +147,7 @@ public class TransactionDAO extends DatabaseConfig implements IDAO<Transactions>
     public List<Transactions> findByUserId(int userId) {
         String sql = """
             SELECT id, user_id, transaction_type, amount, status, payment_status, content, package_id, txn_ref,
-                   payment_provider, provider_transaction_id
+                   payment_provider, provider_transaction_id, created_at, updated_at
             FROM transactions
             WHERE user_id = ?
             ORDER BY created_at DESC
@@ -183,6 +183,14 @@ public class TransactionDAO extends DatabaseConfig implements IDAO<Transactions>
         t.setTxnRef(rs.getString("txn_ref"));
         t.setPaymentProvider(rs.getString("payment_provider"));
         t.setProviderTransactionId(rs.getString("provider_transaction_id"));
+        java.sql.Timestamp createdAt = rs.getTimestamp("created_at");
+        if (createdAt != null) {
+            t.setCreatedAt(createdAt.toLocalDateTime());
+        }
+        java.sql.Timestamp updatedAt = rs.getTimestamp("updated_at");
+        if (updatedAt != null) {
+            t.setUpdatedAt(updatedAt.toLocalDateTime());
+        }
         return t;
     }
 

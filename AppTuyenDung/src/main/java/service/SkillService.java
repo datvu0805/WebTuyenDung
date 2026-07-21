@@ -1,5 +1,6 @@
 package service;
 
+import com.google.gson.reflect.TypeToken;
 import dao.SkillDAO;
 import dto.SkillDTO;
 import mapper.SkillMapper;
@@ -11,12 +12,17 @@ import java.util.List;
 
 public class SkillService {
 
+    private static final String SKILLS_CACHE_KEY = "catalog:skills";
+    private static final long SKILLS_CACHE_TTL_SECONDS = 600;
+
     private final SkillDAO skillDAO;
     private final SkillValidator validator;
+    private final RedisService redisService;
 
     public SkillService() {
         this.skillDAO = new SkillDAO();
         this.validator = new SkillValidator();
+        this.redisService = new RedisService();
     }
 
     public void addSkill(SkillDTO dto) {
@@ -33,6 +39,7 @@ public class SkillService {
 
         // Đồng bộ id vừa được DB sinh ra vào DTO
         dto.setId(skill.getId());
+        redisService.delete(SKILLS_CACHE_KEY);
     }
 
     public void updateSkill(int id, SkillDTO dto) {
@@ -51,6 +58,7 @@ public class SkillService {
         skill.setId(id);
 
         skillDAO.update(skill);
+        redisService.delete(SKILLS_CACHE_KEY);
     }
 
     public void deleteSkill(int id) {
@@ -60,6 +68,7 @@ public class SkillService {
         }
 
         skillDAO.delete(id);
+        redisService.delete(SKILLS_CACHE_KEY);
     }
 
     public SkillDTO getSkillById(int id) {
@@ -75,11 +84,20 @@ public class SkillService {
 
     public List<SkillDTO> getAllSkills() {
 
+        List<SkillDTO> cachedSkills = redisService.getObject(
+                SKILLS_CACHE_KEY,
+                new TypeToken<List<SkillDTO>>() {}.getType()
+        );
+        if (cachedSkills != null) {
+            return cachedSkills;
+        }
+
         List<SkillDTO> skillDTOList = new ArrayList<>();
 
         List<Skill> skillList = skillDAO.getAll();
 
         skillList.forEach(x -> skillDTOList.add(new SkillDTO(x.getId(), x.getSkillName())));
+        redisService.setObjiect(SKILLS_CACHE_KEY, skillDTOList, SKILLS_CACHE_TTL_SECONDS);
 
         return skillDTOList;
     }

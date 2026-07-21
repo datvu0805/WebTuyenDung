@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Result, Button, Spin, Typography, Card } from 'antd';
+import { Result, Button, Spin, Typography, Card, Alert } from 'antd';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { paymentApi } from '../api/services';
 import { useAuth } from '../context/AuthContext';
@@ -105,10 +105,15 @@ export default function PaymentResultPage() {
                     <div>Số tiền: {Number(transaction.amount).toLocaleString('vi-VN')} ₫</div>
                   )}
                   {status === 'SUCCESS' && vipStatus?.active && (
-                    <div style={{ marginTop: 12 }}>
-                      Gói đang kích hoạt: <strong>{vipStatus.packageName}</strong>
-                      {vipStatus.endDate ? ` (đến ${vipStatus.endDate})` : ''}
-                    </div>
+                    <Alert
+                      type="success"
+                      showIcon
+                      style={{ marginTop: 16, textAlign: 'left' }}
+                      message={user?.role === 'EMPLOYER' ? 'VIP nhà tuyển dụng đã kích hoạt' : 'VIP ứng viên đã kích hoạt'}
+                      description={user?.role === 'EMPLOYER'
+                        ? 'Bạn có thể tiếp tục đăng tin, quản lý đơn ứng tuyển và theo dõi thời hạn gói trong lịch sử thanh toán.'
+                        : 'Bạn có thể xem Gợi ý cho bạn bằng AI trong danh sách việc làm; kết quả dựa trên kỹ năng và mức lương mong muốn.'}
+                    />
                   )}
                   {status === 'PENDING' && (
                     <div style={{ marginTop: 12 }}>Backend chưa nhận được kết quả cuối cùng. Bạn có thể kiểm tra lại sau.</div>
@@ -123,6 +128,12 @@ export default function PaymentResultPage() {
                   style={{ background: GREEN }}
                 >
                   Xem gói VIP
+                </Button>,
+                <Button
+                  key="history"
+                  onClick={() => navigate('/payment/history')}
+                >
+                  Xem lịch sử thanh toán
                 </Button>,
                 <Button key="home" onClick={() => navigate(home)}>
                   Về trang chính

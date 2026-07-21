@@ -5,7 +5,7 @@ import redis.clients.jedis.RedisClient;
 public final class RedisConfig {
 
     private static final String DEFAULT_REDIS_URL =
-            "redis://localhost:6379";
+            "redis://localhost:6379/1";
 
     private static final RedisClient CLIENT =
             RedisClient.create(getRedisUrl());

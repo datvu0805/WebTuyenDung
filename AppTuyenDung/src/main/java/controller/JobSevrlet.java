@@ -11,6 +11,7 @@ import mapper.JobRequestMapper;
 import mapper.JobSearchRequestMapper;
 import service.JobService;
 import service.RecommendationService;
+import service.PaymentService;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,6 +25,7 @@ import java.util.List;
 public class JobSevrlet extends BaseServlet {
     private final JobService jobService = new JobService();
     private final RecommendationService recommendationService = new RecommendationService();
+    private final PaymentService paymentService = new PaymentService();
     // chuyển đổi để json đọc được data từ kiểu localdatetime
     private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule()).disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
@@ -61,11 +63,19 @@ public class JobSevrlet extends BaseServlet {
 
                 HttpSession session = req.getSession(false);
                 Integer candidateId = session == null ? null : (Integer) session.getAttribute("candidateId");
+                Integer userId = session == null ? null : (Integer) session.getAttribute("userId");
 
-                if (candidateId == null) {
+                if (candidateId == null || userId == null) {
                     resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
                     resp.getWriter().print(objectMapper.writeValueAsString(
                             new ApiResponse<>(false, "Chỉ ứng viên mới có thể xem gợi ý việc làm.", null)));
+                    return;
+                }
+
+                if (!paymentService.getVipStatus(userId).isActive()) {
+                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    resp.getWriter().print(objectMapper.writeValueAsString(
+                            new ApiResponse<>(false, "Vui lòng nạp VIP để sử dụng AI gợi ý việc làm.", null)));
                     return;
                 }
 

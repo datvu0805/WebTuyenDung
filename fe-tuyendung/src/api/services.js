@@ -104,6 +104,7 @@ export const paymentApi = {
     }),
   getTransactionStatus: (txnRef) =>
     api.get('/api/payment/transaction-status', { params: { txnRef } }),
+  getHistory: () => api.get('/api/payment/history'),
 };
 
 export const certificateApi = {

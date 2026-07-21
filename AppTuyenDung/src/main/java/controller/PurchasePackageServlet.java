@@ -1,6 +1,7 @@
 package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import dto.ApiResponse;
 import dto.PaymentCreateResponseDTO;
 import dto.PurchaseRequestDTO;
@@ -23,11 +24,13 @@ import java.util.List;
         "/api/payment/packages",
         "/api/payment/vip-status",
         "/api/payment/create",
-        "/api/payment/transaction-status"
+        "/api/payment/transaction-status",
+        "/api/payment/history"
 })
 public class PurchasePackageServlet extends HttpServlet {
     private final PaymentService paymentService = new PaymentService();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -54,14 +57,13 @@ public class PurchasePackageServlet extends HttpServlet {
                 write(response, 200, new ApiResponse<>(true, "Trạng thái VIP", status));
                 return;
             }
-            if ("/api/payment/transaction-status".equals(path)) {
-                String txnRef = request.getParameter("txnRef");
-                var status = paymentService.getTransactionStatus(userId, txnRef);
-                if (status == null) {
-                    write(response, 404, new ApiResponse<>(false, "Không tìm thấy giao dịch"));
-                } else {
-                    write(response, 200, new ApiResponse<>(true, "Trạng thái giao dịch", status));
+            if ("/api/payment/history".equals(path)) {
+                if (!"CANDIDATE".equalsIgnoreCase(role) && !"EMPLOYER".equalsIgnoreCase(role)) {
+                    write(response, HttpServletResponse.SC_FORBIDDEN,
+                            new ApiResponse<>(false, "Vai trò này không có lịch sử thanh toán"));
+                    return;
                 }
+                write(response, 200, new ApiResponse<>(true, "Lịch sử thanh toán", paymentService.getTransactionHistory(userId)));
                 return;
             }
             write(response, 404, new ApiResponse<>(false, "API không tồn tại"));

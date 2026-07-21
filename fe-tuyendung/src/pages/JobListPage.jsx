@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Input, Select, Spin, Empty, Tag, Typography, Pagination, message } from 'antd';
+import { Input, Select, Spin, Empty, Tag, Typography, Pagination, message, Button } from 'antd';
 import {
   SearchOutlined, EnvironmentOutlined, DollarOutlined,
   TeamOutlined, ClockCircleOutlined, FireOutlined, BankOutlined,
-  SolutionOutlined, StarOutlined, StarFilled,
+  SolutionOutlined, StarOutlined, StarFilled, CrownOutlined,
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
-import { jobApi, favoriteJobApi } from '../api/services';
+import { jobApi, favoriteJobApi, paymentApi } from '../api/services';
 import { useAuth } from '../context/AuthContext';
 import AppLayout from '../components/AppLayout';
 import dayjs from 'dayjs';
@@ -209,6 +209,8 @@ export default function JobListPage() {
   const [favoriteIds, setFavoriteIds] = useState(new Set());
   const [recommended, setRecommended] = useState([]);
   const [recommendedLoading, setRecommendedLoading] = useState(false);
+  const [hasActiveVip, setHasActiveVip] = useState(false);
+  const [vipStatusResolved, setVipStatusResolved] = useState(false);
 
   useEffect(() => {
     fetch('https://provinces.open-api.vn/api/p/')
@@ -218,15 +220,58 @@ export default function JobListPage() {
   }, []);
 
   useEffect(() => {
-    if (!isCandidate) return;
+    if (!isCandidate) {
+      setRecommended([]);
+      setHasActiveVip(false);
+      setVipStatusResolved(false);
+      return;
+    }
+
+    let active = true;
     favoriteJobApi.getByCandidate(user.candidateId)
-      .then((res) => { if (res.data.success) setFavoriteIds(new Set((res.data.data || []).map(j => j.id))); })
+      .then((res) => {
+        if (active && res.data.success) {
+          setFavoriteIds(new Set((res.data.data || []).map((job) => job.id)));
+        }
+      })
       .catch(() => {});
-    setRecommendedLoading(true);
-    jobApi.getRecommended()
-      .then((res) => { if (res.data.success) setRecommended(res.data.data || []); })
-      .catch(() => {})
-      .finally(() => setRecommendedLoading(false));
+
+    paymentApi.getVipStatus()
+      .then((res) => {
+        if (!active) return;
+        const vipActive = res.data.success && res.data.data?.active === true;
+        setHasActiveVip(vipActive);
+        setVipStatusResolved(true);
+        if (!vipActive) {
+          setRecommended([]);
+          return;
+        }
+
+        setRecommendedLoading(true);
+        jobApi.getRecommended()
+          .then((recommendationRes) => {
+            if (active && recommendationRes.data.success) {
+              setRecommended(recommendationRes.data.data || []);
+            }
+          })
+          .catch(() => {
+            if (active) setRecommended([]);
+          })
+          .finally(() => {
+            if (active) setRecommendedLoading(false);
+          });
+      })
+      .catch(() => {
+        if (active) {
+          setHasActiveVip(false);
+          setVipStatusResolved(true);
+          setRecommended([]);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCandidate]);
 
@@ -339,7 +384,7 @@ export default function JobListPage() {
       </div>
 
       <div style={{ maxWidth: 940, margin: '0 auto', padding: '28px 16px' }}>
-        {isCandidate && (recommendedLoading || recommended.length > 0) && (
+        {isCandidate && hasActiveVip && (recommendedLoading || recommended.length > 0) && (
           <div style={{ marginBottom: 28 }}>
             <Title level={5} style={{ marginBottom: 12 }}>
               <FireOutlined style={{ marginRight: 6, color: GREEN }} />Gợi ý cho bạn
@@ -363,6 +408,34 @@ export default function JobListPage() {
           </div>
         )}
 
+        {isCandidate && vipStatusResolved && !hasActiveVip && (
+          <div
+            style={{
+              marginBottom: 28,
+              padding: '20px 24px',
+              border: '1px solid #ffe7ba',
+              borderRadius: 12,
+              background: '#fffbe6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: 16,
+              flexWrap: 'wrap',
+            }}
+          >
+            <div>
+              <Text strong style={{ fontSize: 16, color: '#ad6800' }}>
+                <CrownOutlined style={{ marginRight: 8 }} />Nạp VIP để mở khóa AI gợi ý việc làm
+              </Text>
+              <div style={{ marginTop: 4, color: '#8c6d1f' }}>
+                Nhận các gợi ý phù hợp với kỹ năng và hồ sơ của bạn.
+              </div>
+            </div>
+            <Button type="primary" onClick={() => navigate('/vip')} style={{ background: GREEN }}>
+              Nâng cấp VIP
+            </Button>
+          </div>
+        )}
         {loading ? (
           <div style={{ textAlign: 'center', padding: 80 }}><Spin size="large" /></div>
         ) : (

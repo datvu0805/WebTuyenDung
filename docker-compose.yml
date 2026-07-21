@@ -1,4 +1,35 @@
 services:
+  redis:
+    image: redis:7.4-alpine
+    container_name: webtuyendung-redis
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    networks:
+      - webtuyendung-net
+
+  redis-ui:
+    image: rediscommander/redis-commander:latest
+    container_name: webtuyendung-redis-ui
+    environment:
+      - REDIS_HOSTS=local:redis:6379:1
+    ports:
+      - "8082:8081"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - webtuyendung-net
+
   ai-service:
     build:
       context: ./ai-service
@@ -103,10 +134,13 @@ services:
       - "8080:8080"
     environment:
       - FAKE_BANK_API_URL=http://fake-bank-api:8080
+      - REDIS_URL=redis://redis:6379/1
       # This address is resolved inside the shared Docker network by fake-bank.
       - FAKE_BANK_WEBHOOK_URL=http://backend:8080/AppTuyenDung/api/payment/fake-bank/webhook
       - FE_BASE_URL=${FE_BASE_URL:-http://localhost:3000}
     depends_on:
+      redis:
+        condition: service_healthy
       ai-service:
         condition: service_started
       fake-bank-api:
@@ -130,6 +164,7 @@ services:
 
 volumes:
   fake-bank-postgres-data:
+  redis-data:
 
 networks:
   webtuyendung-net:

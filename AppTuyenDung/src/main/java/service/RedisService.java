@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import config.RedisConfig;
 import redis.clients.jedis.RedisClient;
 
+import java.lang.reflect.Type;
+
 public class RedisService {
     private final RedisClient redis = RedisConfig.getClient();
 
@@ -14,8 +16,7 @@ public class RedisService {
     }
 
     public void set(String key, String value, long ttlSeconds) {
-        redis.set(key, value);
-        redis.expire(key, ttlSeconds);
+        redis.setex(key, ttlSeconds, value);
     }
 
     public void delete(String key) {
@@ -44,21 +45,24 @@ public class RedisService {
     public String ping() {
         return redis.ping();
     }
-    public void setObjiect(String key, Object value,long ttlSeconds) {
+    public void setObjiect(String key, Object value, long ttlSeconds) {
         String json = gson.toJson(value);
-        redis.set(key, json);
-        redis.expire(key, ttlSeconds);
+        redis.setex(key, ttlSeconds, json);
     }
+
     public void setWithTtl(String key, String value, long seconds) {
-        redis.set(key, value);
-        redis.expire(key, seconds);
+        redis.setex(key, seconds, value);
+    }
+
+    public <T> T getObject(String key, Type type) {
+        String json = redis.get(key);
+        if (json == null) {
+            return null;
+        }
+        return gson.fromJson(json, type);
     }
 
     public <T> T getObjiect(String key, Class<T> objectClass) {
-        String json = redis.get(key);
-        if(json == null) {
-            return null;
-        }
-        return gson.fromJson(json, objectClass);
+        return getObject(key, objectClass);
     }
 }

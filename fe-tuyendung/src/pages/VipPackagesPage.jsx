@@ -3,7 +3,7 @@ import {
   Card, Col, Row, Button, Tag, Typography, Spin, Empty, message, Space, Alert,
 } from 'antd';
 import {
-  CrownOutlined, CheckCircleOutlined, ThunderboltOutlined, SafetyCertificateOutlined,
+  CrownOutlined, CheckCircleOutlined, SafetyCertificateOutlined,
   ClockCircleOutlined, RocketOutlined,
 } from '@ant-design/icons';
 import { paymentApi } from '../api/services';
@@ -14,24 +14,40 @@ const { Title, Text, Paragraph } = Typography;
 const GREEN = '#00b14f';
 const GOLD = '#faad14';
 
+function formatVipDate(value) {
+  if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return '—';
+  const [year, month, day] = value.split('-');
+  return `${day}/${month}/${year}`;
+}
+
 const BENEFIT_LABELS = {
   PRIORITY_APPLY: 'Ưu tiên hồ sơ ứng tuyển',
   FEATURED_JOB: 'Đẩy tin tuyển dụng nổi bật',
 };
 
 const ROLE_BENEFITS = {
-  CANDIDATE: [
-    'Badge VIP hiển thị trên hồ sơ',
-    'Ưu tiên gợi ý việc làm phù hợp',
-    'Hồ sơ nổi bật với nhà tuyển dụng',
-    'Hỗ trợ ưu tiên khi ứng tuyển',
-  ],
-  EMPLOYER: [
-    'Badge VIP cho tin tuyển dụng',
-    'Đẩy tin nổi bật lên đầu danh sách',
-    'Ưu tiên hiển thị công ty',
-    'Tiếp cận ứng viên tốt hơn',
-  ],
+  CANDIDATE: {
+    active: [
+      'Kích hoạt gói VIP sau khi Fake Bank xác nhận thành công',
+      'Gợi ý việc làm bằng AI theo kỹ năng và mức lương mong muốn',
+      'Cập nhật kỹ năng để cải thiện kết quả gợi ý',
+    ],
+    unavailable: [
+      'Ưu tiên hồ sơ hoặc đơn ứng tuyển chưa bật trong bản demo',
+      'Badge VIP công khai trên hồ sơ chưa bật trong bản demo',
+    ],
+  },
+  EMPLOYER: {
+    active: [
+      'Kích hoạt gói VIP sau khi Fake Bank xác nhận thành công',
+      'Đăng tin và quản lý đơn ứng tuyển như hiện tại',
+      'Theo dõi thời hạn và lịch sử thanh toán của gói',
+    ],
+    unavailable: [
+      'AI xếp hạng ứng viên chưa bật trong bản demo',
+      'Đẩy tin nổi bật hoặc Badge VIP công khai chưa bật trong bản demo',
+    ],
+  },
 };
 
 export default function VipPackagesPage() {
@@ -103,7 +119,7 @@ export default function VipPackagesPage() {
             message={
               <span>
                 Bạn đang dùng gói <strong>{vipStatus.packageName}</strong>
-                {vipStatus.endDate ? ` — hết hạn ${vipStatus.endDate}` : ''}
+                {` — hết hạn ${formatVipDate(vipStatus.endDate)}`}
               </span>
             }
             description="Mua thêm gói sẽ được cộng dồn thời hạn VIP."
@@ -111,16 +127,20 @@ export default function VipPackagesPage() {
         )}
 
         <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
-          {benefits.map((b) => (
-            <Col xs={24} sm={12} md={6} key={b}>
-              <Card size="small" style={{ borderRadius: 12, height: '100%', borderColor: '#e8f9f0' }}>
-                <Space>
-                  <ThunderboltOutlined style={{ color: GREEN }} />
-                  <Text>{b}</Text>
-                </Space>
-              </Card>
-            </Col>
-          ))}
+          <Col xs={24} md={12}>
+            <Card size="small" title="Đã có trong hệ thống" style={{ borderRadius: 12, height: '100%', borderColor: '#e8f9f0' }}>
+              <ul style={{ margin: 0, paddingLeft: 20 }}>
+                {benefits.active.map((benefit) => <li key={benefit}>{benefit}</li>)}
+              </ul>
+            </Card>
+          </Col>
+          <Col xs={24} md={12}>
+            <Card size="small" title="Chưa bật trong bản demo" style={{ borderRadius: 12, height: '100%' }}>
+              <ul style={{ margin: 0, paddingLeft: 20, color: '#777' }}>
+                {benefits.unavailable.map((benefit) => <li key={benefit}>{benefit}</li>)}
+              </ul>
+            </Card>
+          </Col>
         </Row>
 
         {loading ? (

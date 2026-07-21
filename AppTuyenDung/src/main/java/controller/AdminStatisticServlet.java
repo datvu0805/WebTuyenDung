@@ -22,6 +22,8 @@ public class AdminStatisticServlet extends BaseServlet {
                          HttpServletResponse resp)
             throws IOException {
 
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
 
         try {

@@ -21,6 +21,8 @@ import CandidateProfilePage from './pages/CandidateProfilePage';
 import CandidateListPage from './pages/CandidateListPage';
 import AdminPage from './pages/AdminPage';
 import ChatPage from './pages/ChatPage';
+import VipPackagesPage from './pages/VipPackagesPage';
+import PaymentResultPage from './pages/PaymentResultPage';
 
 dayjs.extend(relativeTime);
 dayjs.locale('vi');
@@ -69,6 +71,12 @@ export default function App() {
             } />
             <Route path="/messages" element={
               <PrivateRoute roles={['CANDIDATE', 'EMPLOYER']}><ChatPage /></PrivateRoute>
+            } />
+            <Route path="/vip" element={
+              <PrivateRoute roles={['CANDIDATE', 'EMPLOYER']}><VipPackagesPage /></PrivateRoute>
+            } />
+            <Route path="/payment/result" element={
+              <PrivateRoute roles={['CANDIDATE', 'EMPLOYER']}><PaymentResultPage /></PrivateRoute>
             } />
 
             <Route path="/admin" element={

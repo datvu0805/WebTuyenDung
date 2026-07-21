@@ -2,17 +2,17 @@ package dto;
 
 import model.Users;
 
-// yêu cầu mua hàng
+// yêu cầu mua gói VIP (userID lấy từ session, không tin client)
 public class PurchaseRequestDTO {
     private Integer userID;
     private Integer packageID;
 
-    public PurchaseRequestDTO(Integer userID, Integer packageiD) {
-        this.userID = userID;
-        this.packageID = packageiD;
+    public PurchaseRequestDTO() {
     }
 
-    public PurchaseRequestDTO() {
+    public PurchaseRequestDTO(Integer userID, Integer packageID) {
+        this.userID = userID;
+        this.packageID = packageID;
     }
 
     public Integer getUserID() {
@@ -33,9 +33,6 @@ public class PurchaseRequestDTO {
 
     @Override
     public String toString() {
-        return "PurchaseRequestDTO{" +
-                "userID=" + userID +
-                ", packageiD=" + packageID +
-                '}';
+        return "PurchaseRequestDTO{userID=" + userID + ", packageID=" + packageID + '}';
     }
 }

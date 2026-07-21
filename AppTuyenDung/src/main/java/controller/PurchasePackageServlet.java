@@ -2,7 +2,11 @@ package controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dto.ApiResponse;
+import dto.PaymentCreateResponseDTO;
 import dto.PurchaseRequestDTO;
+import dto.ServicePackageDTO;
+import dto.UserVipStatusDTO;
+import exception.BusinessException;
 import service.PaymentService;
 import validator.PaymentValidator;
 
@@ -11,36 +15,108 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.List;
 
-@WebServlet("/api/payment/purchase")
+@WebServlet(urlPatterns = {
+        "/api/payment/packages",
+        "/api/payment/vip-status",
+        "/api/payment/create",
+        "/api/payment/transaction-status"
+})
 public class PurchasePackageServlet extends HttpServlet {
     private final PaymentService paymentService = new PaymentService();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json;charset=UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        String path = request.getServletPath();
+        try {
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("userId") == null) {
+                write(response, HttpServletResponse.SC_UNAUTHORIZED, new ApiResponse<>(false, "Bạn chưa đăng nhập"));
+                return;
+            }
+            Integer userId = (Integer) session.getAttribute("userId");
+            String role = (String) session.getAttribute("role");
+
+            if ("/api/payment/packages".equals(path)) {
+                List<ServicePackageDTO> packages = paymentService.listPackages(role);
+                write(response, 200, new ApiResponse<>(true, "Danh sách gói VIP", packages));
+                return;
+            }
+            if ("/api/payment/vip-status".equals(path)) {
+                UserVipStatusDTO status = paymentService.getVipStatus(userId);
+                write(response, 200, new ApiResponse<>(true, "Trạng thái VIP", status));
+                return;
+            }
+            if ("/api/payment/transaction-status".equals(path)) {
+                String txnRef = request.getParameter("txnRef");
+                var status = paymentService.getTransactionStatus(userId, txnRef);
+                if (status == null) {
+                    write(response, 404, new ApiResponse<>(false, "Không tìm thấy giao dịch"));
+                } else {
+                    write(response, 200, new ApiResponse<>(true, "Trạng thái giao dịch", status));
+                }
+                return;
+            }
+            write(response, 404, new ApiResponse<>(false, "API không tồn tại"));
+        } catch (Exception e) {
+            writeError(response, e);
+        }
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
         response.setContentType("application/json;charset=UTF-8");
-
+        response.setCharacterEncoding("UTF-8");
+        String path = request.getServletPath();
         try {
-            // Đọc luồng dữ liệu JSON từ request body map trực tiếp vào đối tượng DTO vận chuyển qua Jackson
-            PurchaseRequestDTO requestDTO = objectMapper.readValue(request.getReader(), PurchaseRequestDTO.class);
+            HttpSession session = request.getSession(false);
+            if (session == null || session.getAttribute("userId") == null) {
+                write(response, HttpServletResponse.SC_UNAUTHORIZED, new ApiResponse<>(false, "Bạn chưa đăng nhập"));
+                return;
+            }
+            Integer userId = (Integer) session.getAttribute("userId");
+            String role = (String) session.getAttribute("role");
 
-            // 1. Chạy qua bộ kiểm định dữ liệu đầu vào định dạng số
-            PaymentValidator.vadidatePurchaseInput(requestDTO);
+            if ("/api/payment/create".equals(path)) {
+                PurchaseRequestDTO requestDTO = objectMapper.readValue(request.getReader(), PurchaseRequestDTO.class);
+                // Luôn lấy userId từ session — chống IDOR
+                requestDTO.setUserID(userId);
+                PaymentValidator.vadidatePurchaseInput(requestDTO);
 
-            // 2. Chuyển giao luồng dữ liệu xuống tầng nghiệp vụ điều phối giao dịch mua gói Premium
-            paymentService.purchasepackage(requestDTO.getUserID(), requestDTO.getPackageID());
-
-            // 3. Phản hồi cấu trúc đối tượng dữ liệu JSON thành công tiêu chuẩn về phía Client
-            response.setStatus(HttpServletResponse.SC_OK);
-            ApiResponse<Void> apiResponse = new ApiResponse<>(true, "Kích hoạt tính năng Premium Boost thành công! Tài khoản của bạn đã được nâng cấp đặc quyền.");
-            response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
-
+                PaymentCreateResponseDTO data = paymentService.createPayment(
+                        userId, role, requestDTO.getPackageID());
+                write(response, 200, new ApiResponse<>(true, "Tạo phiên thanh toán thành công", data));
+                return;
+            }
+            write(response, 404, new ApiResponse<>(false, "API không tồn tại"));
         } catch (Exception e) {
-            throw new ServletException(e); // Quăng ngoại lệ lên bộ lọc lỗi tập trung ngoài cùng (Filter) xử lý kết xuất
+            writeError(response, e);
         }
+    }
+
+    private void write(HttpServletResponse response, int status, Object body) throws IOException {
+        response.setStatus(status);
+        response.getWriter().write(objectMapper.writeValueAsString(body));
+    }
+
+    private void writeError(HttpServletResponse response, Exception e) throws IOException {
+        if (e instanceof BusinessException.ValidationException) {
+            write(response, 400, new ApiResponse<>(false, e.getMessage()));
+            return;
+        }
+        if (e instanceof BusinessException) {
+            write(response, 400, new ApiResponse<>(false, e.getMessage()));
+            return;
+        }
+        e.printStackTrace();
+        write(response, 500, new ApiResponse<>(false, "Lỗi hệ thống: " + e.getMessage()));
     }
 }

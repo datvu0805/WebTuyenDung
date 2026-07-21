@@ -1,0 +1,16 @@
+{
+  "name": "@fake-bank/openapi",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "echo \"OpenAPI package watch mode is not implemented yet.\"",
+    "test": "echo \"OpenAPI package tests are not implemented yet.\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "redocly lint ../../openapi/openapi.yaml"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^2.37.0",
+    "typescript": "^5.9.3"
+  }
+}

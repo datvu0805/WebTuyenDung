@@ -1,0 +1,90 @@
+name: fake-bank
+
+x-api-image: &api-image
+  image: fake-bank-api:local
+  build:
+    context: ..
+    dockerfile: docker/Dockerfile.api
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: fake-bank-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fake_bank}
+      POSTGRES_USER: ${POSTGRES_USER:-fake_bank}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fake_bank}
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    <<: *api-image
+    environment:
+      DATABASE_URL: postgres://${POSTGRES_USER:-fake_bank}:${POSTGRES_PASSWORD:-fake_bank}@postgres:5432/${POSTGRES_DB:-fake_bank}
+    command:
+      - pnpm
+      - --filter
+      - "@fake-bank/api"
+      - db:migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    <<: *api-image
+    environment:
+      API_HOST: 0.0.0.0
+      API_PORT: 8080
+      API_PUBLIC_BASE_URL: http://127.0.0.1:8080
+      CHECKOUT_PUBLIC_BASE_URL: http://127.0.0.1:5173
+      DATABASE_URL: postgres://${POSTGRES_USER:-fake_bank}:${POSTGRES_PASSWORD:-fake_bank}@postgres:5432/${POSTGRES_DB:-fake_bank}
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:8080/health').then((response)=>{if(!response.ok)process.exit(1)}).catch(()=>process.exit(1))
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+  checkout-ui:
+    image: fake-bank-checkout-ui:local
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.checkout-ui
+    ports:
+      - "127.0.0.1:5173:5173"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - --quiet
+        - --output-document=-
+        - http://127.0.0.1:5173/health
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  postgres-data:

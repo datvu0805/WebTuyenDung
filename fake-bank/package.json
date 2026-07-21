@@ -1,0 +1,33 @@
+{
+  "name": "fake-bank",
+  "version": "0.1.0",
+  "description": "Open-source payment provider simulator with API, hosted checkout and webhook scenarios.",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.0.9",
+  "scripts": {
+    "dev": "pnpm db:migrate && pnpm -r --parallel --if-present dev",
+    "dev:services": "docker compose --env-file .env.example -f docker/docker-compose.yml up -d postgres",
+    "dev:services:down": "docker compose --env-file .env.example -f docker/docker-compose.yml down postgres",
+    "db:migrate": "pnpm --filter @fake-bank/api db:migrate",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "build:checkout": "pnpm --filter @fake-bank/checkout-ui build",
+    "lint:openapi": "redocly lint openapi/openapi.yaml",
+    "lint:migrations": "node scripts/validate-migrations.mjs",
+    "validate": "pnpm lint:openapi && pnpm lint:migrations && pnpm typecheck && pnpm test && pnpm build:checkout"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^2.37.0",
+    "typescript": "^5.9.3"
+  },
+  "keywords": [
+    "payments",
+    "payment-provider",
+    "simulator",
+    "checkout",
+    "webhooks",
+    "openapi"
+  ]
+}

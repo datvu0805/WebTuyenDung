@@ -1,0 +1,552 @@
+openapi: 3.1.0
+info:
+  title: Fake-bank API
+  summary: Payment provider simulator API.
+  description: >
+    Fake-bank exposes a deterministic payment provider simulator API for
+    developer integrations, hosted checkout testing, and webhook lifecycle
+    simulation.
+  version: 0.1.0
+  license:
+    name: Apache-2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+servers:
+  - url: http://localhost:8080
+    description: Local development server
+security: []
+tags:
+  - name: System
+    description: Service status endpoints.
+  - name: Payments
+    description: Create payments, retrieve payment state, and confirm checkout.
+  - name: Webhooks
+    description: Payment lifecycle callback contracts.
+webhooks:
+  paymentEvent:
+    post:
+      tags:
+        - Webhooks
+      summary: Receive a payment lifecycle webhook
+      description: >
+        Webhook payload delivered by Fake-bank to the merchant webhook URL
+        configured when the payment is created.
+      operationId: receivePaymentWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebhookPayload"
+            examples:
+              paymentSucceeded:
+                summary: Payment succeeded event
+                value:
+                  event: payment.succeeded
+                  event_id: event_000001
+                  payment_id: pay_000001
+                  merchant_id: demo-shop
+                  merchant_reference: order_10001
+                  amount: 199.99
+                  currency: EUR
+                  created_at: "2026-07-07T12:01:00Z"
+      responses:
+        "200":
+          description: Webhook accepted by the merchant endpoint.
+paths:
+  /health:
+    get:
+      tags:
+        - System
+      summary: Get service health
+      description: Returns basic API service health status.
+      operationId: getHealth
+      responses:
+        "200":
+          description: API service is healthy.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+  /v1/payments:
+    post:
+      tags:
+        - Payments
+      summary: Create a payment
+      description: >
+        Creates a payment and returns a hosted checkout URL that can be opened
+        by a buyer. The payment starts in the created state and can be advanced
+        by hosted checkout confirmation and selected scenario behavior.
+      operationId: createPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+            examples:
+              cardPayment:
+                summary: Card payment
+                value:
+                  merchant_id: demo-shop
+                  merchant_reference: order_10001
+                  amount: 199.99
+                  currency: EUR
+                  payment_method: card
+                  return_url: https://merchant.example/checkout/return
+                  webhook_url: https://merchant.example/webhooks/payments
+                  scenario: card_success
+      responses:
+        "201":
+          description: Payment created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatePaymentResponse"
+              examples:
+                created:
+                  value:
+                    payment_id: pay_000001
+                    status: created
+                    checkout_url: http://localhost:5173/checkout/pay_000001
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /v1/payments/{payment_id}:
+    get:
+      tags:
+        - Payments
+      summary: Get a payment
+      description: Returns the current payment state and checkout details.
+      operationId: getPayment
+      parameters:
+        - $ref: "#/components/parameters/PaymentId"
+      responses:
+        "200":
+          description: Payment found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+              examples:
+                pending:
+                  value:
+                    payment_id: pay_000001
+                    merchant_id: demo-shop
+                    merchant_reference: order_10001
+                    amount: 199.99
+                    currency: EUR
+                    payment_method: card
+                    status: pending
+                    checkout_url: http://localhost:5173/checkout/pay_000001
+                    return_url: https://merchant.example/checkout/return
+                    webhook_url: https://merchant.example/webhooks/payments
+                    scenario: card_success
+                    created_at: "2026-07-07T12:00:00Z"
+                    updated_at: "2026-07-07T12:00:00Z"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalError"
+  /v1/payments/{payment_id}/confirm:
+    post:
+      tags:
+        - Payments
+      summary: Confirm a payment
+      description: >
+        Confirms a hosted checkout payment with a supported test card. The
+        response contains the resulting payment state for the selected scenario.
+      operationId: confirmPayment
+      parameters:
+        - $ref: "#/components/parameters/PaymentId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConfirmPaymentRequest"
+            examples:
+              successCard:
+                summary: Successful test card
+                value:
+                  payment_method: card
+                  card:
+                    number: "4242424242424242"
+                    expiry: "12/30"
+                    cvv: "123"
+              declinedCard:
+                summary: Declined test card
+                value:
+                  payment_method: card
+                  card:
+                    number: "4000000000000002"
+                    expiry: "12/30"
+                    cvv: "123"
+      responses:
+        "200":
+          description: Payment confirmation result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Payment"
+              examples:
+                succeeded:
+                  value:
+                    payment_id: pay_000001
+                    merchant_id: demo-shop
+                    merchant_reference: order_10001
+                    amount: 199.99
+                    currency: EUR
+                    payment_method: card
+                    status: succeeded
+                    checkout_url: http://localhost:5173/checkout/pay_000001
+                    return_url: https://merchant.example/checkout/return
+                    webhook_url: https://merchant.example/webhooks/payments
+                    scenario: card_success
+                    created_at: "2026-07-07T12:00:00Z"
+                    updated_at: "2026-07-07T12:01:00Z"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalError"
+components:
+  parameters:
+    PaymentId:
+      name: payment_id
+      in: path
+      required: true
+      description: Payment identifier.
+      schema:
+        $ref: "#/components/schemas/PaymentId"
+  responses:
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          examples:
+            invalidRequest:
+              value:
+                error_code: invalid_request
+                message: Request validation failed.
+                request_id: req_000001
+                details:
+                  field: amount
+                  reason: Amount must be greater than zero.
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          examples:
+            notFound:
+              value:
+                error_code: payment_not_found
+                message: Payment was not found.
+                request_id: req_000002
+    Conflict:
+      description: Request conflicts with the current resource state.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          examples:
+            terminalPayment:
+              value:
+                error_code: payment_already_finalized
+                message: Payment is already in a terminal state.
+                request_id: req_000003
+    InternalError:
+      description: Provider simulator error.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          examples:
+            providerError:
+              value:
+                error_code: provider_error
+                message: Provider simulator returned an error.
+                request_id: req_000004
+  schemas:
+    PaymentId:
+      type: string
+      pattern: "^pay_[A-Za-z0-9]+$"
+      example: pay_000001
+    EventId:
+      type: string
+      pattern: "^event_[A-Za-z0-9]+$"
+      example: event_000001
+    RequestId:
+      type: string
+      pattern: "^req_[A-Za-z0-9]+$"
+      example: req_000001
+    PaymentStatus:
+      type: string
+      description: Current payment lifecycle state.
+      enum:
+        - created
+        - pending
+        - succeeded
+        - failed
+    PaymentMethod:
+      type: string
+      description: Payment method selected for the payment.
+      enum:
+        - card
+    Scenario:
+      type: string
+      description: Deterministic simulator behavior selected for the payment.
+      enum:
+        - card_success
+        - card_declined
+        - delayed_success
+        - timeout
+        - duplicate_webhook
+        - provider_error
+    Currency:
+      type: string
+      description: Three-letter currency code for display and integration tests.
+      minLength: 3
+      maxLength: 3
+      pattern: "^[A-Z]{3}$"
+      example: EUR
+    Amount:
+      type: number
+      format: double
+      description: Positive payment amount.
+      exclusiveMinimum: 0
+      example: 199.99
+    CreatePaymentRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - merchant_id
+        - amount
+        - currency
+        - payment_method
+        - return_url
+        - webhook_url
+      properties:
+        merchant_id:
+          type: string
+          description: Merchant identifier used by the integrating application.
+          minLength: 1
+          maxLength: 100
+          example: demo-shop
+        merchant_reference:
+          type: string
+          description: Optional merchant-side reference for matching records in tests.
+          maxLength: 200
+          example: order_10001
+        amount:
+          $ref: "#/components/schemas/Amount"
+        currency:
+          $ref: "#/components/schemas/Currency"
+        payment_method:
+          $ref: "#/components/schemas/PaymentMethod"
+        return_url:
+          type: string
+          format: uri
+          description: URL where the buyer can be returned after checkout.
+          example: https://merchant.example/checkout/return
+        webhook_url:
+          type: string
+          format: uri
+          description: URL that receives payment lifecycle events.
+          example: https://merchant.example/webhooks/payments
+        scenario:
+          $ref: "#/components/schemas/Scenario"
+        metadata:
+          type: object
+          description: Optional merchant-defined test metadata.
+          additionalProperties:
+            type: string
+          example:
+            cart_id: cart_123
+    CreatePaymentResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - payment_id
+        - status
+        - checkout_url
+      properties:
+        payment_id:
+          $ref: "#/components/schemas/PaymentId"
+        status:
+          $ref: "#/components/schemas/PaymentStatus"
+        checkout_url:
+          type: string
+          format: uri
+          description: Hosted checkout URL for the buyer.
+          example: http://localhost:5173/checkout/pay_000001
+    Payment:
+      type: object
+      additionalProperties: false
+      required:
+        - payment_id
+        - merchant_id
+        - amount
+        - currency
+        - payment_method
+        - status
+        - checkout_url
+        - return_url
+        - webhook_url
+        - created_at
+        - updated_at
+      properties:
+        payment_id:
+          $ref: "#/components/schemas/PaymentId"
+        merchant_id:
+          type: string
+          example: demo-shop
+        merchant_reference:
+          type: string
+          example: order_10001
+        amount:
+          $ref: "#/components/schemas/Amount"
+        currency:
+          $ref: "#/components/schemas/Currency"
+        payment_method:
+          $ref: "#/components/schemas/PaymentMethod"
+        status:
+          $ref: "#/components/schemas/PaymentStatus"
+        checkout_url:
+          type: string
+          format: uri
+          example: http://localhost:5173/checkout/pay_000001
+        return_url:
+          type: string
+          format: uri
+          example: https://merchant.example/checkout/return
+        webhook_url:
+          type: string
+          format: uri
+          example: https://merchant.example/webhooks/payments
+        scenario:
+          $ref: "#/components/schemas/Scenario"
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-07-07T12:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          example: "2026-07-07T12:01:00Z"
+    ConfirmPaymentRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - payment_method
+        - card
+      properties:
+        payment_method:
+          $ref: "#/components/schemas/PaymentMethod"
+        card:
+          $ref: "#/components/schemas/TestCard"
+    TestCard:
+      type: object
+      additionalProperties: false
+      required:
+        - number
+        - expiry
+        - cvv
+      properties:
+        number:
+          type: string
+          description: Test card number.
+          pattern: "^[0-9]{12,19}$"
+          example: "4242424242424242"
+        expiry:
+          type: string
+          description: Test card expiry in MM/YY format.
+          pattern: "^(0[1-9]|1[0-2])/[0-9]{2}$"
+          example: "12/30"
+        cvv:
+          type: string
+          description: Test card verification code.
+          pattern: "^[0-9]{3,4}$"
+          example: "123"
+    WebhookEventType:
+      type: string
+      description: Payment lifecycle webhook event name.
+      enum:
+        - payment.succeeded
+        - payment.failed
+    WebhookPayload:
+      type: object
+      additionalProperties: false
+      required:
+        - event
+        - event_id
+        - payment_id
+        - amount
+        - currency
+        - created_at
+      properties:
+        event:
+          $ref: "#/components/schemas/WebhookEventType"
+        event_id:
+          $ref: "#/components/schemas/EventId"
+        payment_id:
+          $ref: "#/components/schemas/PaymentId"
+        merchant_id:
+          type: string
+          example: demo-shop
+        merchant_reference:
+          type: string
+          example: order_10001
+        amount:
+          $ref: "#/components/schemas/Amount"
+        currency:
+          $ref: "#/components/schemas/Currency"
+        created_at:
+          type: string
+          format: date-time
+          example: "2026-07-07T12:01:00Z"
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+        - error_code
+        - message
+        - request_id
+      properties:
+        error_code:
+          type: string
+          description: Stable machine-readable error code.
+          example: invalid_request
+        message:
+          type: string
+          description: Human-readable error message.
+          example: Request validation failed.
+        request_id:
+          $ref: "#/components/schemas/RequestId"
+        details:
+          type: object
+          description: Optional structured error details.
+          additionalProperties: true
+    HealthResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - ok

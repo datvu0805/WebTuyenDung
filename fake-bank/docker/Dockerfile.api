@@ -1,0 +1,24 @@
+FROM node:24-alpine
+
+ENV PNPM_HOME=/pnpm
+ENV COREPACK_HOME=/corepack
+ENV PATH=$PNPM_HOME:$PATH
+
+RUN mkdir -p "$COREPACK_HOME" \
+    && corepack enable \
+    && corepack prepare pnpm@11.0.9 --activate \
+    && chmod -R a+rX "$COREPACK_HOME"
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/api/package.json apps/api/package.json
+
+RUN pnpm install --frozen-lockfile --filter @fake-bank/api...
+
+COPY apps/api apps/api
+COPY db db
+
+USER node
+
+CMD ["pnpm", "--filter", "@fake-bank/api", "exec", "tsx", "src/index.ts"]

@@ -75,6 +75,10 @@ fe-tuyendung/dist/
 # Node / Frontend
 ############################
 fe-tuyendung/node_modules/
+fake-bank/**/node_modules/
+fake-bank/**/dist/
+fake-bank/.pnpm-store/
+fake-bank/**/*.tsbuildinfo
 
 ############################
 # Local configuration

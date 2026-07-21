@@ -1,0 +1,27 @@
+FROM node:24-alpine AS build
+
+ENV PNPM_HOME=/pnpm
+ENV COREPACK_HOME=/corepack
+ENV PATH=$PNPM_HOME:$PATH
+
+RUN mkdir -p "$COREPACK_HOME" \
+    && corepack enable \
+    && corepack prepare pnpm@11.0.9 --activate
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
+COPY apps/checkout-ui/package.json apps/checkout-ui/package.json
+
+RUN pnpm install --frozen-lockfile --filter @fake-bank/checkout-ui...
+
+COPY apps/checkout-ui apps/checkout-ui
+
+RUN pnpm --filter @fake-bank/checkout-ui build
+
+FROM nginx:1.29-alpine
+
+COPY docker/checkout-ui.nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/apps/checkout-ui/dist /usr/share/nginx/html
+
+EXPOSE 5173

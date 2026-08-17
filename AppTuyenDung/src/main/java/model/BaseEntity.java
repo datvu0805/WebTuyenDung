@@ -25,5 +25,5 @@ public abstract class BaseEntity {
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
-    public abstract String getInfo();
+
 }

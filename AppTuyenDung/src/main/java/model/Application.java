@@ -1,8 +1,21 @@
 package model;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 // bảng đơn ứng tuyển
+@Entity
+@Table
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Application extends BaseEntity{
     private Candidates candidateID;
     private Job jodID;
@@ -12,88 +25,4 @@ public class Application extends BaseEntity{
     private String description;
     private int status;
 
-    public Application() {
-    }
-
-    public Application(Candidates candidateID, Job jodID, CV cvID, LocalDateTime appliedAt, String coverLetter, String description, int status) {
-        this.candidateID = candidateID;
-        this.jodID = jodID;
-        this.cvID = cvID;
-        this.appliedAt = appliedAt;
-        this.coverLetter = coverLetter;
-        this.description = description;
-        this.status = status;
-    }
-
-    public Application(int id, Candidates candidateID, Job jodID, CV cvID, LocalDateTime appliedAt, String coverLetter, String description, int status) {
-        super(id);
-        this.candidateID = candidateID;
-        this.jodID = jodID;
-        this.cvID = cvID;
-        this.appliedAt = appliedAt;
-        this.coverLetter = coverLetter;
-        this.description = description;
-        this.status = status;
-    }
-
-    public Candidates getCandidateID() {
-        return candidateID;
-    }
-
-    public void setCandidateID(Candidates candidateID) {
-        this.candidateID = candidateID;
-    }
-
-    public Job getJodID() {
-        return jodID;
-    }
-
-    public void setJodID(Job jodID) {
-        this.jodID = jodID;
-    }
-
-    public CV getCvID() {
-        return cvID;
-    }
-
-    public void setCvID(CV cvID) {
-        this.cvID = cvID;
-    }
-
-    public LocalDateTime getAppliedAt() {
-        return appliedAt;
-    }
-
-    public void setAppliedAt(LocalDateTime appliedAt) {
-        this.appliedAt = appliedAt;
-    }
-
-    public String getCoverLetter() {
-        return coverLetter;
-    }
-
-    public void setCoverLetter(String coverLetter) {
-        this.coverLetter = coverLetter;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    @Override
-    public String getInfo() {
-        return "";
-    }
 }
